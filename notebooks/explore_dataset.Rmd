@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup}
+library("stringr")
+library("here")
+library("Matrix")
+library("magrittr")
+library("data.table")
+library("dplyr")
+
+set.seed(123)
+
+here::i_am("notebooks/explore_dataset.Rmd")
+```
+
+```{r data_loading}
+data_full_meta <- fread(here(
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv")) %>% 
+  rename(cell = V1)
+
+data_full_rownames <- readLines(here(
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_genes.tsv"
+))
+
+data_full_colnames <- readLines(here(
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_barcodes.tsv"
+))
+
+data_full_matrix <- readMM(here(
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"))
+
+data_full_matrix@Dimnames <- list(
+  data_full_rownames,
+  data_full_colnames
+)
+```
+
+```{r data_sampling}
+sample_perc <- 0.001
+
+rnd_row_ind <- nrow(data_full_matrix) %>% 
+  sample(x = seq_len(.), size = sample_perc * .)
+
+rnd_col_ind <- ncol(data_full_matrix) %>% 
+  sample(x = seq_len(.), size = sample_perc * .)
+
+data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
+
+data_subsamp_meta   <- data_full_meta[rnd_col_ind, ]
+```
+
+```{r set_data_used}
+count_mat <- data_subsamp_matrix
+meta      <- data_subsamp_meta
+```
+
+```{r convert_count_mat_to_proto_sigmat}
+# The proto signature matrix counts how often a transcript was found in each
+# cell type
+celltypes <- meta %>% 
+  extract2("celltype_major") %>% 
+  unique()
+
+celltype_cell_map <- lapply(
+  celltypes,
+  function(celltype, meta_df, cell_colname, celltype_colname) {
+    meta_df %>% 
+      filter(if_any(all_of(celltype_colname), ~ .x == celltype)) %>% 
+      as.data.frame() %>% 
+      extract2(cell_colname)
+  },
+  meta, "cell", "celltype_major"
+) %>%
+  set_names(celltypes)
+
+celltype_group <- celltype_cell_map %>%
+  unlist() %>%
+  set_names(str_extract(names(.), "[^0-9]+")) %>% 
+  factor(levels = colnames(count_mat)) %>% 
+  sort() %>% 
+  names()
+
+proto_sigmat <- count_mat %>%
+  t() %>%
+  as.matrix() %>%
+  rowsum(group = celltype_group) %>%
+  as("dgTMatrix") %>%
+  t()
+```
+
+```{r signature_matrix_generation}
+# set threshold for which transcript count is necessary for a transcript to be
+# considered as an indicator for a cell type
+count_thresh <- 1
+```
+
+
+```{r pseudobulk_generation}
+
+```
+
