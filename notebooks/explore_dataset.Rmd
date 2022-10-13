@@ -107,8 +107,26 @@ sigmat <- proto_sigmat %>%
   multiply_by(1)
 ```
 
-
 ```{r pseudobulk_generation}
+n_bulk_cells <- 0.1 * ncol(count_mat)
+bulk_cell_idx <- sample(seq_len(ncol(count_mat)), n_bulk_cells)
+
+bulk_count_mat <- count_mat[, bulk_cell_idx] %>%
+  # FIXME: Decomplicate, this just removes transcripts not found in the
+  # pseudo-bulk
+  extract(which(rowSums(.) > 0), seq_len(ncol(.)))
+
+bulk_transcript_counts <- rowSums(bulk_count_mat)
+
+bulk_cells <- colnames(bulk_count_mat)
+
+bulk_celltype_counts <- celltype_cell_map %>%
+  extract(which(. %in% bulk_cells)) %>%
+  names() %>%
+  table()
+```
+
+```{r deconvolution}
 
 ```
 
