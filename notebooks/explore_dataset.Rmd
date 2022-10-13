@@ -19,6 +19,7 @@ set.seed(123)
 here::i_am("notebooks/explore_dataset.Rmd")
 
 source(here("functions/dedupe_sigmut_mat.R"))
+source(here("functions/rmse.R"))
 ```
 
 ```{r data_loading}
@@ -155,5 +156,25 @@ deconv_props <- deconvolute(
 )$proportions
 ```
 
+```{r compute_deconv_err}
+true_prop_df <- bulk_celltype_counts %>% 
+  as.matrix() %>% 
+  divide_by(sum(.)) %>% 
+  {data.frame(celltype = rownames(.), prop = .)}
+
+deconv_prop_df <- deconv_props %>%
+  as.matrix() %>%
+  extract(i = 1, j = ) %>%
+  {data.frame(celltype = names(.), prop = .)}
+
+all_prop_df <- left_join(
+  true_prop_df,
+  deconv_prop_df,
+  by = "celltype",
+  suffix = c("_true", "_deconv")
+) 
+
+deconv_err <- with(all_prop_df, rmse(prop_true, prop_deconv))
+deconv_err
 ```
 
