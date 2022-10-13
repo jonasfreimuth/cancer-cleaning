@@ -46,10 +46,10 @@ data_full_matrix@Dimnames <- list(
 sample_perc <- 0.001
 
 rnd_row_ind <- nrow(data_full_matrix) %>%
-  sample(x = seq_len(.), size = sample_perc * .)
+  {sample(x = seq_len(.), size = sample_perc * .)}
 
 rnd_col_ind <- ncol(data_full_matrix) %>%
-  sample(x = seq_len(.), size = sample_perc * .)
+  {sample(x = seq_len(.), size = sample_perc * .)}
 
 data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
 
