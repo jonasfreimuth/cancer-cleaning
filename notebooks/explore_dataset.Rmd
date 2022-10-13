@@ -96,6 +96,7 @@ proto_sigmat <- count_mat %>%
 ```{r signature_matrix_generation}
 # set threshold for which transcript count is necessary for a transcript to be
 # considered as an indicator for a cell type
+# TODO: Consider transcript counts as weights.
 count_thresh <- 1
 ```
 
