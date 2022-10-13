@@ -100,6 +100,11 @@ proto_sigmat <- count_mat %>%
 # considered as an indicator for a cell type
 # TODO: Consider transcript counts as weights.
 count_thresh <- 1
+
+sigmat <- proto_sigmat %>%
+  is_weakly_greater_than(count_thresh) %>%
+  # Simple as.numeric() returns a vector.
+  multiply_by(1)
 ```
 
 
