@@ -78,13 +78,13 @@ celltype_cell_map <- lapply(
   },
   meta, "cell", "celltype_major"
 ) %>%
-  set_names(celltypes)
+  set_names(celltypes) %>%
+  unlist() %>%
+  set_names(str_extract(names(.), "[^0-9]+"))
 
 celltype_group <- celltype_cell_map %>%
-  unlist() %>%
-  set_names(str_extract(names(.), "[^0-9]+")) %>% 
-  factor(levels = colnames(count_mat)) %>% 
-  sort() %>% 
+  factor(levels = colnames(count_mat)) %>%
+  sort() %>%
   names()
 
 proto_sigmat <- count_mat %>%
