@@ -12,10 +12,13 @@ library("Matrix")
 library("magrittr")
 library("data.table")
 library("dplyr")
+library("deconvR")
 
 set.seed(123)
 
 here::i_am("notebooks/explore_dataset.Rmd")
+
+source(here("functions/dedupe_sigmut_mat.R"))
 ```
 
 ```{r data_loading}
@@ -126,6 +129,31 @@ bulk_celltype_counts <- celltype_cell_map %>%
 ```
 
 ```{r deconvolution}
+bulk_transcript_idx <- which(
+  rownames(sigmat) %in% names(bulk_transcript_counts)
+)
+
+bulk_sigmat <- sigmat[bulk_transcript_idx, ]
+
+bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
+
+deconv_bulk <- bulk_transcript_counts %>% 
+  {data.frame(
+    IDs = names(.),
+    sample = . / sum(.)
+  )}
+
+deconv_reference <- bulk_sigmat_deduped %>% 
+  as.data.frame() %>% 
+  mutate(IDs = rownames(.)) %>% 
+  select(IDs, everything())
+
+deconv_props <- deconvolute(
+  reference = deconv_reference,
+  bulk = deconv_bulk,
+  model = "nnls"
+)$proportions
+```
 
 ```
 
