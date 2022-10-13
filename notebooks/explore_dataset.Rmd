@@ -20,7 +20,8 @@ here::i_am("notebooks/explore_dataset.Rmd")
 
 ```{r data_loading}
 data_full_meta <- fread(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv")) %>% 
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
+)) %>%
   rename(cell = V1)
 
 data_full_rownames <- readLines(here(
@@ -32,7 +33,8 @@ data_full_colnames <- readLines(here(
 ))
 
 data_full_matrix <- readMM(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"))
+  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"
+))
 
 data_full_matrix@Dimnames <- list(
   data_full_rownames,
@@ -43,35 +45,35 @@ data_full_matrix@Dimnames <- list(
 ```{r data_sampling}
 sample_perc <- 0.001
 
-rnd_row_ind <- nrow(data_full_matrix) %>% 
+rnd_row_ind <- nrow(data_full_matrix) %>%
   sample(x = seq_len(.), size = sample_perc * .)
 
-rnd_col_ind <- ncol(data_full_matrix) %>% 
+rnd_col_ind <- ncol(data_full_matrix) %>%
   sample(x = seq_len(.), size = sample_perc * .)
 
 data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
 
-data_subsamp_meta   <- data_full_meta[rnd_col_ind, ]
+data_subsamp_meta <- data_full_meta[rnd_col_ind, ]
 ```
 
 ```{r set_data_used}
 count_mat <- data_subsamp_matrix
-meta      <- data_subsamp_meta
+meta <- data_subsamp_meta
 ```
 
 ```{r convert_count_mat_to_proto_sigmat}
 # The proto signature matrix counts how often a transcript was found in each
 # cell type
-celltypes <- meta %>% 
-  extract2("celltype_major") %>% 
+celltypes <- meta %>%
+  extract2("celltype_major") %>%
   unique()
 
 celltype_cell_map <- lapply(
   celltypes,
   function(celltype, meta_df, cell_colname, celltype_colname) {
-    meta_df %>% 
-      filter(if_any(all_of(celltype_colname), ~ .x == celltype)) %>% 
-      as.data.frame() %>% 
+    meta_df %>%
+      filter(if_any(all_of(celltype_colname), ~ .x == celltype)) %>%
+      as.data.frame() %>%
       extract2(cell_colname)
   },
   meta, "cell", "celltype_major"
