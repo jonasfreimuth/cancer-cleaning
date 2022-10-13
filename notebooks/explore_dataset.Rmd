@@ -91,7 +91,6 @@ proto_sigmat <- count_mat %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
-  as(., "dgTMatrix") %>%
   t()
 ```
 
