@@ -162,7 +162,10 @@ deconv_prop_list <- pseudobulk_list %>%
   lapply(
     function(pseudobulk, sigmat) {
       transcript_counts <- pseudobulk[["transcript_counts"]]
-      bulk_celltype_counts <- pseudobulk[["celltype_counts"]]
+      celltype_props <- pseudobulk[["celltype_counts"]] %>%
+        as.matrix() %>%
+        divide_by(sum(.))
+
 
       transcript_idx <- which(
         rownames(sigmat) %in% names(transcript_counts)
@@ -196,9 +199,7 @@ deconv_prop_list <- pseudobulk_list %>%
         type = c("output")
       )
 
-      true_prop_df <- bulk_celltype_counts %>%
-        as.matrix() %>%
-        divide_by(sum(.)) %>%
+      true_prop_df <- celltype_props %>%
         {
           data.frame(celltype = rownames(.), prop = .)
         }
@@ -210,14 +211,13 @@ deconv_prop_list <- pseudobulk_list %>%
           data.frame(celltype = names(.), prop = .)
         }
 
-      all_prop_df <- left_join(
+      left_join(
         true_prop_df,
         deconv_prop_df,
         by = "celltype",
         suffix = c("_true", "_deconv")
-      )
-
-      return(all_prop_df)
+      ) %>%
+        return()
     },
     sigmat
   )
