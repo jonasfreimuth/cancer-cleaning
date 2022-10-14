@@ -52,10 +52,14 @@ data_full_matrix@Dimnames <- list(
 sample_perc <- 0.001
 
 rnd_row_ind <- nrow(data_full_matrix) %>%
-  {sample(x = seq_len(.), size = sample_perc * .)}
+  {
+    sample(x = seq_len(.), size = sample_perc * .)
+  }
 
 rnd_col_ind <- ncol(data_full_matrix) %>%
-  {sample(x = seq_len(.), size = sample_perc * .)}
+  {
+    sample(x = seq_len(.), size = sample_perc * .)
+  }
 
 data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
 
@@ -140,15 +144,17 @@ bulk_sigmat <- sigmat[bulk_transcript_idx, ]
 
 bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
 
-deconv_bulk <- bulk_transcript_counts %>% 
-  {data.frame(
-    IDs = names(.),
-    sample = . / sum(.)
-  )}
+deconv_bulk <- bulk_transcript_counts %>%
+  {
+    data.frame(
+      IDs = names(.),
+      sample = . / sum(.)
+    )
+  }
 
-deconv_reference <- bulk_sigmat_deduped %>% 
-  as.data.frame() %>% 
-  mutate(IDs = rownames(.)) %>% 
+deconv_reference <- bulk_sigmat_deduped %>%
+  as.data.frame() %>%
+  mutate(IDs = rownames(.)) %>%
   select(IDs, everything())
 
 deconv_props <- deconvolute(
@@ -159,22 +165,26 @@ deconv_props <- deconvolute(
 ```
 
 ```{r compute_deconv_err}
-true_prop_df <- bulk_celltype_counts %>% 
-  as.matrix() %>% 
-  divide_by(sum(.)) %>% 
-  {data.frame(celltype = rownames(.), prop = .)}
+true_prop_df <- bulk_celltype_counts %>%
+  as.matrix() %>%
+  divide_by(sum(.)) %>%
+  {
+    data.frame(celltype = rownames(.), prop = .)
+  }
 
 deconv_prop_df <- deconv_props %>%
   as.matrix() %>%
   extract(i = 1, j = ) %>%
-  {data.frame(celltype = names(.), prop = .)}
+  {
+    data.frame(celltype = names(.), prop = .)
+  }
 
 all_prop_df <- left_join(
   true_prop_df,
   deconv_prop_df,
   by = "celltype",
   suffix = c("_true", "_deconv")
-) 
+)
 
 deconv_err <- with(all_prop_df, rmse(prop_true, prop_deconv))
 deconv_err
