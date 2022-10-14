@@ -24,6 +24,7 @@ testing <- TRUE
 # considered as an indicator for a cell type
 count_thresh <- 1
 
+pseudobulk_cell_frac <- 0.1
 
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
@@ -116,7 +117,7 @@ sigmat <- proto_sigmat %>%
 
 
 ## ----pseudobulk_generation----------------------------------------------------
-n_bulk_cells <- 0.1 * ncol(count_mat)
+n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
 bulk_cell_idx <- sample(seq_len(ncol(count_mat)), n_bulk_cells)
 
 bulk_count_mat <- count_mat[, bulk_cell_idx] %>%
