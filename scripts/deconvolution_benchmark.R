@@ -17,6 +17,10 @@ source(here("functions/dedupe_sigmut_mat.R"))
 source(here("functions/rmse.R"))
 
 
+## ----parameters --------------------------------------------------------------
+testing <- TRUE
+
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -40,29 +44,30 @@ data_full_matrix@Dimnames <- list(
   data_full_colnames
 )
 
-
-## ----data_sampling------------------------------------------------------------
-sample_perc <- 0.001
-
-rnd_row_ind <- nrow(data_full_matrix) %>%
-  {
-    sample(x = seq_len(.), size = sample_perc * .)
-  }
-
-rnd_col_ind <- ncol(data_full_matrix) %>%
-  {
-    sample(x = seq_len(.), size = sample_perc * .)
-  }
-
-data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
-
-data_subsamp_meta <- data_full_meta[rnd_col_ind, ]
-
-
 ## ----set_data_used------------------------------------------------------------
-count_mat <- data_subsamp_matrix
-meta <- data_subsamp_meta
+if (testing) {
+  sample_perc <- 0.001
 
+  rnd_row_ind <- nrow(data_full_matrix) %>%
+    {
+      sample(x = seq_len(.), size = sample_perc * .)
+    }
+
+  rnd_col_ind <- ncol(data_full_matrix) %>%
+    {
+      sample(x = seq_len(.), size = sample_perc * .)
+    }
+
+  data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
+
+  data_subsamp_meta <- data_full_meta[rnd_col_ind, ]
+
+  count_mat <- data_subsamp_matrix
+  meta <- data_subsamp_meta
+} else {
+  count_mat <- data_full_matrix
+  meta <- data_full_meta
+}
 
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
 # The proto signature matrix counts how often a transcript was found in each
