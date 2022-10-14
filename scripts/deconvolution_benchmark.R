@@ -20,6 +20,10 @@ source(here("functions/rmse.R"))
 ## ----parameters --------------------------------------------------------------
 testing <- TRUE
 
+# set threshold for which transcript count is necessary for a transcript to be
+# considered as an indicator for a cell type
+count_thresh <- 1
+
 
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
@@ -103,10 +107,7 @@ proto_sigmat <- count_mat %>%
 
 
 ## ----signature_matrix_generation----------------------------------------------
-# set threshold for which transcript count is necessary for a transcript to be
-# considered as an indicator for a cell type
 # TODO: Consider transcript counts as weights.
-count_thresh <- 1
 
 sigmat <- proto_sigmat %>%
   is_weakly_greater_than(count_thresh) %>%
