@@ -120,31 +120,48 @@ sigmat <- proto_sigmat %>%
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
 
-# predraw which cells are used in each pseudobulk
-pseudobulk_cell_idx_list <- lapply(
-  rep(list(seq_len(ncol(count_mat))), n_repeat),
-  function(sample_vec, n) {
-    sample(sample_vec, n)
-  },
-  n_bulk_cells
-)
+pseudobulk_list <-
+  # predraw which cells are used in each pseudobulk
+  lapply(
+    rep(list(seq_len(ncol(count_mat))), n_repeat),
+    function(sample_vec, n) {
+      sample(sample_vec, n)
+    },
+    n_bulk_cells
+  ) %>%
+  # actually draw pseudobulks
+  lapply(
+    function(idx_vec, count_mat, celltype_map) {
+      bulk_count_mat <- count_mat[, idx_vec] %>%
+        # FIXME: Decomplicate, this just removes transcripts not found in the
+        # pseudo-bulk
+        extract(which(rowSums(.) > 0), seq_len(ncol(.)))
 
-bulk_count_mat <- count_mat[, pseudobulk_cell_idx_list[[1]]] %>%
-  # FIXME: Decomplicate, this just removes transcripts not found in the
-  # pseudo-bulk
-  extract(which(rowSums(.) > 0), seq_len(ncol(.)))
+      bulk_transcript_counts <- rowSums(bulk_count_mat)
 
-bulk_transcript_counts <- rowSums(bulk_count_mat)
+      bulk_cells <- colnames(bulk_count_mat)
 
-bulk_cells <- colnames(bulk_count_mat)
+      bulk_celltype_counts <- celltype_map %>%
+        extract(which(. %in% bulk_cells)) %>%
+        names() %>%
+        table()
 
-bulk_celltype_counts <- celltype_cell_map %>%
-  extract(which(. %in% bulk_cells)) %>%
-  names() %>%
-  table()
+      return(
+        list(
+          count_mat = bulk_count_mat,
+          transcript_counts = bulk_transcript_counts,
+          celltype_counts = bulk_celltype_counts
+        )
+      )
+    },
+    count_mat, celltype_cell_map
+  )
 
 
 ## ----deconvolution------------------------------------------------------------
+bulk_transcript_counts <- pseudobulk_list[[1]][["transcript_counts"]]
+bulk_count_mat         <- pseudobulk_list[[1]][["count_mat"]]
+bulk_celltype_counts   <- pseudobulk_list[[1]][["celltype_counts"]]
 bulk_transcript_idx <- which(
   rownames(sigmat) %in% names(bulk_transcript_counts)
 )
