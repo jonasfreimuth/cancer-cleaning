@@ -217,19 +217,19 @@ deconv_prop_list <- pseudobulk_list %>%
         by = "celltype",
         suffix = c("_true", "_deconv")
       ) %>%
-        mutate(abs_err = abs(prop_true - prop_deconv)) %>% 
+        mutate(abs_err = abs(prop_true - prop_deconv)) %>%
         return()
     },
     sigmat
   )
 
 ## ----compute_deconv_err-------------------------------------------------------
-deconv_err_vec <- deconv_prop_list %>% 
+deconv_err_vec <- deconv_prop_list %>%
   lapply(
     function(deconv_prop_df) {
       with(deconv_prop_df, rmse(prop_true, prop_deconv))
     }
-  ) %>% 
+  ) %>%
   unlist()
 
 mean(deconv_err_vec)
@@ -249,7 +249,8 @@ all_prop_df %>%
   labs(
     title = paste(
       "Mean sample RMSE:",
-      mean(deconv_err_vec) %>% round(2)),
+      mean(deconv_err_vec) %>% round(2)
+    ),
     x = "Cell types",
     y = "Per celltype RMSE"
   ) +
