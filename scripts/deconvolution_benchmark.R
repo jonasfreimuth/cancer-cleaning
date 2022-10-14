@@ -162,17 +162,17 @@ pseudobulk_list <-
 deconv_prop_list <- pseudobulk_list %>%
   lapply(
     function(pseudobulk, sigmat) {
-      bulk_transcript_counts <- pseudobulk[["transcript_counts"]]
+      transcript_counts <- pseudobulk[["transcript_counts"]]
 
-      bulk_transcript_idx <- which(
-        rownames(sigmat) %in% names(bulk_transcript_counts)
+      transcript_idx <- which(
+        rownames(sigmat) %in% names(transcript_counts)
       )
 
-      bulk_sigmat <- sigmat[bulk_transcript_idx, ]
+      bulk_sigmat <- sigmat[transcript_idx, ]
 
       bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
 
-      deconv_bulk <- bulk_transcript_counts %>%
+      deconv_bulk <- transcript_counts %>%
         {
           data.frame(
             IDs = names(.),
