@@ -1,5 +1,5 @@
 ## ----setup--------------------------------------------------------------------
-library("tidyr")
+library("tidyr", exclude = "extract")
 library("ggplot2")
 library("stringr")
 library("here")
