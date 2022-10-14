@@ -217,6 +217,7 @@ deconv_prop_list <- pseudobulk_list %>%
         by = "celltype",
         suffix = c("_true", "_deconv")
       ) %>%
+        mutate(abs_err = abs(prop_true - prop_deconv)) %>% 
         return()
     },
     sigmat
@@ -234,16 +235,24 @@ deconv_err_vec <- deconv_prop_list %>%
 mean(deconv_err_vec)
 
 ## ----plot_deconv_err----------------------------------------------------------
-all_prop_df <- deconv_prop_list[[1]]
+all_prop_df <- deconv_prop_list %>%
+  bind_rows(.id = "sample") %>%
+  drop_na()
 
 all_prop_df %>%
-  pivot_longer(matches("prop_*"),
-    names_prefix = "prop_",
-    names_to = "source",
-    values_to = "prop"
+  group_by(celltype) %>%
+  summarise(
+    rmse = rmse(prop_true, prop_deconv)
   ) %>%
-  ggplot(aes(celltype, prop, fill = source)) +
+  ggplot(aes(celltype, rmse)) +
   geom_col(alpha = 0.5, position = position_identity()) +
+  labs(
+    title = paste(
+      "Mean sample RMSE:",
+      mean(deconv_err_vec) %>% round(2)),
+    x = "Cell types",
+    y = "Per celltype RMSE"
+  ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
