@@ -148,7 +148,6 @@ pseudobulk_list <-
 
       return(
         list(
-          count_mat = bulk_count_mat,
           transcript_counts = transcript_counts,
           celltype_counts = celltype_counts
         )
@@ -163,7 +162,6 @@ deconv_prop_list <- pseudobulk_list %>%
   lapply(
     function(pseudobulk, sigmat) {
       transcript_counts <- pseudobulk[["transcript_counts"]]
-      bulk_count_mat <- pseudobulk[["count_mat"]]
       bulk_celltype_counts <- pseudobulk[["celltype_counts"]]
 
       transcript_idx <- which(
