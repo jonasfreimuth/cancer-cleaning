@@ -11,7 +11,7 @@ library("deconvR")
 
 set.seed(123)
 
-here::i_am("notebooks/explore_dataset.Rmd")
+here::i_am("scripts/deconvolution_benchmark.R")
 
 source(here("functions/dedupe_sigmut_mat.R"))
 source(here("functions/rmse.R"))
