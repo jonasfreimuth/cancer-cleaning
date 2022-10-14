@@ -159,38 +159,54 @@ pseudobulk_list <-
 
 
 ## ----deconvolution------------------------------------------------------------
-bulk_transcript_counts <- pseudobulk_list[[1]][["transcript_counts"]]
-bulk_count_mat         <- pseudobulk_list[[1]][["count_mat"]]
-bulk_celltype_counts   <- pseudobulk_list[[1]][["celltype_counts"]]
-bulk_transcript_idx <- which(
-  rownames(sigmat) %in% names(bulk_transcript_counts)
-)
+deconv_prop_list <- pseudobulk_list %>%
+  lapply(
+    function(pseudobulk, sigmat) {
+      bulk_transcript_counts <- pseudobulk[["transcript_counts"]]
 
-bulk_sigmat <- sigmat[bulk_transcript_idx, ]
+      bulk_transcript_idx <- which(
+        rownames(sigmat) %in% names(bulk_transcript_counts)
+      )
 
-bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
+      bulk_sigmat <- sigmat[bulk_transcript_idx, ]
 
-deconv_bulk <- bulk_transcript_counts %>%
-  {
-    data.frame(
-      IDs = names(.),
-      sample = . / sum(.)
-    )
-  }
+      bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
 
-deconv_reference <- bulk_sigmat_deduped %>%
-  as.data.frame() %>%
-  mutate(IDs = rownames(.)) %>%
-  select(IDs, everything())
+      deconv_bulk <- bulk_transcript_counts %>%
+        {
+          data.frame(
+            IDs = names(.),
+            sample = . / sum(.)
+          )
+        }
 
-deconv_props <- deconvolute(
-  reference = deconv_reference,
-  bulk = deconv_bulk,
-  model = "nnls"
-)$proportions
+      deconv_reference <- bulk_sigmat_deduped %>%
+        as.data.frame() %>%
+        mutate(IDs = rownames(.)) %>%
+        select(IDs, everything())
 
+      capture.output(
+        suppressMessages(
+          deconv_props <- deconvolute(
+            reference = deconv_reference,
+            bulk = deconv_bulk,
+            model = "nnls"
+          )$proportions
+        ),
+        type = c("output")
+      )
+
+      return(deconv_props)
+    },
+    sigmat
+  )
 
 ## ----compute_deconv_err-------------------------------------------------------
+bulk_count_mat <- pseudobulk[["count_mat"]]
+bulk_celltype_counts <- pseudobulk[["celltype_counts"]]
+
+deconv_props <- deconv_prop_list[[1]]
+
 true_prop_df <- bulk_celltype_counts %>%
   as.matrix() %>%
   divide_by(sum(.)) %>%
