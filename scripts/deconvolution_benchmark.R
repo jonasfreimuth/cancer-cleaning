@@ -223,13 +223,19 @@ deconv_prop_list <- pseudobulk_list %>%
   )
 
 ## ----compute_deconv_err-------------------------------------------------------
-all_prop_df <- deconv_prop_list[[1]]
+deconv_err_vec <- deconv_prop_list %>% 
+  lapply(
+    function(deconv_prop_df) {
+      with(deconv_prop_df, rmse(prop_true, prop_deconv))
+    }
+  ) %>% 
+  unlist()
 
-deconv_err <- with(all_prop_df, rmse(prop_true, prop_deconv))
-deconv_err
-
+mean(deconv_err_vec)
 
 ## ----plot_deconv_err----------------------------------------------------------
+all_prop_df <- deconv_prop_list[[1]]
+
 all_prop_df %>%
   pivot_longer(matches("prop_*"),
     names_prefix = "prop_",
