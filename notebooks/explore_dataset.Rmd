@@ -6,6 +6,8 @@ editor_options:
 ---
 
 ```{r setup}
+library("tidyr")
+library("ggplot2")
 library("stringr")
 library("here")
 library("Matrix")
@@ -176,5 +178,18 @@ all_prop_df <- left_join(
 
 deconv_err <- with(all_prop_df, rmse(prop_true, prop_deconv))
 deconv_err
+```
+
+```{r plot_deconv_err}
+all_prop_df %>%
+  pivot_longer(matches("prop_*"),
+    names_prefix = "prop_",
+    names_to = "source",
+    values_to = "prop"
+  ) %>%
+  ggplot(aes(celltype, prop, fill = source)) +
+  geom_col(alpha = 0.5, position = position_identity()) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
