@@ -24,6 +24,7 @@ testing <- TRUE
 # considered as an indicator for a cell type
 count_thresh <- 1
 
+n_repeat <- 10
 pseudobulk_cell_frac <- 0.1
 
 ## ----data_loading-------------------------------------------------------------
@@ -118,9 +119,17 @@ sigmat <- proto_sigmat %>%
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
-bulk_cell_idx <- sample(seq_len(ncol(count_mat)), n_bulk_cells)
 
-bulk_count_mat <- count_mat[, bulk_cell_idx] %>%
+# predraw which cells are used in each pseudobulk
+pseudobulk_cell_idx_list <- lapply(
+  rep(list(seq_len(ncol(count_mat))), n_repeat),
+  function(sample_vec, n) {
+    sample(sample_vec, n)
+  },
+  n_bulk_cells
+)
+
+bulk_count_mat <- count_mat[, pseudobulk_cell_idx_list[[1]]] %>%
   # FIXME: Decomplicate, this just removes transcripts not found in the
   # pseudo-bulk
   extract(which(rowSums(.) > 0), seq_len(ncol(.)))
