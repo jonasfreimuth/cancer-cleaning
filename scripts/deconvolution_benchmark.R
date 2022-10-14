@@ -137,11 +137,11 @@ pseudobulk_list <-
         # pseudo-bulk
         extract(which(rowSums(.) > 0), seq_len(ncol(.)))
 
-      bulk_transcript_counts <- rowSums(bulk_count_mat)
+      transcript_counts <- rowSums(bulk_count_mat)
 
       bulk_cells <- colnames(bulk_count_mat)
 
-      bulk_celltype_counts <- celltype_map %>%
+      celltype_counts <- celltype_map %>%
         extract(which(. %in% bulk_cells)) %>%
         names() %>%
         table()
@@ -149,8 +149,8 @@ pseudobulk_list <-
       return(
         list(
           count_mat = bulk_count_mat,
-          transcript_counts = bulk_transcript_counts,
-          celltype_counts = bulk_celltype_counts
+          transcript_counts = transcript_counts,
+          celltype_counts = celltype_counts
         )
       )
     },
