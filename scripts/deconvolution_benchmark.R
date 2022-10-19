@@ -143,6 +143,11 @@ sigmat <- proto_sigmat %>%
   # Simple as.numeric() returns a vector.
   multiply_by(1)
 
+deconv_ref <- sigmat %>%
+  dedupe_sigmut_mat() %>%
+  as.data.frame() %>%
+  mutate(IDs = rownames(.)) %>%
+  select(IDs, everything())
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
@@ -191,15 +196,6 @@ deconv_prop_list <- pseudobulk_list %>%
         as.matrix() %>%
         divide_by(sum(.))
 
-
-      transcript_idx <- which(
-        rownames(sigmat) %in% names(transcript_counts)
-      )
-
-      bulk_sigmat <- sigmat[transcript_idx, ]
-
-      bulk_sigmat_deduped <- dedupe_sigmut_mat(bulk_sigmat)
-
       deconv_bulk <- transcript_counts %>%
         {
           data.frame(
@@ -208,15 +204,10 @@ deconv_prop_list <- pseudobulk_list %>%
           )
         }
 
-      deconv_reference <- bulk_sigmat_deduped %>%
-        as.data.frame() %>%
-        mutate(IDs = rownames(.)) %>%
-        select(IDs, everything())
-
       capture.output(
         suppressMessages(
           deconv_props <- deconvolute(
-            reference = deconv_reference,
+            reference = deconv_ref,
             bulk = deconv_bulk,
             model = "nnls"
           )$proportions
