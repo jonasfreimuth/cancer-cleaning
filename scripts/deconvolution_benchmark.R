@@ -81,6 +81,25 @@ if (testing) {
   meta <- data_full_meta
 }
 
+count_mat <- count_mat %>%
+  apply(
+    2,
+    function(count_row) {
+      row_sum <- sum(count_row)
+
+      # Remove rows without transcripts (might happen if down sampling)
+      if (row_sum == 0) {
+        return(NULL)
+      }
+
+      # log normalize counts
+      count_row <- log((count_row / row_sum) + 1)
+
+      return(count_row)
+    },
+    simplify = TRUE
+  )
+
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
 # The proto signature matrix counts how often a transcript was found in each
 # cell type
