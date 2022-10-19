@@ -162,10 +162,7 @@ pseudobulk_list <-
   # actually draw pseudobulks
   lapply(
     function(idx_vec, count_mat, celltype_map) {
-      bulk_count_mat <- count_mat[, idx_vec] %>%
-        # FIXME: Decomplicate, this just removes transcripts not found in the
-        # pseudo-bulk
-        extract(which(rowSums(.) > 0), seq_len(ncol(.)))
+      bulk_count_mat <- count_mat[, idx_vec]
 
       transcript_counts <- rowSums(bulk_count_mat)
 
