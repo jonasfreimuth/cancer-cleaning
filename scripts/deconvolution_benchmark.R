@@ -23,7 +23,7 @@ testing <- TRUE
 # set threshold for which transcript count is necessary for a transcript to be
 # considered as an indicator for a cell type (strict greater than, applied
 # after normalization)
-count_thresh <- 1
+count_thresh <- 50
 
 n_repeat <- 50
 pseudobulk_cell_frac <- 0.1
