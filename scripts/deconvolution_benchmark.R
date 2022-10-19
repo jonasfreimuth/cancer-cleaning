@@ -21,7 +21,8 @@ source(here("functions/rmse.R"))
 testing <- TRUE
 
 # set threshold for which transcript count is necessary for a transcript to be
-# considered as an indicator for a cell type
+# considered as an indicator for a cell type (strict greater than, applied
+# after normalization)
 count_thresh <- 1
 
 n_repeat <- 50
@@ -138,7 +139,7 @@ proto_sigmat <- count_mat %>%
 # TODO: Consider transcript counts as weights.
 
 sigmat <- proto_sigmat %>%
-  is_weakly_greater_than(count_thresh) %>%
+  is_greater_than(count_thresh) %>%
   # Simple as.numeric() returns a vector.
   multiply_by(1)
 
