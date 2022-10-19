@@ -25,7 +25,7 @@ testing <- TRUE
 # after normalization)
 count_thresh <- 50
 
-n_repeat <- 50
+n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
 ## ----data_loading-------------------------------------------------------------
