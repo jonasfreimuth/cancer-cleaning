@@ -25,7 +25,6 @@
         "r-dyngen"
         "wget"
         "coreutils"
-        "rstudio-server"
         "git"
         "bash"
         "findutils"
