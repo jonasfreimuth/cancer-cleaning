@@ -41,14 +41,17 @@ data_full_colnames <- readLines(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_barcodes.tsv"
 ))
 
-data_full_matrix <- readMM(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"
-))
+# FIXME Turn this hack for saving time into something robust
+if (!exists("data_full_matrix")) {
+  data_full_matrix <- readMM(here(
+    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"
+  ))
 
-data_full_matrix@Dimnames <- list(
-  data_full_rownames,
-  data_full_colnames
-)
+  data_full_matrix@Dimnames <- list(
+    data_full_rownames,
+    data_full_colnames
+  )
+}
 
 ## ----set_data_used------------------------------------------------------------
 if (testing) {
@@ -64,7 +67,10 @@ if (testing) {
       sample(x = seq_len(.), size = sample_perc * .)
     }
 
-  data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
+  # FIXME Turn this hack for saving time into something robust
+  if (!exists("data_subsamp_matrix")) {
+    data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
+  }
 
   data_subsamp_meta <- data_full_meta[rnd_col_ind, ]
 
