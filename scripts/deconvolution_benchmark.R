@@ -55,7 +55,7 @@ if (!exists("data_full_matrix")) {
 
 ## ----set_data_used------------------------------------------------------------
 if (testing) {
-  sample_perc <- 0.001
+  sample_perc <- 0.01
 
   rnd_row_ind <- nrow(data_full_matrix) %>%
     {
