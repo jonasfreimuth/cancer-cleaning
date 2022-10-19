@@ -24,7 +24,7 @@ testing <- TRUE
 # considered as an indicator for a cell type
 count_thresh <- 1
 
-n_repeat <- 10
+n_repeat <- 50
 pseudobulk_cell_frac <- 0.1
 
 ## ----data_loading-------------------------------------------------------------
