@@ -72,7 +72,8 @@ if (testing) {
     data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
   }
 
-  data_subsamp_meta <- data_full_meta[rnd_col_ind, ]
+  data_subsamp_meta <- data_full_meta %>%
+    filter(cell %in% colnames(data_subsamp_matrix))
 
   count_mat <- data_subsamp_matrix
   meta <- data_subsamp_meta
