@@ -93,7 +93,7 @@ count_mat <- count_mat %>%
       }
 
       # log normalize counts
-      count_row <- log((count_row / row_sum) + 1)
+      count_row <- log((count_row / row_sum) + 1) * 10 ^ 4
 
       return(count_row)
     },
