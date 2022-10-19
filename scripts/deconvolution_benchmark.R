@@ -150,9 +150,7 @@ pseudobulk_list <-
   # predraw which cells are used in each pseudobulk
   lapply(
     rep(list(seq_len(ncol(count_mat))), n_repeat),
-    function(sample_vec, n) {
-      sample(sample_vec, n)
-    },
+    sample,
     n_bulk_cells
   ) %>%
   # actually draw pseudobulks
