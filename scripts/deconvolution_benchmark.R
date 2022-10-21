@@ -100,6 +100,53 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
   )
 }
 
+deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
+  transcript_counts <- pseudobulk[["transcript_counts"]]
+  celltype_props <- pseudobulk[["celltype_counts"]] %>%
+    as.matrix() %>%
+    divide_by(sum(.))
+
+  deconv_bulk <- transcript_counts %>%
+    {
+      data.frame(
+        IDs = names(.),
+        sample = . / sum(.)
+      )
+    }
+
+  capture.output(
+    suppressMessages(
+      deconv_props <- deconvolute(
+        reference = deconv_ref,
+        bulk = deconv_bulk,
+        model = "nnls"
+      )$proportions
+    ),
+    type = c("output")
+  )
+
+  true_prop_df <- celltype_props %>%
+    {
+      data.frame(celltype = rownames(.), prop = .)
+    }
+
+  deconv_prop_df <- deconv_props %>%
+    as.matrix() %>%
+    extract(i = 1, j = ) %>%
+    {
+      data.frame(celltype = names(.), prop = .)
+    }
+
+  left_join(
+    true_prop_df,
+    deconv_prop_df,
+    by = "celltype",
+    suffix = c("_true", "_deconv")
+  ) %>%
+    mutate(abs_err = abs(prop_true - prop_deconv)) %>%
+    return()
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -227,52 +274,7 @@ pseudobulk_list <-
 ## ----deconvolution------------------------------------------------------------
 deconv_prop_list <- pseudobulk_list %>%
   lapply(
-    function(pseudobulk, sigmat) {
-      transcript_counts <- pseudobulk[["transcript_counts"]]
-      celltype_props <- pseudobulk[["celltype_counts"]] %>%
-        as.matrix() %>%
-        divide_by(sum(.))
-
-      deconv_bulk <- transcript_counts %>%
-        {
-          data.frame(
-            IDs = names(.),
-            sample = . / sum(.)
-          )
-        }
-
-      capture.output(
-        suppressMessages(
-          deconv_props <- deconvolute(
-            reference = deconv_ref,
-            bulk = deconv_bulk,
-            model = "nnls"
-          )$proportions
-        ),
-        type = c("output")
-      )
-
-      true_prop_df <- celltype_props %>%
-        {
-          data.frame(celltype = rownames(.), prop = .)
-        }
-
-      deconv_prop_df <- deconv_props %>%
-        as.matrix() %>%
-        extract(i = 1, j = ) %>%
-        {
-          data.frame(celltype = names(.), prop = .)
-        }
-
-      left_join(
-        true_prop_df,
-        deconv_prop_df,
-        by = "celltype",
-        suffix = c("_true", "_deconv")
-      ) %>%
-        mutate(abs_err = abs(prop_true - prop_deconv)) %>%
-        return()
-    },
+    deconvolute_pseudobulk,
     sigmat
   )
 
