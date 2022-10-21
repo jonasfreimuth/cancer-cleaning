@@ -72,6 +72,14 @@ uniquify_sigmat <- function(sigmat) {
   return(sigmat[unique_transcript_idx_vec, ])
 }
 
+create_celltype_map <- function(celltype, meta_df, cell_colname,
+                                celltype_colname) {
+  meta_df %>%
+    filter(if_any(all_of(celltype_colname), ~ .x == celltype)) %>%
+    as.data.frame() %>%
+    extract2(cell_colname)
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -143,12 +151,7 @@ celltypes <- meta %>%
 
 celltype_cell_map <- lapply(
   celltypes,
-  function(celltype, meta_df, cell_colname, celltype_colname) {
-    meta_df %>%
-      filter(if_any(all_of(celltype_colname), ~ .x == celltype)) %>%
-      as.data.frame() %>%
-      extract2(cell_colname)
-  },
+  create_celltype_map,
   meta, "cell", "celltype_major"
 ) %>%
   set_names(celltypes) %>%
