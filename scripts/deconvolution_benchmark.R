@@ -20,10 +20,12 @@ source(here("functions/rmse.R"))
 ## ----parameters --------------------------------------------------------------
 testing <- TRUE
 
-# set threshold for which transcript count is necessary for a transcript to be
-# considered as an indicator for a cell type (strict greater than, applied
-# after normalization)
-count_thresh <- 50
+# # set threshold for which transcript count is necessary for a transcript to be
+# # considered as an indicator for a cell type (strict greater than, applied
+# # after normalization)
+# count_thresh <- 50
+# Step size for exploring the effect of the count threshold
+count_thresh_step_frac <- 0.1
 
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
@@ -277,11 +279,29 @@ proto_sigmat <- count_mat %>%
   t()
 
 
+count_range <- proto_sigmat %>%
+  as.vector() %>%
+  range()
+
+count_thresh_vec <- seq_base(
+  count_range[1],
+  count_range[2],
+  count_thresh_step_frac
+) %>%
+  set_names(as.character(.))
+
+
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Explore effects of sigmat threshold
 
-sigmat <- sigmat_from_thresh(count_thresh, proto_sigmat)
+sigmat_list <- lapply(
+  count_thresh_vec,
+  sigmat_from_thresh,
+  proto_sigmat = proto_sigmat
+)
+
+sigmat <- sigmat_list[1]
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
