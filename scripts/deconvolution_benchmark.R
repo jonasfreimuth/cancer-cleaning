@@ -28,6 +28,21 @@ count_thresh <- 50
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
+## ----functions ---------------------------------------------------------------
+lognorm_row <- function(count_row) {
+  row_sum <- sum(count_row)
+
+  # Remove rows without transcripts (might happen if down sampling)
+  if (row_sum == 0) {
+    return(NULL)
+  }
+
+  # log normalize counts
+  count_row <- log((count_row / row_sum) + 1) * 10^4
+
+  return(count_row)
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -86,19 +101,7 @@ if (testing) {
 count_mat <- count_mat %>%
   apply(
     2,
-    function(count_row) {
-      row_sum <- sum(count_row)
-
-      # Remove rows without transcripts (might happen if down sampling)
-      if (row_sum == 0) {
-        return(NULL)
-      }
-
-      # log normalize counts
-      count_row <- log((count_row / row_sum) + 1) * 10 ^ 4
-
-      return(count_row)
-    },
+    lognorm_row,
     simplify = TRUE
   )
 
