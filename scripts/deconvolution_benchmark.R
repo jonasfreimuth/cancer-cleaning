@@ -90,7 +90,10 @@ uniquify_sigmat <- function(sigmat) {
       .row_is_identifiying
     )
 
-  return(sigmat[unique_transcript_idx_vec, ])
+  # if only one row is selected, we would get a vector
+  sigmat_unique <- sigmat[unique_transcript_idx_vec, , drop = FALSE]
+
+  return(sigmat_unique)
 }
 
 create_celltype_map <- function(celltype, meta_df, cell_colname,
