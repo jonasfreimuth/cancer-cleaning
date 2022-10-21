@@ -171,7 +171,9 @@ uniquify_sigmat <- function(sigmat) {
 sigmat <- proto_sigmat %>%
   is_greater_than(count_thresh) %>%
   # Simple as.numeric() returns a vector.
-  multiply_by(1)
+  multiply_by(1) %>%
+  uniquify_sigmat()
+
 
 deconv_ref <- sigmat %>%
   dedupe_sigmut_mat() %>%
