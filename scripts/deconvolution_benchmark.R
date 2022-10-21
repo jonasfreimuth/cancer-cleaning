@@ -43,6 +43,27 @@ lognorm_row <- function(count_row, base = 10) {
   return(count_row)
 }
 
+seq_base <- function(start, stop, step_frac, base = 10) {
+  in_vec <- c(start, stop)
+  zero_ind_vec <- in_vec == 0
+  if (any(zero_ind_vec)) {
+    in_vec[zero_ind_vec] <- in_vec[zero_ind_vec] + 10^-16
+
+    start <- in_vec[1]
+    stop <- in_vec[2]
+  }
+
+
+  start_base <- log(start, base = base)
+  stop_base <- log(stop, base = base)
+
+  seq_len <- stop_base - start_base
+  step_size <- seq_len * step_frac
+  step_seq <- seq(from = start_base, to = stop_base, by = step_size)
+
+  return(base^step_seq)
+}
+
 uniquify_sigmat <- function(sigmat) {
   .row_is_identifiying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
