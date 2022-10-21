@@ -96,6 +96,22 @@ uniquify_sigmat <- function(sigmat) {
   return(sigmat_unique)
 }
 
+sigmat_from_thresh <- function(count_thresh, proto_sigmat) {
+  sigmat <- proto_sigmat %>%
+    is_greater_than(count_thresh) %>%
+    # Simple as.numeric() returns a vector.
+    multiply_by(1) %>%
+    uniquify_sigmat()
+
+  deconv_ref <- sigmat %>%
+    dedupe_sigmut_mat() %>%
+    as.data.frame() %>%
+    mutate(IDs = rownames(.)) %>%
+    select(IDs, everything())
+
+  return(deconv_ref)
+}
+
 create_celltype_map <- function(celltype, meta_df, cell_colname,
                                 celltype_colname) {
   meta_df %>%
@@ -265,18 +281,7 @@ proto_sigmat <- count_mat %>%
 # TODO: Consider transcript counts as weights.
 # TODO: Explore effects of sigmat threshold
 
-sigmat <- proto_sigmat %>%
-  is_greater_than(count_thresh) %>%
-  # Simple as.numeric() returns a vector.
-  multiply_by(1) %>%
-  uniquify_sigmat()
-
-
-deconv_ref <- sigmat %>%
-  dedupe_sigmut_mat() %>%
-  as.data.frame() %>%
-  mutate(IDs = rownames(.)) %>%
-  select(IDs, everything())
+sigmat <- sigmat_from_thresh(count_thresh, proto_sigmat)
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
