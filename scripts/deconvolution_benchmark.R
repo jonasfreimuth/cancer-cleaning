@@ -277,7 +277,7 @@ deconv_err_vec <- deconv_prop_list %>%
   ) %>%
   unlist()
 
-mean(deconv_err_vec)
+print(mean(deconv_err_vec))
 
 ## ----plot_deconv_err----------------------------------------------------------
 all_prop_df <- deconv_prop_list %>%
