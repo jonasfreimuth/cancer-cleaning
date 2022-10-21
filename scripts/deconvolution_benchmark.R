@@ -43,6 +43,35 @@ lognorm_row <- function(count_row) {
   return(count_row)
 }
 
+uniquify_sigmat <- function(sigmat) {
+  .row_is_identifiying <- function(row, frac = 0) {
+    # Determine if a row can be used to identify a column. Whether or not that
+    # is the case is determined by whether a fraction of elements is non-zero.
+    # The fraction maps to the number of elements which is at minimum 1 and
+    # at maximum the length of the row.
+    len <- length(row)
+    len_out <- len * frac
+
+    if (len_out < 1) {
+      len_out <- 1
+    } else if (len_out > len) {
+      len_out <- len
+    }
+
+    row_sum <- sum(row > 0)
+
+    row_sum <= len_out && row_sum > 0
+  }
+
+  unique_transcript_idx_vec <- sigmat %>%
+    apply(
+      1,
+      .row_is_identifiying
+    )
+
+  return(sigmat[unique_transcript_idx_vec, ])
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -141,35 +170,6 @@ proto_sigmat <- count_mat %>%
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Explore effects of sigmat threshold
-
-uniquify_sigmat <- function(sigmat) {
-  .row_is_identifiying <- function(row, frac = 0) {
-    # Determine if a row can be used to identify a column. Whether or not that
-    # is the case is determined by whether a fraction of elements is non-zero.
-    # The fraction maps to the number of elements which is at minimum 1 and
-    # at maximum the length of the row.
-    len <- length(row)
-    len_out <- len * frac
-
-    if (len_out < 1) {
-      len_out <- 1
-    } else if (len_out > len) {
-      len_out <- len
-    }
-
-    row_sum <- sum(row > 0)
-
-    row_sum <= len_out && row_sum > 0
-  }
-
-  unique_transcript_idx_vec <- sigmat %>%
-    apply(
-      1,
-      .row_is_identifiying
-    )
-
-  return(sigmat[unique_transcript_idx_vec, ])
-}
 
 sigmat <- proto_sigmat %>%
   is_greater_than(count_thresh) %>%
