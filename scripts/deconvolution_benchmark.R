@@ -80,6 +80,26 @@ create_celltype_map <- function(celltype, meta_df, cell_colname,
     extract2(cell_colname)
 }
 
+pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
+  bulk_count_mat <- count_mat[, idx_vec]
+
+  transcript_counts <- rowSums(bulk_count_mat)
+
+  bulk_cells <- colnames(bulk_count_mat)
+
+  celltype_counts <- celltype_map %>%
+    extract(which(. %in% bulk_cells)) %>%
+    names() %>%
+    table()
+
+  return(
+    list(
+      transcript_counts = transcript_counts,
+      celltype_counts = celltype_counts
+    )
+  )
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -199,25 +219,7 @@ pseudobulk_list <-
   ) %>%
   # actually draw pseudobulks
   lapply(
-    function(idx_vec, count_mat, celltype_map) {
-      bulk_count_mat <- count_mat[, idx_vec]
-
-      transcript_counts <- rowSums(bulk_count_mat)
-
-      bulk_cells <- colnames(bulk_count_mat)
-
-      celltype_counts <- celltype_map %>%
-        extract(which(. %in% bulk_cells)) %>%
-        names() %>%
-        table()
-
-      return(
-        list(
-          transcript_counts = transcript_counts,
-          celltype_counts = celltype_counts
-        )
-      )
-    },
+    pseudobulk_from_idx,
     count_mat, celltype_cell_map
   )
 
