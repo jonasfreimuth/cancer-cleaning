@@ -29,7 +29,7 @@ n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
 ## ----functions ---------------------------------------------------------------
-lognorm_row <- function(count_row) {
+lognorm_row <- function(count_row, base = 10) {
   row_sum <- sum(count_row)
 
   # Remove rows without transcripts (might happen if down sampling)
@@ -38,7 +38,7 @@ lognorm_row <- function(count_row) {
   }
 
   # log normalize counts
-  count_row <- log((count_row / row_sum) + 1) * 10^4
+  count_row <- log((count_row / row_sum) + 1, base = base) * 10^4
 
   return(count_row)
 }
