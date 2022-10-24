@@ -14,6 +14,12 @@ dedupe_sigmut_mat <- function(sigmut_mat, var_sep = "_") {
   #   * The input matrix with identical columns and their colnames merged.
   #   * A list of character vectors, giving names of variants which have equal
   #     cols.
+
+  # Handle case of only one col present (might get read as a vector)
+  if (is.null(dim(sigmut_mat))) {
+    return(sigmut_mat)
+  }
+
   variant_names <- colnames(sigmut_mat)
 
   is_dupe <- duplicated(sigmut_mat, MARGIN = 2)
