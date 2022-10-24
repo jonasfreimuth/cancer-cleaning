@@ -321,42 +321,66 @@ pseudobulk_list <-
 
 
 ## ----deconvolution------------------------------------------------------------
-deconv_prop_list <- pseudobulk_list %>%
-  lapply(
-    deconvolute_pseudobulk,
-    sigmat
-  )
+deconv_res_list <- lapply(
+  sigmat_list,
+  function(sigmat, pseudobulk_list) {
+    deconv_prop_list <- pseudobulk_list %>%
+      lapply(
+        deconvolute_pseudobulk,
+        sigmat
+      )
 
-## ----compute_deconv_err-------------------------------------------------------
-deconv_err_vec <- deconv_prop_list %>%
-  lapply(
-    function(deconv_prop_df) {
-      with(deconv_prop_df, rmse(prop_true, prop_deconv))
-    }
-  ) %>%
-  unlist()
+    ## ----compute_deconv_err---------------------------------------------------
+    deconv_err_vec <- deconv_prop_list %>%
+      lapply(
+        function(deconv_prop_df) {
+          with(deconv_prop_df, rmse(prop_true, prop_deconv))
+        }
+      ) %>%
+      unlist()
 
-print(mean(deconv_err_vec))
+    # This was down to ~0.15 once, but that was when due to the indexing error
+    # during full matrix subsampling only a few cells matched between count_mat
+    # and meta_data
+    print(mean(deconv_err_vec))
+
+    all_prop_df <- deconv_prop_list %>%
+      bind_rows(.id = "sample") %>%
+      drop_na()
+
+    return(list(
+      "errors" = deconv_err_vec,
+      "deconv_res" = all_prop_df
+    ))
+  },
+  pseudobulk_list
+)
+
 
 ## ----plot_deconv_err----------------------------------------------------------
-all_prop_df <- deconv_prop_list %>%
-  bind_rows(.id = "sample") %>%
-  drop_na()
+plot_list <- lapply(
+  deconv_res_list,
+  function(deconv_res) {
+    all_prop_df <- deconv_res[["deconv_res"]]
+    deconv_err_vec <- deconv_res[["errors"]]
 
-all_prop_df %>%
-  group_by(celltype) %>%
-  summarise(
-    rmse = rmse(prop_true, prop_deconv)
-  ) %>%
-  ggplot(aes(celltype, rmse)) +
-  geom_col(alpha = 0.5, position = position_identity()) +
-  labs(
-    title = paste(
-      "Mean sample RMSE:",
-      mean(deconv_err_vec) %>% round(2)
-    ),
-    x = "Cell types",
-    y = "Per celltype RMSE"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+    all_prop_df %>%
+      group_by(celltype) %>%
+      summarise(
+        rmse = rmse(prop_true, prop_deconv)
+      ) %>%
+      ggplot(aes(celltype, rmse)) +
+      geom_col(alpha = 0.5, position = position_identity()) +
+      labs(
+        title = paste(
+          "Mean sample RMSE:",
+          mean(deconv_err_vec) %>% round(2)
+        ),
+        x = "Cell types",
+        y = "Per celltype RMSE"
+      ) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  }
+)
