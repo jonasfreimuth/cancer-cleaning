@@ -159,7 +159,7 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
   capture.output(
     suppressMessages(
       deconv_props <- deconvolute(
-        reference = deconv_ref,
+        reference = sigmat,
         bulk = deconv_bulk,
         model = "nnls"
       )$proportions
