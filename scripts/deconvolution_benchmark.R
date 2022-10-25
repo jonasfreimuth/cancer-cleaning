@@ -21,11 +21,10 @@ source(here("functions/rmse.R"))
 ## ----parameters --------------------------------------------------------------
 testing <- TRUE
 
-# # set threshold for which transcript count is necessary for a transcript to be
-# # considered as an indicator for a cell type (strict greater than, applied
-# # after normalization)
-# count_thresh <- 50
-# Step size for exploring the effect of the count threshold
+# Step size for exploring the effect of the count threshold, i.e. the threshold
+# for which transcript count is necessary for a transcript to be considered as
+# an indicator for a cell type (strict greater than, applied after
+# normalization)
 count_thresh_step_frac <- 0.1
 
 n_repeat <- 200
