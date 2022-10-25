@@ -31,6 +31,61 @@ n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
 ## ----functions ---------------------------------------------------------------
+load_experiment <- function(count_mat_file, rowname_file, colname_file,
+                            meta_file, testing) {
+  # FIXME Make this function more general
+  data_full_meta <- fread(meta_file) %>%
+    rename(cell = V1)
+
+  data_full_rownames <- readLines(rowname_file)
+
+  data_full_colnames <- readLines(colname_file)
+
+  # FIXME Turn this hack for saving time into something robust
+  if (!exists("data_full_matrix")) {
+    data_full_matrix <- readMM(count_mat_file)
+
+    data_full_matrix@Dimnames <- list(
+      data_full_rownames,
+      data_full_colnames
+    )
+  }
+
+  ## ----set_data_used----------------------------------------------------------
+  if (testing) {
+    sample_perc <- 0.01
+
+    rnd_row_ind <- nrow(data_full_matrix) %>%
+      {
+        sample(x = seq_len(.), size = sample_perc * .)
+      }
+
+    rnd_col_ind <- ncol(data_full_matrix) %>%
+      {
+        sample(x = seq_len(.), size = sample_perc * .)
+      }
+
+    # FIXME Turn this hack for saving time into something robust
+    if (!exists("data_subsamp_matrix")) {
+      data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
+    }
+
+    data_subsamp_meta <- data_full_meta %>%
+      filter(cell %in% colnames(data_subsamp_matrix))
+
+    count_mat <- data_subsamp_matrix
+    meta <- data_subsamp_meta
+  } else {
+    count_mat <- data_full_matrix
+    meta <- data_full_meta
+  }
+
+  return(list(
+    count_mat = count_mat,
+    meta = meta
+  ))
+}
+
 lognorm_row <- function(count_row, base = 10) {
   row_sum <- sum(count_row)
 
@@ -261,59 +316,24 @@ plot_deconv_res <- function(deconv_res) {
 }
 
 ## ----data_loading-------------------------------------------------------------
-data_full_meta <- fread(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
-)) %>%
-  rename(cell = V1)
-
-data_full_rownames <- readLines(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_genes.tsv"
-))
-
-data_full_colnames <- readLines(here(
-  "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_barcodes.tsv"
-))
-
-# FIXME Turn this hack for saving time into something robust
-if (!exists("data_full_matrix")) {
-  data_full_matrix <- readMM(here(
+data <- load_experiment(
+  count_mat_file = here(
     "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"
-  ))
+  ),
+  rowname_file = here(
+    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_genes.tsv"
+  ),
+  colname_file = here(
+    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_barcodes.tsv"
+  ),
+  meta_file = here(
+    "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
+  ),
+  testing = testing
+)
 
-  data_full_matrix@Dimnames <- list(
-    data_full_rownames,
-    data_full_colnames
-  )
-}
-
-## ----set_data_used------------------------------------------------------------
-if (testing) {
-  sample_perc <- 0.01
-
-  rnd_row_ind <- nrow(data_full_matrix) %>%
-    {
-      sample(x = seq_len(.), size = sample_perc * .)
-    }
-
-  rnd_col_ind <- ncol(data_full_matrix) %>%
-    {
-      sample(x = seq_len(.), size = sample_perc * .)
-    }
-
-  # FIXME Turn this hack for saving time into something robust
-  if (!exists("data_subsamp_matrix")) {
-    data_subsamp_matrix <- data_full_matrix[rnd_row_ind, rnd_col_ind]
-  }
-
-  data_subsamp_meta <- data_full_meta %>%
-    filter(cell %in% colnames(data_subsamp_matrix))
-
-  count_mat <- data_subsamp_matrix
-  meta <- data_subsamp_meta
-} else {
-  count_mat <- data_full_matrix
-  meta <- data_full_meta
-}
+count_mat <- data$count_mat
+meta <- data$meta
 
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
 # The proto signature matrix counts how often a transcript was found in each
