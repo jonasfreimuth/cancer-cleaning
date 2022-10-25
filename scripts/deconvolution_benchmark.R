@@ -1,4 +1,5 @@
 ## ----setup--------------------------------------------------------------------
+library("scuttle")
 library("tidyr", exclude = "extract")
 library("ggplot2")
 library("stringr")
@@ -260,11 +261,7 @@ if (testing) {
 }
 
 count_mat <- count_mat %>%
-  apply(
-    2,
-    lognorm_row,
-    simplify = TRUE
-  )
+  scuttle::calculateTPM()
 
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
 # The proto signature matrix counts how often a transcript was found in each
