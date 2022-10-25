@@ -139,7 +139,8 @@ create_celltype_map <- function(celltype, meta_df, cell_colname,
 }
 
 pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
-  bulk_count_mat <- count_mat[, idx_vec]
+  bulk_count_mat <- count_mat[, idx_vec] %>%
+    scuttle::calculateTPM()
 
   transcript_counts <- rowSums(bulk_count_mat)
 
@@ -260,9 +261,6 @@ if (testing) {
   meta <- data_full_meta
 }
 
-count_mat <- count_mat %>%
-  scuttle::calculateTPM()
-
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
 # The proto signature matrix counts how often a transcript was found in each
 # cell type
@@ -285,6 +283,7 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
+  scuttle::calculateTPM() %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
