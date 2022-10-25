@@ -255,15 +255,25 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
     type = c("output")
   )
 
+  sigmat <- deconv_ref %>%
+    select(-IDs) %>%
+    as.matrix()
+
+  dp_vec <- deconv_props %>%
+    as.matrix() %>%
+    extract(i = 1, j = )
+
+  transcript_props_pred <- sigmat %*% dp_vec
+
+  deconv_resid <- transcript_props - transcript_props_pred
+
   true_prop_df <- celltype_props %>%
     {
       data.frame(celltype = rownames(.), prop = .)
     } %>%
     separate_rows(celltype, sep = "_")
 
-  deconv_prop_df <- deconv_props %>%
-    as.matrix() %>%
-    extract(i = 1, j = ) %>%
+  deconv_prop_df <- dp_vec %>%
     {
       data.frame(celltype = names(.), prop = .)
     }
