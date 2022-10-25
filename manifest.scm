@@ -7,6 +7,7 @@
 (specifications->manifest
   (list "r-guix-install"
         "libxml2"
+        "r-scuttle"
         "r-seurat"
         "r-rstudioapi"
         "r-miniui"
