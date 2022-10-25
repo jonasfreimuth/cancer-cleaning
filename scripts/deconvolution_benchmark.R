@@ -248,7 +248,8 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
   true_prop_df <- celltype_props %>%
     {
       data.frame(celltype = rownames(.), prop = .)
-    }
+    } %>%
+    separate_rows(celltype, sep = "_")
 
   deconv_prop_df <- deconv_props %>%
     as.matrix() %>%
