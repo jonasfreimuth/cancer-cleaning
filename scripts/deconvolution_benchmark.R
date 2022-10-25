@@ -165,7 +165,7 @@ uniquify_sigmat <- function(sigmat) {
 }
 
 
-sigmat_from_thresh <- function(count_thresh, proto_sigmat) {
+reference_from_thresh <- function(count_thresh, proto_sigmat) {
   sigmat <- proto_sigmat %>%
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.
@@ -228,9 +228,9 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
 }
 
 
-deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
+deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
   transcript_props <- pseudobulk[["transcript_counts"]] %>%
-    extract(names(.) %in% sigmat$IDs) %>%
+    extract(names(.) %in% deconv_ref$IDs) %>%
     divide_by(sum(.))
   celltype_props <- pseudobulk[["celltype_counts"]] %>%
     as.matrix() %>%
@@ -247,7 +247,7 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
   capture.output(
     suppressMessages(
       deconv_props <- deconvolute(
-        reference = sigmat,
+        reference = deconv_ref,
         bulk = deconv_bulk,
         model = "qp"
       )$proportions
@@ -275,7 +275,7 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
     suffix = c("_true", "_deconv")
   ) %>%
     # ctypes not found in deconv output (likely due to them not having cols
-    # uniquely identifying them in the sigmat) should be set to 0 to be able
+    # uniquely identifying them in the deconv_ref) should be set to 0 to be able
     # to still compute errors properly.
     # TODO Does this make sense? Is this comparable to using Others col, and
     # should that maybe be preferred visavis cancer prop calculation from
@@ -289,11 +289,11 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
 }
 
 
-benchmark_sigmat <- function(sigmat, pseudobulk_list) {
+benchmark_reference <- function(deconv_ref, pseudobulk_list) {
   deconv_prop_list <- pseudobulk_list %>%
     lapply(
       deconvolute_pseudobulk,
-      sigmat
+      deconv_ref
     )
 
   ## ----compute_deconv_err---------------------------------------------------
@@ -431,17 +431,17 @@ count_thresh_vec <- 7323
 # TODO: Add others?
 # TODO: Do the residual computation and correlate with actual cancer prop
 
-sigmat_list <- lapply(
+deconv_ref_list <- lapply(
   count_thresh_vec,
-  sigmat_from_thresh,
+  reference_from_thresh,
   proto_sigmat = proto_sigmat
 )
 
-is_null_sigmat <- lapply(sigmat_list, is.null) %>%
+is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
 
-sigmat_list <- sigmat_list %>%
-  extract(!is_null_sigmat)
+deconv_ref_list <- deconv_ref_list %>%
+  extract(!is_null_reference)
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
@@ -462,8 +462,8 @@ pseudobulk_list <-
 
 ## ----deconvolution------------------------------------------------------------
 deconv_res_list <- lapply(
-  sigmat_list,
-  benchmark_sigmat,
+  deconv_ref_list,
+  benchmark_reference,
   pseudobulk_list
 )
 
