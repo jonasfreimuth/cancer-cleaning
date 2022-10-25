@@ -178,7 +178,7 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
       deconv_props <- deconvolute(
         reference = sigmat,
         bulk = deconv_bulk,
-        model = "nnls"
+        model = "qp"
       )$proportions
     ),
     type = c("output")
