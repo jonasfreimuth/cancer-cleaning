@@ -296,6 +296,7 @@ proto_sigmat <- count_mat %>%
 
 count_range <- proto_sigmat %>%
   as.vector() %>%
+  extract(. > 0) %>%
   range()
 
 count_thresh_vec <- seq_base(
@@ -303,6 +304,9 @@ count_thresh_vec <- seq_base(
   count_range[2],
   count_thresh_step_frac
 ) %>%
+  {
+    c(0, .)
+  } %>%
   set_names(as.character(.))
 
 
