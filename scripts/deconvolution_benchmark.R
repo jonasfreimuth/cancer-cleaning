@@ -262,7 +262,10 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
     by = "celltype",
     suffix = c("_true", "_deconv")
   ) %>%
-    mutate(abs_err = abs(prop_true - prop_deconv)) %>%
+    mutate(
+      abs_err = abs(prop_true - prop_deconv),
+      n_ctypes = nrow(deconv_prop_df)
+    ) %>%
     return()
 }
 
