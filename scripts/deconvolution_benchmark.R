@@ -375,16 +375,24 @@ count_mat <- count_mat %>%
   as.matrix()
 
 
-count_thresh_vec <- seq_base(
-  count_range[1],
-  count_range[2],
-  count_thresh_step_frac
-) %>%
-  {
-    c(0, .)
-  } %>%
-  set_names(as.character(.))
+# count_range <- proto_sigmat %>%
+#   as.vector() %>%
+#   extract(. > 0) %>%
+#   range()
+#
+# count_thresh_vec <- seq_base(
+#   count_range[1],
+#   count_range[2],
+#   count_thresh_step_frac,
+#   base = 3
+# ) %>%
+#   {
+#     c(0, .)
+#   } %>%
+#   set_names(as.character(.))
 
+# temp solution
+count_thresh_vec <- 7323
 
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
