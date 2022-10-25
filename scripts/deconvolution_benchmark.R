@@ -278,7 +278,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
       data.frame(celltype = names(.), prop = .)
     }
 
-  full_join(
+  deconv_res <- full_join(
     true_prop_df,
     deconv_prop_df,
     by = "celltype",
@@ -294,18 +294,26 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
     mutate(
       abs_err = abs(prop_true - prop_deconv),
       n_ctypes = nrow(deconv_prop_df)
-    ) %>%
-    return()
+    )
+
+  return(list(
+    res = deconv_res,
+    residuals = deconv_resid
+  ))
 }
 
 
 benchmark_reference <- function(deconv_ref, pseudobulk_list) {
-  deconv_prop_list <- pseudobulk_list %>%
+  deconv_res_list <- pseudobulk_list %>%
     lapply(
       deconvolute_pseudobulk,
       deconv_ref
     )
 
+  deconv_prop_list <- deconv_res_list %>%
+    lapply(function(deconv_res) {
+      deconv_res$res
+    })
   ## ----compute_deconv_err---------------------------------------------------
   deconv_err_vec <- deconv_prop_list %>%
     lapply(
