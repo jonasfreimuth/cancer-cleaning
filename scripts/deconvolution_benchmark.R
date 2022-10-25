@@ -310,6 +310,8 @@ count_thresh_vec <- seq_base(
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Explore effects of sigmat threshold
+# TODO: Add others?
+# TODO: Do the residual computation and correlate with actual cancer prop
 
 sigmat_list <- lapply(
   count_thresh_vec,
