@@ -86,6 +86,7 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
   ))
 }
 
+
 lognorm_row <- function(count_row, base = 10) {
   row_sum <- sum(count_row)
 
@@ -99,6 +100,7 @@ lognorm_row <- function(count_row, base = 10) {
 
   return(count_row)
 }
+
 
 seq_base <- function(start, stop, step_frac, base = 10) {
   in_vec <- c(start, stop)
@@ -153,6 +155,7 @@ uniquify_sigmat <- function(sigmat) {
   return(sigmat_unique)
 }
 
+
 sigmat_from_thresh <- function(count_thresh, proto_sigmat) {
   sigmat <- proto_sigmat %>%
     is_greater_than(count_thresh) %>%
@@ -184,6 +187,7 @@ sigmat_from_thresh <- function(count_thresh, proto_sigmat) {
   return(deconv_ref)
 }
 
+
 create_celltype_map <- function(celltype, meta_df, cell_colname,
                                 celltype_colname) {
   meta_df %>%
@@ -191,6 +195,7 @@ create_celltype_map <- function(celltype, meta_df, cell_colname,
     as.data.frame() %>%
     extract2(cell_colname)
 }
+
 
 pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
   bulk_count_mat <- count_mat[, idx_vec] %>%
@@ -212,6 +217,7 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
     )
   )
 }
+
 
 deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
   transcript_counts <- pseudobulk[["transcript_counts"]]
@@ -260,6 +266,7 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
     return()
 }
 
+
 benchmark_sigmat <- function(sigmat, pseudobulk_list) {
   deconv_prop_list <- pseudobulk_list %>%
     lapply(
@@ -290,6 +297,7 @@ benchmark_sigmat <- function(sigmat, pseudobulk_list) {
     "deconv_res" = all_prop_df
   ))
 }
+
 
 plot_deconv_res <- function(deconv_res) {
   all_prop_df <- deconv_res[["deconv_res"]]
