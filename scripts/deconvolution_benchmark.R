@@ -103,10 +103,25 @@ sigmat_from_thresh <- function(count_thresh, proto_sigmat) {
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.
     multiply_by(1) %>%
-    uniquify_sigmat()
+    uniquify_sigmat() %>%
+    dedupe_sigmut_mat()
+
+  # sigmats with colSums equal 0 lead to deconv troubles
+  # TODO check what problems this causes, e.g. leading to
+  # 1 or 0 col sigmats.
+  col_sums <- colSums(sigmat)
+
+  sigmat <- sigmat[, col_sums > 0, drop = FALSE]
+
+  if (!ncol(sigmat) < nrow(sigmat)) {
+    warning(paste0(
+      "Threshold ", count_thresh, " produced a non-tall signature matrix, ",
+      "NULL returned instead. (Will likely be filtered out downstream.)"
+    ))
+    return(NULL)
+  }
 
   deconv_ref <- sigmat %>%
-    dedupe_sigmut_mat() %>%
     as.data.frame() %>%
     mutate(IDs = rownames(.)) %>%
     select(IDs, everything())
@@ -301,7 +316,11 @@ sigmat_list <- lapply(
   proto_sigmat = proto_sigmat
 )
 
-sigmat <- sigmat_list[1]
+is_null_sigmat <- lapply(sigmat_list, is.null) %>%
+  unlist()
+
+sigmat_list <- sigmat_list %>%
+  extract(!is_null_sigmat)
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
