@@ -205,6 +205,37 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
     return()
 }
 
+benchmark_sigmat <- function(sigmat, pseudobulk_list) {
+  deconv_prop_list <- pseudobulk_list %>%
+    lapply(
+      deconvolute_pseudobulk,
+      sigmat
+    )
+
+  ## ----compute_deconv_err---------------------------------------------------
+  deconv_err_vec <- deconv_prop_list %>%
+    lapply(
+      function(deconv_prop_df) {
+        with(deconv_prop_df, rmse(prop_true, prop_deconv))
+      }
+    ) %>%
+    unlist()
+
+  # This was down to ~0.15 once, but that was when due to the indexing error
+  # during full matrix subsampling only a few cells matched between count_mat
+  # and meta_data
+  print(mean(deconv_err_vec))
+
+  all_prop_df <- deconv_prop_list %>%
+    bind_rows(.id = "sample") %>%
+    drop_na()
+
+  return(list(
+    "errors" = deconv_err_vec,
+    "deconv_res" = all_prop_df
+  ))
+}
+
 ## ----data_loading-------------------------------------------------------------
 data_full_meta <- fread(here(
   "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
@@ -343,36 +374,7 @@ pseudobulk_list <-
 ## ----deconvolution------------------------------------------------------------
 deconv_res_list <- lapply(
   sigmat_list,
-  function(sigmat, pseudobulk_list) {
-    deconv_prop_list <- pseudobulk_list %>%
-      lapply(
-        deconvolute_pseudobulk,
-        sigmat
-      )
-
-    ## ----compute_deconv_err---------------------------------------------------
-    deconv_err_vec <- deconv_prop_list %>%
-      lapply(
-        function(deconv_prop_df) {
-          with(deconv_prop_df, rmse(prop_true, prop_deconv))
-        }
-      ) %>%
-      unlist()
-
-    # This was down to ~0.15 once, but that was when due to the indexing error
-    # during full matrix subsampling only a few cells matched between count_mat
-    # and meta_data
-    print(mean(deconv_err_vec))
-
-    all_prop_df <- deconv_prop_list %>%
-      bind_rows(.id = "sample") %>%
-      drop_na()
-
-    return(list(
-      "errors" = deconv_err_vec,
-      "deconv_res" = all_prop_df
-    ))
-  },
+  benchmark_sigmat,
   pseudobulk_list
 )
 
