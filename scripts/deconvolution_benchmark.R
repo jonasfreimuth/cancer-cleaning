@@ -220,16 +220,17 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
 
 
 deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
-  transcript_counts <- pseudobulk[["transcript_counts"]]
+  transcript_props <- pseudobulk[["transcript_counts"]] %>%
+    divide_by(sum(.))
   celltype_props <- pseudobulk[["celltype_counts"]] %>%
     as.matrix() %>%
     divide_by(sum(.))
 
-  deconv_bulk <- transcript_counts %>%
+  deconv_bulk <- transcript_props %>%
     {
       data.frame(
         IDs = names(.),
-        sample = . / sum(.)
+        sample = .
       )
     }
 
