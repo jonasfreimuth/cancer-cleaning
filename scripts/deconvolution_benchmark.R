@@ -287,9 +287,6 @@ benchmark_sigmat <- function(sigmat, pseudobulk_list) {
     ) %>%
     unlist()
 
-  # This was down to ~0.15 once, but that was when due to the indexing error
-  # during full matrix subsampling only a few cells matched between count_mat
-  # and meta_data
   print(mean(deconv_err_vec))
 
   all_prop_df <- deconv_prop_list %>%
