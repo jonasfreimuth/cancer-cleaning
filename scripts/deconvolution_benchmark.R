@@ -258,12 +258,19 @@ deconvolute_pseudobulk <- function(pseudobulk, sigmat) {
       data.frame(celltype = names(.), prop = .)
     }
 
-  left_join(
+  full_join(
     true_prop_df,
     deconv_prop_df,
     by = "celltype",
     suffix = c("_true", "_deconv")
   ) %>%
+    # ctypes not found in deconv output (likely due to them not having cols
+    # uniquely identifying them in the sigmat) should be set to 0 to be able
+    # to still compute errors properly.
+    # TODO Does this make sense? Is this comparable to using Others col, and
+    # should that maybe be preferred visavis cancer prop calculation from
+    # residuals?
+    mutate(across(matches("prop_*"), ~ replace_na(.x, 0))) %>%
     mutate(
       abs_err = abs(prop_true - prop_deconv),
       n_ctypes = nrow(deconv_prop_df)
