@@ -295,9 +295,21 @@ benchmark_sigmat <- function(sigmat, pseudobulk_list) {
     bind_rows(.id = "sample") %>%
     drop_na()
 
+  all_prop_sum_df <- all_prop_df %>%
+    group_by(sample) %>%
+    summarise(
+      across(all_of(c(
+        "prop_true", "prop_deconv"
+      )), sum),
+      med_abs_err = median(abs_err),
+      unq_n_ct = paste(unique(n_ctypes), sep = "_"),
+      rmse = rmse(prop_true, prop_deconv)
+    )
+
   return(list(
     "errors" = deconv_err_vec,
-    "deconv_res" = all_prop_df
+    "deconv_res" = all_prop_df,
+    "deconv_sum" = all_prop_sum_df
   ))
 }
 
