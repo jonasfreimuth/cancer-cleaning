@@ -5,7 +5,9 @@
 ;; See the "Replicating Guix" section in the manual.
 
 (specifications->manifest
-  (list "r-seurat"
+  (list "r-guix-install"
+        "libxml2"
+        "r-seurat"
         "r-rstudioapi"
         "r-miniui"
         "r-styler"
@@ -17,9 +19,7 @@
         "r-data-table"
         "r-dplyr"
         "r-deconvr"
-        "libxml2"
         "r-rcurl"
-        "r-guix-install"
         "lzlib"
         "r-tidyverse"
         "r-dyngen"
@@ -29,7 +29,6 @@
         "bash"
         "findutils"
         "guix"
-        "libxml2"
         "zlib"
         "curl"
         "openssl"
@@ -54,6 +53,5 @@
         "python-pip"
         "python"
         "r"
-        "r-guix-install"
         "glibc-locales"
         "nss-certs"))
