@@ -30,6 +30,15 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
+cat(paste0(
+  "\nRun params:\n",
+  "\tTest run: ", testing, "\n",
+  "\tCount matrix threshold step size: ", count_thresh_step_frac, "\n",
+  "\tNumber of repeat samplings: ", n_repeat, "\n",
+  "\tFraction of ground truth sampled per pseudobulk: ", pseudobulk_cell_frac,
+  "\n"
+))
+
 ## ----functions ---------------------------------------------------------------
 load_experiment <- function(count_mat_file, rowname_file, colname_file,
                             meta_file, testing) {
