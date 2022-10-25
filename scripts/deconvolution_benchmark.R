@@ -371,11 +371,9 @@ proto_sigmat <- count_mat %>%
   rowsum(group = celltype_group) %>%
   t()
 
+count_mat <- count_mat %>%
+  as.matrix()
 
-count_range <- proto_sigmat %>%
-  as.vector() %>%
-  extract(. > 0) %>%
-  range()
 
 count_thresh_vec <- seq_base(
   count_range[1],
