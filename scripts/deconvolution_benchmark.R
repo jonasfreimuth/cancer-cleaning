@@ -132,6 +132,7 @@ seq_base <- function(start, stop, step_frac, base = 10) {
   return(base^step_seq)
 }
 
+
 uniquify_sigmat <- function(sigmat) {
   .row_is_identifiying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
