@@ -356,6 +356,33 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       deconv_res$res
     })
 
+  # Compute deconvolution errors
+  deconv_err_vec <- deconv_prop_list %>%
+    lapply(
+      function(deconv_prop_df) {
+        with(deconv_prop_df, rmse(prop_true, prop_deconv))
+      }
+    ) %>%
+    unlist()
+
+  print(mean(deconv_err_vec))
+
+  # Generate overall result df
+  all_prop_df <- deconv_prop_list %>%
+    bind_rows(.id = "sample")
+
+  all_prop_sum_df <- all_prop_df %>%
+    group_by(sample) %>%
+    summarise(
+      across(all_of(c(
+        "prop_true", "prop_deconv"
+      )), sum),
+      med_abs_err = median(abs_err),
+      unq_n_ct = paste(unique(n_ctypes), sep = "_"),
+      rmse = rmse(prop_true, prop_deconv)
+    )
+
+  # Summarize residuals
   deconv_residuals_df <- deconv_res_list %>%
     lapply(function(deconv_res) {
       deconv_res$residuals %>%
@@ -375,30 +402,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       sum_abs_resid = sum(abs(residual))
     )
 
-  deconv_err_vec <- deconv_prop_list %>%
-    lapply(
-      function(deconv_prop_df) {
-        with(deconv_prop_df, rmse(prop_true, prop_deconv))
-      }
-    ) %>%
-    unlist()
-
-  print(mean(deconv_err_vec))
-
-  all_prop_df <- deconv_prop_list %>%
-    bind_rows(.id = "sample")
-
-  all_prop_sum_df <- all_prop_df %>%
-    group_by(sample) %>%
-    summarise(
-      across(all_of(c(
-        "prop_true", "prop_deconv"
-      )), sum),
-      med_abs_err = median(abs_err),
-      unq_n_ct = paste(unique(n_ctypes), sep = "_"),
-      rmse = rmse(prop_true, prop_deconv)
-    )
-
+  # Compute cancer comp df
   cancer_prop_from_resid_df <- deconv_res_list %>%
     lapply(function(deconv_res) {
       deconv_res$cancer_prop
