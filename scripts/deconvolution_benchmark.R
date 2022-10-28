@@ -503,9 +503,7 @@ count_thresh_vec <- 7323
 
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
-# TODO: Explore effects of sigmat threshold
-# TODO: Add others?
-# TODO: Do the residual computation and correlate with actual cancer prop
+# TODO: Add Others col?
 
 deconv_ref_list <- lapply(
   count_thresh_vec,
