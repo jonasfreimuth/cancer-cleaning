@@ -537,15 +537,130 @@ pseudobulk_list <-
 
 
 ## ----deconvolution------------------------------------------------------------
-deconv_res_list <- lapply(
+deconv_res_list_split <- lapply(
   deconv_ref_list,
   benchmark_reference,
-  pseudobulk_list
+  pseudobulk_list,
+  split_cancer = TRUE
 )
 
+deconv_res_list_nosplit <- lapply(
+  deconv_ref_list,
+  benchmark_reference,
+  pseudobulk_list,
+  split_cancer = FALSE
+)
+
+mean_rmses <- c(
+  deconv_res_list_split[[1]] %>%
+    extract2("errors") %>%
+    mean(),
+  deconv_res_list_nosplit[[1]] %>%
+    extract2("errors") %>%
+    mean()
+) %>%
+  {
+    data.frame(
+      split = c(TRUE, FALSE),
+      mean_rmse = .
+    )
+  }
+
+cancer_comp_df <- bind_rows(
+  deconv_res_list_split[[1]] %>%
+    extract2("cancer_comp") %>%
+    mutate(split = TRUE),
+  deconv_res_list_nosplit[[1]] %>%
+    extract2("cancer_comp") %>%
+    mutate(split = FALSE)
+)
+
+cor_meth <- "pearson"
+
+cancer_comp_df_sum <- cancer_comp_df %>%
+  group_by(split) %>%
+  summarize(
+    cor_resid_by_sigmat = cor(prop_true, by_sigmat, method = cor_meth),
+    cor_resid_by_transcr_prop = cor(
+      prop_true, by_transcr_prop,
+      method = cor_meth
+    ),
+    cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
+    cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth)
+  ) %>%
+  left_join(mean_rmses, by = "split")
+
+print(cancer_comp_df_sum)
+
+corr_cols <- c(
+  "by_sigmat" = "cor_resid_by_sigmat",
+  "by_transcr_prop" = "cor_resid_by_transcr_prop",
+  "sum_sq_resid" = "cor_sum_sq_res",
+  "sum_abs_resid" = "cor_sum_abs_res"
+)
+
+split_vals <- unique(cancer_comp_df$split)
+
+opar <- par(
+  mfrow = c(
+    length(split_vals),
+    length(corr_cols)
+  ),
+  oma = c(0, 3, 0, 0)
+)
+
+for (split in split_vals) {
+  for (col in names(corr_cols)) {
+    split_df_ind <- cancer_comp_df$split == split
+    split_sum_ind <- cancer_comp_df_sum$split == split
+
+    x <- cancer_comp_df$prop_true[split_df_ind]
+    y <- cancer_comp_df[[col]][split_df_ind]
+
+    prefix <- ""
+
+    if (cor_meth %in% c("spearman", "kendall")) {
+      x <- rank(x)
+      y <- rank(y)
+
+      prefix <- "Rank of "
+    }
+
+    plot(
+      x, y,
+      main = round(cancer_comp_df_sum[[corr_cols[col]]][split_sum_ind], 3),
+      xlab = paste0(prefix, "True cancer proportion"),
+      ylab = paste0(prefix, col)
+    )
+  }
+}
+
+mtext(
+  paste("Cancer cells split from signature matrix",
+    paste(rev(split_vals), collapse = "\t\t\t"),
+    sep = "\n"
+  ),
+  side = 2, outer = TRUE
+)
+
+par(opar)
+
+benchmark_plot <- ggdraw() +
+  draw_plot(recordPlot())
+
+dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
+
+png(here("plots/benchmark_plot.png"),
+  width = 20, height = 10, units = "in",
+  res = 300
+)
+
+print(benchmark_plot)
+
+dev.off()
 
 ## ----plot_deconv_err----------------------------------------------------------
 plot_list <- lapply(
-  deconv_res_list,
+  deconv_res_list_no_split,
   plot_deconv_res
 )
