@@ -554,48 +554,59 @@ pseudobulk_list <-
 
 
 ## ----deconvolution------------------------------------------------------------
-deconv_res_list_split <- lapply(
-  deconv_ref_list,
-  benchmark_reference,
-  pseudobulk_list,
-  split_cancer = TRUE
-)
+split_vals <- c(TRUE, FALSE)
 
-deconv_res_list_nosplit <- lapply(
-  deconv_ref_list,
-  benchmark_reference,
-  pseudobulk_list,
-  split_cancer = FALSE
-)
-
-mean_rmses <- c(
-  deconv_res_list_split[[1]] %>%
-    extract2("errors") %>%
-    mean(),
-  deconv_res_list_nosplit[[1]] %>%
-    extract2("errors") %>%
-    mean()
-) %>%
-  {
-    data.frame(
-      split = c(TRUE, FALSE),
-      mean_rmse = .
+split_res_list <- lapply(
+  split_vals,
+  function(split) {
+    lapply(
+      deconv_ref_list,
+      benchmark_reference,
+      pseudobulk_list,
+      split_cancer = split
     )
   }
+) %>%
+  set_names(split_vals)
 
-cancer_comp_df <- bind_rows(
-  deconv_res_list_split[[1]] %>%
-    extract2("cancer_comp") %>%
-    mutate(split = TRUE),
-  deconv_res_list_nosplit[[1]] %>%
-    extract2("cancer_comp") %>%
-    mutate(split = FALSE)
-)
+mean_rmses <- split_res_list %>%
+  lapply(
+    function(split_res) {
+      split_res %>%
+        lapply(
+          function(deconv_res) {
+            deconv_res %>%
+              extract2("errors") %>%
+              mean() %>%
+              {
+                data.frame(mean_rmse = .)
+              }
+          }
+        ) %>%
+        bind_rows(.id = "sigmat_thresh")
+    }
+  ) %>%
+  bind_rows(.id = "split")
+
+cancer_comp_df <- split_res_list %>%
+  lapply(
+    function(split_res) {
+      split_res %>%
+        lapply(
+          function(deconv_res) {
+            deconv_res %>%
+              extract2("cancer_comp")
+          }
+        ) %>%
+        bind_rows(.id = "sigmat_thresh")
+    }
+  ) %>%
+  bind_rows(.id = "split")
 
 cor_meth <- "pearson"
 
 cancer_comp_df_sum <- cancer_comp_df %>%
-  group_by(split) %>%
+  group_by(split, sigmat_thresh) %>%
   summarize(
     cor_resid_by_sigmat = cor(prop_true, by_sigmat, method = cor_meth),
     cor_resid_by_transcr_prop = cor(
@@ -605,7 +616,7 @@ cancer_comp_df_sum <- cancer_comp_df %>%
     cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
     cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth)
   ) %>%
-  left_join(mean_rmses, by = "split")
+  left_join(mean_rmses, by = c("split", "sigmat_thresh"))
 
 print(cancer_comp_df_sum)
 
@@ -615,8 +626,6 @@ corr_cols <- c(
   "sum_sq_resid" = "cor_sum_sq_res",
   "sum_abs_resid" = "cor_sum_abs_res"
 )
-
-split_vals <- unique(cancer_comp_df$split)
 
 opar <- par(
   mfrow = c(
