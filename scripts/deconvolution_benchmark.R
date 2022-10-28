@@ -315,7 +315,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list) {
     lapply(function(deconv_res) {
       deconv_res$res
     })
-  ## ----compute_deconv_err---------------------------------------------------
+
   deconv_err_vec <- deconv_prop_list %>%
     lapply(
       function(deconv_prop_df) {
