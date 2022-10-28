@@ -230,8 +230,16 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
 
 
 deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
-                                   split_cancer = FALSE) {
-  # TODO Abstract cancer splitting to (vector of) arbitrary colnames
+                                   split_cancer = FALSE,
+                                   cancer_cols = "Cancer Epithelial") {
+  # FIXME Think about what multiple cancer cols would mean.
+  if (length(cancer_cols) > 1) {
+    stop(paste(
+      "Currently more than one column of cancer celltypes (cancer_col) is",
+      "not supported."
+    ))
+  }
+
   transcript_props <- pseudobulk[["transcript_counts"]] %>%
     extract(names(.) %in% deconv_ref$IDs) %>%
     divide_by(sum(.))
@@ -248,11 +256,11 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     }
 
   cancer_ref <- deconv_ref %>%
-    select(IDs, `Cancer Epithelial`)
+    select(IDs, all_of(cancer_cols))
 
   if (split_cancer) {
     deconv_ref <- deconv_ref %>%
-      select(-`Cancer Epithelial`)
+      select(-all_of(cancer_cols))
   }
 
   capture.output(
@@ -278,13 +286,19 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   deconv_resid <- transcript_props - transcript_props_pred
 
-  cancer_sig <- cancer_ref$`Cancer Epithelial`
-  resid_cancer_prop <- t(cancer_sig) %*% deconv_resid
+  cancer_sig <- cancer_ref %>%
+    select(all_of(cancer_cols)) %>%
+    as.matrix()
 
-  cancer_trancsr_prop <- proto_sigmat[, "Cancer Epithelial"] %>%
-    extract(names(.) %in% rownames(deconv_resid)) %>%
+  resid_cancer_prop <- t(deconv_resid) %*% cancer_sig
+
+  cancer_trancsr_prop <- proto_sigmat %>%
+    extract(
+      i = rownames(.) %in% rownames(deconv_resid),
+      j = colnames(.) %in% cancer_cols
+    ) %>%
     divide_by(sum(.))
-  prop_cancer_prop <- t(cancer_trancsr_prop) %*% deconv_resid
+  prop_cancer_prop <- t(deconv_resid) %*% cancer_trancsr_prop
 
   cancer_prop <- data.frame(
     by_sigmat = resid_cancer_prop,
