@@ -301,8 +301,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   prop_cancer_prop <- t(deconv_resid) %*% cancer_trancsr_prop
 
   cancer_prop <- data.frame(
-    by_sigmat = resid_cancer_prop,
-    by_transcr_prop = prop_cancer_prop
+    by_sigmat = as.vector(resid_cancer_prop),
+    by_transcr_prop = as.vector(prop_cancer_prop)
   )
 
   true_prop_df <- celltype_props %>%
