@@ -399,7 +399,8 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     group_by(sample) %>%
     summarize(
       sum_sq_resid = sum(residual^2),
-      sum_abs_resid = sum(abs(residual))
+      sum_abs_resid = sum(abs(residual)),
+      sum_resid = sum(residual)
     )
 
   # Compute cancer comp df
