@@ -412,7 +412,6 @@ plot_deconv_res <- function(deconv_res) {
   all_prop_df <- deconv_res[["deconv_res"]]
   deconv_err_vec <- deconv_res[["errors"]]
 
-
   all_prop_df %>%
     group_by(celltype) %>%
     summarise(
@@ -482,7 +481,6 @@ proto_sigmat <- count_mat %>%
 
 count_mat <- count_mat %>%
   as.matrix()
-
 
 # count_range <- proto_sigmat %>%
 #   as.vector() %>%
