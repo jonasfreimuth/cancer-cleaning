@@ -517,7 +517,8 @@ count_mat <- count_mat %>%
 #   set_names(as.character(.))
 
 # temp solution
-count_thresh_vec <- 7323
+count_thresh_vec <- c(7323) %>%
+  set_names(as.character(.))
 
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
