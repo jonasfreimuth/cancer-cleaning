@@ -327,8 +327,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list) {
   print(mean(deconv_err_vec))
 
   all_prop_df <- deconv_prop_list %>%
-    bind_rows(.id = "sample") %>%
-    drop_na()
+    bind_rows(.id = "sample")
 
   all_prop_sum_df <- all_prop_df %>%
     group_by(sample) %>%
