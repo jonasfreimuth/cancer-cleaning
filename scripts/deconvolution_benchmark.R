@@ -615,7 +615,8 @@ cancer_comp_df_sum <- cancer_comp_df %>%
       method = cor_meth
     ),
     cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
-    cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth)
+    cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth),
+    cor_sum_res = cor(prop_true, sum_resid, method = cor_meth)
   ) %>%
   left_join(mean_rmses, by = c("split", "sigmat_thresh"))
 
@@ -625,7 +626,8 @@ corr_cols <- c(
   "by_sigmat" = "cor_resid_by_sigmat",
   "by_transcr_prop" = "cor_resid_by_transcr_prop",
   "sum_sq_resid" = "cor_sum_sq_res",
-  "sum_abs_resid" = "cor_sum_abs_res"
+  "sum_abs_resid" = "cor_sum_abs_res",
+  "sum_resid" = "cor_sum_res"
 )
 
 opar <- par(
