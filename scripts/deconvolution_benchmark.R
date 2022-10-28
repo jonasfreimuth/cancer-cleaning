@@ -229,7 +229,9 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
 }
 
 
-deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
+deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
+                                   split_cancer = FALSE) {
+  # TODO Abstract cancer splitting to (vector of) arbitrary colnames
   transcript_props <- pseudobulk[["transcript_counts"]] %>%
     extract(names(.) %in% deconv_ref$IDs) %>%
     divide_by(sum(.))
@@ -244,6 +246,14 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref) {
         sample = .
       )
     }
+
+  cancer_ref <- deconv_ref %>%
+    select(IDs, `Cancer Epithelial`)
+
+  if (split_cancer) {
+    deconv_ref <- deconv_ref %>%
+      select(-`Cancer Epithelial`)
+  }
 
   capture.output(
     suppressMessages(
