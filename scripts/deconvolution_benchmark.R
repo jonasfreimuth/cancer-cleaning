@@ -630,63 +630,76 @@ corr_cols <- c(
   "sum_resid" = "cor_sum_res"
 )
 
-opar <- par(
-  mfrow = c(
-    length(split_vals),
-    length(corr_cols)
-  ),
-  oma = c(0, 3, 0, 0)
+corr_col_info <- data.frame(
+  col = names(corr_cols),
+  corr = corr_cols,
+  display_name = c(
+    "Residuals *\ncancer signature",
+    "Residuals *\ncancer transcript proportions",
+    "Sum of squared\nresiduals",
+    "Sum of absolute\nresiduals",
+    "Sum of\nresiduals"
+  )
 )
 
-for (split in split_vals) {
-  for (col in names(corr_cols)) {
-    split_df_ind <- cancer_comp_df$split == split
-    split_sum_ind <- cancer_comp_df_sum$split == split
 
-    x <- cancer_comp_df$prop_true[split_df_ind]
-    y <- cancer_comp_df[[col]][split_df_ind]
+plot_corr <- apply(
+  corr_col_info,
+  1,
+  function(col_info, df, df_sum, meth) {
+    rename_vec <- c("corr_col" = col_info[["col"]])
+    corr_df <- df %>%
+      select(
+        split, sigmat_thresh, prop_true, all_of(rename_vec)
+      )
 
     prefix <- ""
 
     if (cor_meth %in% c("spearman", "kendall")) {
-      x <- rank(x)
-      y <- rank(y)
+      corr_df <- corr_df %>%
+        mutate(across(
+          all_of(c("prop_true", "corr_col")),
+          ~ rank(.x)
+        ))
 
       prefix <- "Rank of "
     }
 
-    plot(
-      x, y,
-      main = round(cancer_comp_df_sum[[corr_cols[col]]][split_sum_ind], 3),
-      xlab = paste0(prefix, "True cancer proportion"),
-      ylab = paste0(prefix, col)
+    corr_df %>%
+      ggplot(aes(prop_true, corr_col)) +
+      geom_point() +
+      geom_text(aes(
+        x = mean(prop_true), y = max(.data$corr_col),
+        label = round(cor(prop_true, corr_col), 3)
+      )) +
+      labs(
+        x = paste(prefix, "True cancer proportion"),
+        y = paste(prefix, col_info[["display_name"]])
+      ) +
+      facet_grid(
+        cols = vars(split),
+        rows = vars(sigmat_thresh)
+      ) +
+      theme_minimal() +
+      theme(
+        panel.grid = element_blank(),
+        axis.line = element_line()
+      )
+  },
+  cancer_comp_df,
+  cancer_comp_df_sum,
+  corr_meth
+) %>%
+  {
+    cowplot::plot_grid(
+      plotlist = .,
+      nrow = length(.)
     )
   }
-}
-
-mtext(
-  paste("Cancer cells split from signature matrix",
-    paste(rev(split_vals), collapse = "\t\t\t"),
-    sep = "\n"
-  ),
-  side = 2, outer = TRUE
-)
-
-par(opar)
-
-benchmark_plot <- ggdraw() +
-  draw_plot(recordPlot())
 
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
-png(here("plots/benchmark_plot.png"),
-  width = 20, height = 10, units = "in",
-  res = 300
-)
-
-print(benchmark_plot)
-
-dev.off()
+ggsave(here("plots", "benchmark_plot.png"))
 
 ## ----plot_deconv_err----------------------------------------------------------
 plot_list <- lapply(
