@@ -331,9 +331,9 @@ plot_corr <- apply(
     )
   }
 
-dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
-ggsave(here("plots", "benchmark_plot.png"), plot_corr,
+ggsave(here(run_path, "plots", "benchmark_plot.png"), plot_corr,
   height = base_height +
     (length(count_thresh_vec) * facet_height * nrow(corr_col_info)),
   width = base_width + (length(split_vals) * facet_width)
@@ -389,9 +389,9 @@ plot_err <- celltype_rmse_df %>%
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
-ggsave(here("plots", "rmse_plot.png"), plot_err,
+ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
   height = base_height + (length(count_thresh_vec) * facet_height),
   width = base_width + (length(split_vals) * facet_width)
 )
