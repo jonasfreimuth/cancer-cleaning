@@ -1,4 +1,5 @@
 ## ----setup--------------------------------------------------------------------
+library("cowplot")
 library("scuttle")
 library("tidyr", exclude = "extract")
 library("ggplot2")
