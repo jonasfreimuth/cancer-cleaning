@@ -250,9 +250,22 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   transcript_props <- pseudobulk[["transcript_counts"]] %>%
     extract(names(.) %in% deconv_ref$IDs) %>%
-    divide_by(sum(.))
+    divide_by(sum(.)) %>%
+    extract(!is.na(.))
   celltype_props <- pseudobulk[["celltype_counts"]] %>%
-    divide_by(sum(.))
+    divide_by(sum(.)) %>%
+    extract(!is.na(.))
+
+  input_list <- list(
+    tp = transcript_props,
+    cp = celltype_props
+  )
+
+  input_lens <- lapply(input_list, length)
+
+  if (any(input_lens == 0)) {
+    return(NULL)
+  }
 
   deconv_bulk <- transcript_props %>%
     {
@@ -356,7 +369,8 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       deconvolute_pseudobulk,
       deconv_ref,
       split_cancer = split_cancer
-    )
+    ) %>%
+    extract(!unlist(lapply(., is.null)))
 
   deconv_prop_list <- deconv_res_list %>%
     lapply(function(deconv_res) {
