@@ -699,7 +699,9 @@ plot_corr <- apply(
 
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
-ggsave(here("plots", "benchmark_plot.png"))
+ggsave(here("plots", "benchmark_plot.png"), plot_corr,
+  height = 15, width = 15
+)
 
 ## ----plot_deconv_err----------------------------------------------------------
 plot_list <- lapply(
