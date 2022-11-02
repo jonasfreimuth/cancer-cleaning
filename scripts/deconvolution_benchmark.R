@@ -11,8 +11,6 @@ library("data.table")
 library("dplyr")
 library("deconvR")
 
-set.seed(123)
-
 here::i_am("scripts/deconvolution_benchmark.R")
 
 source(here("functions/dedupe_sigmut_mat.R"))
@@ -32,11 +30,35 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
+seed <- 123
+
 base_width <- 3
 base_height <- 2
 
 facet_height <- 1
 facet_width <- 4.5
+
+param_sep <- "_"
+pair_sep <- "-"
+
+parameter_string <- paste(
+  paste0("testing", pair_sep, testing),
+  paste0("seed", pair_sep, seed),
+  paste0("nrepeat", pair_sep, n_repeat),
+  paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
+  sep = param_sep
+)
+
+run_path <- here(
+  "output",
+  paste(
+    format(Sys.time(), "%Y%m%d-%H%M"),
+    parameter_string,
+    sep = param_sep
+  )
+)
+
+dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
 cat(paste0(
   "\nRun params:\n",
@@ -44,8 +66,12 @@ cat(paste0(
   "\tCount matrix threshold step size: ", count_thresh_step_frac, "\n",
   "\tNumber of repeat samplings: ", n_repeat, "\n",
   "\tFraction of ground truth sampled per pseudobulk: ", pseudobulk_cell_frac,
-  "\n"
+  "\n", "\n",
+  "Outputs will be found at ", run_path, "\n"
 ))
+
+set.seed(seed)
+
 
 ## ----data_loading-------------------------------------------------------------
 data <- load_experiment(
