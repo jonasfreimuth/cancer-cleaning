@@ -14,6 +14,9 @@ library("magrittr")
 library("scuttle")
 library("utils")
 
+# TODO Once it is clear which functions are actually useful, add proper
+# docstrings.
+
 load_experiment <- function(count_mat_file, rowname_file, colname_file,
                             meta_file, testing) {
   # FIXME Make this function more general
