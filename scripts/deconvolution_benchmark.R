@@ -536,7 +536,7 @@ count_mat <- count_mat %>%
 #   {
 #     c(0, .)
 #   } %>%
-#   set_names(as.character(.))
+#   set_names(as.character(round(., 2)))
 
 # temp solution
 count_thresh_vec <- c(7323) %>%
