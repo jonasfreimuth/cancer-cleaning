@@ -31,6 +31,9 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
+facet_height <- 1
+facet_width <- 4.5
+
 cat(paste0(
   "\nRun params:\n",
   "\tTest run: ", testing, "\n",
@@ -728,9 +731,6 @@ plot_corr <- apply(
       nrow = length(.)
     )
   }
-
-facet_height <- 1
-facet_width <- 4.5
 
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
