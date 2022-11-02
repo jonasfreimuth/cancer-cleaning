@@ -791,4 +791,7 @@ plot_err <- celltype_rmse_df %>%
 
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
-ggsave(here("plots", "rmse_plot.png"), plot_err)
+ggsave(here("plots", "rmse_plot.png"), plot_err,
+  height = 3 + (length(count_thresh_vec) * facet_height),
+  width = 2 + (length(split_vals) * facet_width)
+)
