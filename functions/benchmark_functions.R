@@ -88,6 +88,28 @@ lognorm_row <- function(count_row, base = 10) {
 }
 
 
+normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
+  if (type == "lognorm") {
+    norm_mat <- count_mat %>%
+      apply(
+        2,
+        lognorm_row,
+        simplify = TRUE,
+        ...
+      )
+  } else if (type == "tpm") {
+    norm_mat <- count_mat %>%
+      scuttle::calculateTPM(...)
+  } else {
+    stop(paste0(
+      "Normalization type \"", type, "\" is not supported."
+    ))
+  }
+
+  return(count_mat)
+}
+
+
 seq_base <- function(start, stop, step_frac, base = 10) {
   in_vec <- c(start, stop)
   zero_ind_vec <- in_vec == 0
