@@ -729,10 +729,14 @@ plot_corr <- apply(
     )
   }
 
+facet_height <- 1
+facet_width <- 4.5
+
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here("plots", "benchmark_plot.png"), plot_corr,
-  height = 15, width = 15
+  height = 3 + (length(count_thresh_vec) * facet_height * nrow(corr_col_info)),
+  width = 2 + (length(split_vals) * facet_width)
 )
 
 ## ----plot_deconv_err----------------------------------------------------------
