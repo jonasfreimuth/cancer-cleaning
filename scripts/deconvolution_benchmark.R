@@ -220,6 +220,13 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map) {
     names() %>%
     table()
 
+  bulk_celltypes <- names(celltype_counts)
+
+  # basically just conversion from table to named vector
+  celltype_counts <- celltype_counts %>%
+    as.vector() %>%
+    set_names(bulk_celltypes)
+
   return(
     list(
       transcript_counts = transcript_counts,
@@ -244,7 +251,6 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     extract(names(.) %in% deconv_ref$IDs) %>%
     divide_by(sum(.))
   celltype_props <- pseudobulk[["celltype_counts"]] %>%
-    as.matrix() %>%
     divide_by(sum(.))
 
   deconv_bulk <- transcript_props %>%
@@ -307,7 +313,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   true_prop_df <- celltype_props %>%
     {
-      data.frame(celltype = rownames(.), prop = .)
+      data.frame(celltype = names(.), prop = .)
     } %>%
     separate_rows(celltype, sep = "_")
 
