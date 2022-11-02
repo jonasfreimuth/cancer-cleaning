@@ -686,13 +686,24 @@ plot_corr <- apply(
       prefix <- "Rank of "
     }
 
+    rename_vec_sum <- c("corr_col_sum" = col_info[["corr"]])
+    corr_df_sum <- df_sum %>%
+      select(
+        split, sigmat_thresh, all_of(rename_vec_sum)
+      )
+
     corr_df %>%
-      ggplot(aes(prop_true, corr_col)) +
-      geom_point() +
-      geom_text(aes(
-        x = mean(prop_true), y = max(.data$corr_col),
-        label = round(cor(prop_true, corr_col), 3)
-      )) +
+      left_join(corr_df_sum, by = c("sigmat_thresh", "split")) %>%
+      mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
+      ggplot() +
+      geom_point(aes(prop_true, corr_col)) +
+      geom_text(
+        aes(
+          x = mean(range(prop_true)),
+          y = max(corr_col) + diff(range(corr_col) * 0.1),
+          label = round(corr_col_sum, 3)
+        )
+      ) +
       labs(
         x = paste(prefix, "True cancer proportion"),
         y = paste(prefix, col_info[["display_name"]])
