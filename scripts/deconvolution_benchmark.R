@@ -29,6 +29,7 @@ count_thresh_step_frac <- 0.1
 
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
+normalization_type <- "tpm"
 
 seed <- 123
 
@@ -44,6 +45,7 @@ pair_sep <- "-"
 parameter_string <- paste(
   paste0("testing", pair_sep, testing),
   paste0("seed", pair_sep, seed),
+  paste0("normtype", pair_sep, normalization_type),
   paste0("nrepeat", pair_sep, n_repeat),
   paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
   sep = param_sep
@@ -115,7 +117,7 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
-  normalize_count_mat(type = "tpm") %>%
+  normalize_count_mat(type = normalization_type) %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
@@ -173,7 +175,7 @@ pseudobulk_list <-
   # actually draw pseudobulks
   lapply(
     pseudobulk_from_idx,
-    count_mat, celltype_cell_map
+    count_mat, celltype_cell_map, normalization_type
   )
 
 
