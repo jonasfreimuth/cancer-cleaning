@@ -31,6 +31,9 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 
+base_width <- 3
+base_height <- 2
+
 facet_height <- 1
 facet_width <- 4.5
 
@@ -735,8 +738,9 @@ plot_corr <- apply(
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here("plots", "benchmark_plot.png"), plot_corr,
-  height = 3 + (length(count_thresh_vec) * facet_height * nrow(corr_col_info)),
-  width = 2 + (length(split_vals) * facet_width)
+  height = base_height +
+    (length(count_thresh_vec) * facet_height * nrow(corr_col_info)),
+  width = base_width + (length(split_vals) * facet_width)
 )
 
 ## ----plot_deconv_err----------------------------------------------------------
@@ -792,6 +796,6 @@ plot_err <- celltype_rmse_df %>%
 dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here("plots", "rmse_plot.png"), plot_err,
-  height = 3 + (length(count_thresh_vec) * facet_height),
-  width = 2 + (length(split_vals) * facet_width)
+  height = base_height + (length(count_thresh_vec) * facet_height),
+  width = base_width + (length(split_vals) * facet_width)
 )
