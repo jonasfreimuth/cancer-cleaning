@@ -704,7 +704,54 @@ ggsave(here("plots", "benchmark_plot.png"), plot_corr,
 )
 
 ## ----plot_deconv_err----------------------------------------------------------
-plot_list <- lapply(
-  deconv_res_list_no_split,
-  plot_deconv_res
-)
+celltype_rmse_df <- split_res_list %>%
+  lapply(
+    function(split_res) {
+      split_res %>%
+        lapply(
+          function(deconv_res) {
+            mean_rmse <- deconv_res %>%
+              extract2("errors") %>%
+              mean()
+
+            deconv_res %>%
+              extract2("deconv_res") %>%
+              group_by(celltype) %>%
+              summarise(
+                rmse = rmse(prop_true, prop_deconv),
+                .groups = "drop_last"
+              ) %>%
+              mutate(overall_rmse = mean_rmse)
+          }
+        ) %>%
+        bind_rows(.id = "sigmat_thresh")
+    }
+  ) %>%
+  bind_rows(.id = "split")
+
+plot_err <- celltype_rmse_df %>%
+  ggplot(aes(celltype, rmse)) +
+  geom_col(alpha = 0.5, position = position_identity()) +
+  geom_text(aes(
+    x = length(unique(celltype)) / 2,
+    y = max(rmse) * 1.1,
+    label = round(overall_rmse, 3)
+  )) +
+  labs(
+    x = "Cell types",
+    y = "Per celltype RMSE"
+  ) +
+  facet_grid(
+    cols = vars(split),
+    rows = vars(sigmat_thresh)
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line()
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+dir.create(here("plots"), recursive = TRUE, showWarnings = FALSE)
+
+ggsave(here("plots", "rmse_plot.png"), plot_err)
