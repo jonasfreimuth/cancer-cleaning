@@ -115,7 +115,7 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
-  scuttle::calculateTPM() %>%
+  normalize_count_mat(type = "tpm") %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
