@@ -766,6 +766,7 @@ celltype_rmse_df <- split_res_list %>%
   bind_rows(.id = "split")
 
 plot_err <- celltype_rmse_df %>%
+  mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
   ggplot(aes(celltype, rmse)) +
   geom_col(alpha = 0.5, position = position_identity()) +
   geom_text(aes(
