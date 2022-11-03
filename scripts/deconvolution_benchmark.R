@@ -69,6 +69,10 @@ dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 cat(paste0(
   "\nRun params:\n",
   "\tTest run: ", testing, "\n",
+  "\tRandomization seed: ", seed, "\n",
+  "\tDeconvolution method: ", deconv_method, "\n",
+  "\tIndependent normalization of count matrix for bulk and reference: ",
+  normalize_independently, "\n",
   "\tCount matrix threshold step size: ", count_thresh_step_frac, "\n",
   "\tNumber of repeat samplings: ", n_repeat, "\n",
   "\tFraction of ground truth sampled per pseudobulk: ", pseudobulk_cell_frac,
