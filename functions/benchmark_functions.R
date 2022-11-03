@@ -282,16 +282,26 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       select(-all_of(cancer_cols))
   }
 
-  capture.output(
-    suppressMessages(
-      deconv_props <- deconvolute(
-        reference = deconv_ref,
-        bulk = deconv_bulk,
-        model = "qp"
-      )$proportions
-    ),
-    type = c("output")
-  )
+  if (ncol(deconv_ref) < 3) {
+    # Some deconvolution methods will fail when only a single celltype is
+    # present. This ensures the correct output.
+    deconv_props <- 1 %>%
+      set_names(names(
+        deconv_ref %>%
+          select(-IDs)
+      ))
+  } else {
+    capture.output(
+      suppressMessages(
+        deconv_props <- deconvolute(
+          reference = deconv_ref,
+          bulk = deconv_bulk,
+          model = "qp"
+        )$proportions
+      ),
+      type = c("output")
+    )
+  }
 
   sigmat <- deconv_ref %>%
     select(-IDs) %>%
