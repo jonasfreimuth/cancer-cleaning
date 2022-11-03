@@ -30,6 +30,7 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 normalization_type <- "tpm"
+deconv_method <- "qp"
 
 seed <- 123
 
@@ -45,6 +46,7 @@ pair_sep <- "-"
 parameter_string <- paste(
   paste0("testing", pair_sep, testing),
   paste0("seed", pair_sep, seed),
+  paste0("method", pair_sep, deconv_method),
   paste0("normtype", pair_sep, normalization_type),
   paste0("nrepeat", pair_sep, n_repeat),
   paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
@@ -189,7 +191,8 @@ split_res_list <- lapply(
       deconv_ref_list,
       benchmark_reference,
       pseudobulk_list,
-      split_cancer = split
+      split_cancer = split,
+      deconv_method = deconv_method
     )
   }
 ) %>%
