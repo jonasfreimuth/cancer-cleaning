@@ -373,12 +373,14 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
 
 benchmark_reference <- function(deconv_ref, pseudobulk_list,
-                                split_cancer = FALSE) {
+                                split_cancer = FALSE,
+                                deconv_method = "qp") {
   deconv_res_list <- pseudobulk_list %>%
     lapply(
       deconvolute_pseudobulk,
       deconv_ref,
-      split_cancer = split_cancer
+      split_cancer = split_cancer,
+      method = deconv_method
     ) %>%
     extract(!unlist(lapply(., is.null)))
 
