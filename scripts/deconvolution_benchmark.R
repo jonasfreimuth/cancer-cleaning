@@ -58,7 +58,7 @@ parameter_string <- paste(
 run_path <- here(
   "output",
   paste(
-    format(Sys.time(), "%Y%m%d-%H%M"),
+    format(Sys.time(), "%Y%m%d-%H%M%S"),
     parameter_string,
     sep = param_sep
   )
