@@ -263,8 +263,6 @@ cancer_comp_df_sum <- cancer_comp_df %>%
   ) %>%
   left_join(mean_rmses, by = c("split", "sigmat_thresh"))
 
-print(cancer_comp_df_sum)
-
 corr_cols <- c(
   "by_sigmat" = "cor_resid_by_sigmat",
   "by_transcr_prop" = "cor_resid_by_transcr_prop",
@@ -415,3 +413,5 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
   height = base_height + (length(count_thresh_vec) * facet_height),
   width = base_width + (length(split_vals) * facet_width)
 )
+
+print(cancer_comp_df_sum)
