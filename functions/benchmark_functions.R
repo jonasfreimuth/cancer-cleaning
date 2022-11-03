@@ -238,7 +238,8 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
 
 deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
                                    split_cancer = FALSE,
-                                   cancer_cols = "Cancer Epithelial") {
+                                   cancer_cols = "Cancer Epithelial",
+                                   method = "qp") {
   # FIXME Think about what multiple cancer cols would mean.
   if (length(cancer_cols) > 1) {
     stop(paste(
@@ -296,7 +297,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
         deconv_props <- deconvolute(
           reference = deconv_ref,
           bulk = deconv_bulk,
-          model = "qp"
+          model = method
         )$proportions
       ),
       type = c("output")
