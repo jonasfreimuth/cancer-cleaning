@@ -19,21 +19,57 @@ source(here("functions/rmse.R"))
 source(here("functions/benchmark_functions.R"))
 
 ## ----parameters --------------------------------------------------------------
-testing <- TRUE
+if (!exists("args")) {
+  args <- commandArgs(trailingOnly = TRUE)
+}
 
-# Step size for exploring the effect of the count threshold, i.e. the threshold
-# for which transcript count is necessary for a transcript to be considered as
-# an indicator for a cell type (strict greater than, applied after
-# normalization)
-count_thresh_step_frac <- 0.1
+# names must match script params
+arg_names <- c(
+  "testing",
+  "count_thresh_step_frac",
+  "n_repeat",
+  "pseudobulk_cell_frac",
+  "normalization_type",
+  "normalize_independently",
+  "deconv_method",
+  "seed"
+)
 
-n_repeat <- 200
-pseudobulk_cell_frac <- 0.1
-normalization_type <- "tpm"
-normalize_independently <- TRUE
-deconv_method <- "qp"
+if (length(args) > 0) {
+  cat("\nUsing provided args...\n")
+  names(args) <- arg_names
 
-seed <- 123
+  for (i in seq_along(args)) {
+    assign(names(args[i]), args[i])
+  }
+} else {
+  cat("\nUsing default args...\n")
+  testing <- FALSE
+
+  # Step size for exploring the effect of the count threshold, i.e. the
+  # threshold for which transcript count is necessary for a transcript to be
+  # considered as an indicator for a cell type (strict greater than, applied
+  # after normalization)
+  count_thresh_step_frac <- 0.8
+
+  n_repeat <- 100
+  pseudobulk_cell_frac <- 0.1
+  normalization_type <- "tpm"
+  normalize_independently <- TRUE
+  deconv_method <- "qp"
+
+  seed <- 123
+}
+
+count_thresh_step_frac %<>%
+  as.numeric()
+n_repeat %<>%
+  as.numeric()
+pseudobulk_cell_frac %<>%
+  as.numeric()
+seed %<>%
+  as.numeric()
+
 
 base_width <- 3
 base_height <- 2
