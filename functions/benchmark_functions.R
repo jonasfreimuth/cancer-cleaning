@@ -89,6 +89,11 @@ lognorm_row <- function(count_row, base = 10) {
 
 
 normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
+  if (is.null(type)) {
+    # NULL means do nothing.
+    return(count_mat)
+  }
+
   if (type == "lognorm") {
     norm_mat <- count_mat %>%
       apply(
