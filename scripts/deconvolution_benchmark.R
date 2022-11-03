@@ -30,6 +30,7 @@ count_thresh_step_frac <- 0.1
 n_repeat <- 200
 pseudobulk_cell_frac <- 0.1
 normalization_type <- "tpm"
+normalize_independently <- TRUE
 deconv_method <- "qp"
 
 seed <- 123
@@ -47,6 +48,7 @@ parameter_string <- paste(
   paste0("testing", pair_sep, testing),
   paste0("seed", pair_sep, seed),
   paste0("method", pair_sep, deconv_method),
+  paste0("indepnorm", pair_sep, normalize_independently),
   paste0("normtype", pair_sep, normalization_type),
   paste0("nrepeat", pair_sep, n_repeat),
   paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
@@ -76,6 +78,14 @@ cat(paste0(
 
 set.seed(seed)
 
+if (normalize_independently) {
+  super_norm_type <- NULL
+  sub_norm_type <- normalization_type
+} else {
+  super_norm_type <- normalization_type
+  sub_norm_type <- NULL
+}
+
 
 ## ----data_loading-------------------------------------------------------------
 data <- load_experiment(
@@ -94,7 +104,8 @@ data <- load_experiment(
   testing = testing
 )
 
-count_mat <- data$count_mat
+count_mat <- data$count_mat %>% 
+  normalize_count_mat(type = super_norm_type)
 meta <- data$meta
 
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
@@ -119,7 +130,7 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
-  normalize_count_mat(type = normalization_type) %>%
+  normalize_count_mat(type = sub_norm_type) %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
@@ -177,7 +188,7 @@ pseudobulk_list <-
   # actually draw pseudobulks
   lapply(
     pseudobulk_from_idx,
-    count_mat, celltype_cell_map, normalization_type
+    count_mat, celltype_cell_map, sub_norm_type
   )
 
 
