@@ -218,6 +218,15 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
 
   transcript_counts <- rowSums(bulk_count_mat)
 
+  # NOTE This relies on celltype_map being ordered by count_mat cells
+  cancer_idx <- intersect(
+    idx_vec,
+    which(names(celltype_map) == "Cancer Epithelial")
+  )
+
+  cancer_expression <- count_mat[, cancer_idx] %>%
+    rowSums()
+
   bulk_cells <- colnames(bulk_count_mat)
 
   celltype_counts <- celltype_map %>%
@@ -235,7 +244,8 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
   return(
     list(
       transcript_counts = transcript_counts,
-      celltype_counts = celltype_counts
+      celltype_counts = celltype_counts,
+      transcript_counts_cancer = cancer_expression
     )
   )
 }
