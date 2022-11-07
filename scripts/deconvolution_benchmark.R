@@ -39,26 +39,28 @@ if (length(args) > 0) {
   cat("\nUsing provided args...\n")
   names(args) <- arg_names
 
-  for (i in seq_along(args)) {
-    assign(names(args[i]), args[i])
-  }
 } else {
   cat("\nUsing default args...\n")
-  testing <- FALSE
+  args <- c(
+    testing = "TRUE",
 
-  # Step size for exploring the effect of the count threshold, i.e. the
-  # threshold for which transcript count is necessary for a transcript to be
-  # considered as an indicator for a cell type (strict greater than, applied
-  # after normalization)
-  count_thresh_step_frac <- 0.8
+    # Step size for exploring the effect of the count threshold, i.e. the
+    # threshold for which transcript count is necessary for a transcript to be
+    # considered as an indicator for a cell type (strict greater than, applied
+    # after normalization)
+    count_thresh_step_frac = "0.3",
+    n_repeat = "200",
+    pseudobulk_cell_frac = "0.2",
+    normalization_type = "tpm",
+    normalize_independently = "TRUE",
+    deconv_method = "qp",
+    seed = "123"
+  )
+}
 
-  n_repeat <- 100
-  pseudobulk_cell_frac <- 0.1
-  normalization_type <- "tpm"
-  normalize_independently <- TRUE
-  deconv_method <- "qp"
-
-  seed <- 123
+for (i in seq_along(args)) {
+  # FIXME Change the script to use args vector and get rid of this assign hack.
+  assign(names(args[i]), args[i])
 }
 
 testing %<>%
