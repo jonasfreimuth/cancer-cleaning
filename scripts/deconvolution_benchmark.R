@@ -61,6 +61,10 @@ if (length(args) > 0) {
   seed <- 123
 }
 
+testing %<>%
+  as.logical()
+normalize_independently %<>%
+  as.logical()
 count_thresh_step_frac %<>%
   as.numeric()
 n_repeat %<>%
