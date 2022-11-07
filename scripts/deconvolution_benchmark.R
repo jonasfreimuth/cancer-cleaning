@@ -351,8 +351,8 @@ plot_corr <- apply(
     corr_df %>%
       left_join(corr_df_sum, by = c("sigmat_thresh", "split")) %>%
       mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
-      ggplot() +
-      geom_point(aes(prop_true, corr_col)) +
+      ggplot(aes(prop_true, corr_col)) +
+      geom_point() +
       geom_text(
         aes(
           x = mean(range(prop_true)),
