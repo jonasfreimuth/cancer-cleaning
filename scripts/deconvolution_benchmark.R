@@ -362,6 +362,7 @@ plot_corr <- apply(
       mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
       ggplot(aes(prop_true, corr_col)) +
       geom_point() +
+      geom_smooth(method = "lm", se = FALSE) +
       geom_text(
         aes(
           x = xpos,
