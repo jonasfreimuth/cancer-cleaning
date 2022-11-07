@@ -403,8 +403,6 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     ) %>%
     unlist()
 
-  print(mean(deconv_err_vec))
-
   # Generate overall result df
   all_prop_df <- deconv_prop_list %>%
     bind_rows(.id = "sample")
