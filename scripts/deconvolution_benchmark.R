@@ -38,7 +38,6 @@ arg_names <- c(
 if (length(script_args) > 0) {
   cat("\nUsing provided args...\n")
   names(script_args) <- arg_names
-
 } else {
   cat("\nUsing default args...\n")
   script_args <- c(
@@ -150,7 +149,7 @@ data <- load_experiment(
   testing = testing
 )
 
-count_mat <- data$count_mat %>% 
+count_mat <- data$count_mat %>%
   normalize_count_mat(type = super_norm_type)
 meta <- data$meta
 
@@ -185,25 +184,25 @@ proto_sigmat <- count_mat %>%
 count_mat <- count_mat %>%
   as.matrix()
 
-# count_range <- proto_sigmat %>%
-#   as.vector() %>%
-#   extract(. > 0) %>%
-#   range()
-#
-# count_thresh_vec <- seq_base(
-#   count_range[1],
-#   count_range[2],
-#   count_thresh_step_frac,
-#   base = 3
-# ) %>%
-#   {
-#     c(0, .)
-#   } %>%
-#   set_names(as.character(round(., 2)))
+count_range <- proto_sigmat %>%
+  as.vector() %>%
+  extract(. > 0) %>%
+  range()
 
-# temp solution
-count_thresh_vec <- c(7323) %>%
-  set_names(as.character(.))
+count_thresh_vec <- seq_base(
+  count_range[1],
+  count_range[2],
+  count_thresh_step_frac,
+  base = 3
+) %>%
+  {
+    c(0, .)
+  } %>%
+  set_names(as.character(round(., 2)))
+
+# # temp solution
+# count_thresh_vec <- c(7323) %>%
+#   set_names(as.character(.))
 
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
@@ -234,7 +233,8 @@ pseudobulk_list <-
   # actually draw pseudobulks
   lapply(
     pseudobulk_from_idx,
-    count_mat, celltype_cell_map, sub_norm_type
+    count_mat, celltype_cell_map,
+    norm_type = sub_norm_type
   )
 
 
