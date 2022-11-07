@@ -376,7 +376,8 @@ plot_corr <- apply(
       ) +
       facet_grid(
         cols = vars(split),
-        rows = vars(sigmat_thresh)
+        rows = vars(sigmat_thresh),
+        scales = "free"
       ) +
       theme_minimal() +
       theme(
