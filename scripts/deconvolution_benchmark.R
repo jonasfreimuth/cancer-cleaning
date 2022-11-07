@@ -19,8 +19,8 @@ source(here("functions/rmse.R"))
 source(here("functions/benchmark_functions.R"))
 
 ## ----parameters --------------------------------------------------------------
-if (!exists("args")) {
-  args <- commandArgs(trailingOnly = TRUE)
+if (!exists("script_args")) {
+  script_args <- commandArgs(trailingOnly = TRUE)
 }
 
 # names must match script params
@@ -35,13 +35,13 @@ arg_names <- c(
   "seed"
 )
 
-if (length(args) > 0) {
+if (length(script_args) > 0) {
   cat("\nUsing provided args...\n")
-  names(args) <- arg_names
+  names(script_args) <- arg_names
 
 } else {
   cat("\nUsing default args...\n")
-  args <- c(
+  script_args <- c(
     testing = "TRUE",
 
     # Step size for exploring the effect of the count threshold, i.e. the
@@ -58,9 +58,9 @@ if (length(args) > 0) {
   )
 }
 
-for (i in seq_along(args)) {
+for (i in seq_along(script_args)) {
   # FIXME Change the script to use args vector and get rid of this assign hack.
-  assign(names(args[i]), args[i])
+  assign(names(script_args[i]), script_args[i])
 }
 
 testing %<>%
