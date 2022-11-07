@@ -450,4 +450,19 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
   width = base_width + (length(split_vals) * facet_width)
 )
 
+
+# Data saving -------------------------------------------------------------
+
+file.copy(
+  here("scripts/deconvolution_benchmark.R"),
+  here(run_path, "deconvolution_benchmark.R")
+)
+
+file.copy(
+  here("functions/benchmark_functions.R"),
+  here(run_path, "benchmark_functions.R")
+)
+
 print(cancer_comp_df_sum)
+
+fwrite(cancer_comp_df_sum, here(run_path, "cancer_comparison_summary.csv"))
