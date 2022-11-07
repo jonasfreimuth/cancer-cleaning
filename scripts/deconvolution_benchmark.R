@@ -348,8 +348,17 @@ plot_corr <- apply(
         split, sigmat_thresh, all_of(rename_vec_sum)
       )
 
+    pos_df <- corr_df %>%
+      group_by(sigmat_thresh, split) %>%
+      summarize(
+        xpos = mean(range(prop_true)),
+        ypos = max(corr_col) + diff(range(corr_col) * 0.3),
+        .groups = "drop_last"
+      )
+
     corr_df %>%
       left_join(corr_df_sum, by = c("sigmat_thresh", "split")) %>%
+      left_join(pos_df, by = c("sigmat_thresh", "split")) %>%
       mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
       ggplot(aes(prop_true, corr_col)) +
       geom_point() +
