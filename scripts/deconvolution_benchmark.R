@@ -364,8 +364,8 @@ plot_corr <- apply(
       geom_point() +
       geom_text(
         aes(
-          x = mean(range(prop_true)),
-          y = max(corr_col) + diff(range(corr_col) * 0.1),
+          x = xpos,
+          y = ypos,
           label = round(corr_col_sum, 3)
         )
       ) +
