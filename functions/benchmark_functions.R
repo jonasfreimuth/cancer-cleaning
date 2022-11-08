@@ -434,6 +434,14 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     ) %>%
     unlist()
 
+  deconv_corr_df <- deconv_corr_vec %>%
+    {
+      data.frame(
+        sample = as.character(seq_along(.)),
+        cancer_expr_corr = .
+      )
+    }
+
   # Generate overall result df
   all_prop_df <- deconv_prop_list %>%
     bind_rows(.id = "sample")
