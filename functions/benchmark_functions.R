@@ -343,25 +343,6 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   cancer_expr_cor <- cor(transcript_props_cancer, as.vector(deconv_resid))
 
-  cancer_sig <- cancer_ref %>%
-    select(all_of(cancer_cols)) %>%
-    as.matrix()
-
-  resid_cancer_prop <- t(deconv_resid) %*% cancer_sig
-
-  cancer_trancsr_prop <- proto_sigmat %>%
-    extract(
-      i = rownames(.) %in% rownames(deconv_resid),
-      j = colnames(.) %in% cancer_cols
-    ) %>%
-    divide_by(sum(.))
-  prop_cancer_prop <- t(deconv_resid) %*% cancer_trancsr_prop
-
-  cancer_prop <- data.frame(
-    by_sigmat = as.vector(resid_cancer_prop),
-    by_transcr_prop = as.vector(prop_cancer_prop)
-  )
-
   true_prop_df <- celltype_props %>%
     {
       data.frame(celltype = names(.), prop = .)
@@ -393,8 +374,6 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   return(list(
     res = deconv_res,
-    residuals = deconv_resid,
-    cancer_prop = cancer_prop,
     cancer_expr_corr = cancer_expr_cor
   ))
 }
