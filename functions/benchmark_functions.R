@@ -427,14 +427,12 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     ) %>%
     unlist()
 
-  deconv_corr_vec <- deconv_res_list %>%
+  deconv_corr_df <- deconv_res_list %>%
     lapply(
       extract2,
       "cancer_expr_corr"
     ) %>%
-    unlist()
-
-  deconv_corr_df <- deconv_corr_vec %>%
+    unlist() %>%
     {
       data.frame(
         sample = as.character(seq_along(.)),
