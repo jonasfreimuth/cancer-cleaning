@@ -484,7 +484,6 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     mutate(rmse = deconv_err_vec)
 
   return(list(
-    "errors" = deconv_err_vec,
     "deconv_res" = all_prop_df,
     "deconv_sum" = all_prop_sum_df,
     "cancer_comp" = cancer_comp_df,
