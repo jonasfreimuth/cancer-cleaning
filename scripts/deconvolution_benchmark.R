@@ -105,7 +105,7 @@ run_path <- here(
 
 dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
-cat(paste0(
+run_info <- paste0(
   "\nRun params:\n",
   "\tDataset used: ", data_path, "\n",
   "\tRandomization seed: ", seed, "\n",
@@ -117,7 +117,11 @@ cat(paste0(
   "\tFraction of ground truth sampled per pseudobulk: ", pseudobulk_cell_frac,
   "\n", "\n",
   "Outputs will be found at ", run_path, "\n"
-))
+)
+
+cat(run_info, here(run_path, "run_info.txt"))
+
+cat(run_info)
 
 set.seed(seed)
 
