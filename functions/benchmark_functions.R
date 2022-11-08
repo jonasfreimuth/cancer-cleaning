@@ -468,7 +468,8 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       sum_sq_resid = sum(residual^2),
       sum_abs_resid = sum(abs(residual)),
       sum_resid = sum(residual)
-    )
+    ) %>%
+    mutate(cancer_expr_corr = deconv_corr_vec)
 
   # Compute cancer comp df
   cancer_prop_from_resid_df <- deconv_res_list %>%
