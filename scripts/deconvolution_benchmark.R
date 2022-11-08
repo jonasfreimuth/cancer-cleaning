@@ -398,9 +398,8 @@ celltype_rmse_df <- split_res_list %>%
       split_res %>%
         lapply(
           function(deconv_res) {
-            mean_rmse <- deconv_res %>%
-              extract2("errors") %>%
-              mean()
+            deconv_sum <- deconv_res %>%
+              extract2("deconv_sum")
 
             deconv_res %>%
               extract2("deconv_res") %>%
@@ -410,7 +409,7 @@ celltype_rmse_df <- split_res_list %>%
                 celltype_rmse = rmse(prop_true, prop_deconv),
                 .groups = "drop_last"
               ) %>%
-              mutate(overall_rmse = mean_rmse)
+              mutate(overall_rmse = mean(deconv_sum$rmse))
           }
         ) %>%
         bind_rows(.id = "sigmat_thresh")
