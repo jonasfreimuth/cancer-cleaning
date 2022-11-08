@@ -455,42 +455,12 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       rmse = rmse(prop_true, prop_deconv)
     )
 
-  # Summarize residuals
-  deconv_residuals_df <- deconv_res_list %>%
-    lapply(function(deconv_res) {
-      deconv_res$residuals %>%
-        {
-          data.frame(
-            transcript = rownames(.),
-            residual = .
-          )
-        }
-    }) %>%
-    bind_rows(.id = "sample")
-
-  resid_sum_df <- deconv_residuals_df %>%
-    group_by(sample) %>%
-    summarize(
-      sum_sq_resid = sum(residual^2),
-      sum_abs_resid = sum(abs(residual)),
-      sum_resid = sum(residual)
-    ) %>%
-    mutate(cancer_expr_corr = deconv_corr_vec)
-
   # Compute cancer comp df
-  cancer_prop_from_resid_df <- deconv_res_list %>%
-    lapply(
-      extract2,
-      "cancer_prop"
-    ) %>%
-    bind_rows(.id = "sample")
-
   cancer_prop_df <- all_prop_df %>%
     filter(celltype == "Cancer Epithelial") %>%
     select(sample, prop_true, prop_deconv, abs_err)
 
-  cancer_comp_df <- cancer_prop_from_resid_df %>%
-    left_join(cancer_prop_df, by = "sample") %>%
+  cancer_comp_df <- cancer_prop_df %>%
     left_join(deconv_corr_df, by = "sample") %>%
     mutate(rmse = deconv_err_vec)
 
