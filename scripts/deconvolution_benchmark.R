@@ -285,7 +285,8 @@ cancer_comp_df_sum <- cancer_comp_df %>%
     ),
     cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
     cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth),
-    cor_sum_res = cor(prop_true, sum_resid, method = cor_meth)
+    cor_sum_res = cor(prop_true, sum_resid, method = cor_meth),
+    .groups = "drop_last"
   )
 
 corr_cols <- c(
