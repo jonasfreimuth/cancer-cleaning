@@ -25,7 +25,7 @@ if (!exists("script_args")) {
 
 # names must match script params
 arg_names <- c(
-  "testing",
+  "data_path",
   "count_thresh_step_frac",
   "n_repeat",
   "pseudobulk_cell_frac",
@@ -41,7 +41,7 @@ if (length(script_args) > 0) {
 } else {
   cat("\nUsing default args...\n")
   script_args <- c(
-    testing = "TRUE",
+    data_path = "datasets/Wu_etal_downsampled_test/",
 
     # Step size for exploring the effect of the count threshold, i.e. the
     # threshold for which transcript count is necessary for a transcript to be
@@ -62,8 +62,6 @@ for (i in seq_along(script_args)) {
   assign(names(script_args[i]), script_args[i])
 }
 
-testing %<>%
-  as.logical()
 normalize_independently %<>%
   as.logical()
 count_thresh_step_frac %<>%
@@ -86,7 +84,7 @@ param_sep <- "_"
 pair_sep <- "-"
 
 parameter_string <- paste(
-  paste0("testing", pair_sep, testing),
+  paste0("data_path", pair_sep, basename(data_path)),
   paste0("seed", pair_sep, seed),
   paste0("method", pair_sep, deconv_method),
   paste0("indepnorm", pair_sep, normalize_independently),
@@ -109,7 +107,7 @@ dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
 cat(paste0(
   "\nRun params:\n",
-  "\tTest run: ", testing, "\n",
+  "\tDataset used: ", data_path, "\n",
   "\tRandomization seed: ", seed, "\n",
   "\tDeconvolution method: ", deconv_method, "\n",
   "\tIndependent normalization of count matrix for bulk and reference: ",
@@ -135,18 +133,17 @@ if (normalize_independently) {
 ## ----data_loading-------------------------------------------------------------
 data <- load_experiment(
   count_mat_file = here(
-    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_sparse.mtx"
+    data_path, "count_matrix_sparse.mtx"
   ),
   rowname_file = here(
-    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_genes.tsv"
+    data_path, "count_matrix_genes.tsv"
   ),
   colname_file = here(
-    "datasets/Wu_etal_2021_BRCA_scRNASeq/count_matrix_barcodes.tsv"
+    data_path, "count_matrix_barcodes.tsv"
   ),
   meta_file = here(
-    "datasets/Wu_etal_2021_BRCA_scRNASeq/metadata.csv"
-  ),
-  testing = testing
+    data_path, "metadata.csv"
+  )
 )
 
 count_mat <- data$count_mat %>%
