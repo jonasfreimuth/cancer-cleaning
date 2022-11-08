@@ -255,25 +255,6 @@ split_res_list <- lapply(
 ) %>%
   set_names(split_vals)
 
-mean_rmses <- split_res_list %>%
-  lapply(
-    function(split_res) {
-      split_res %>%
-        lapply(
-          function(deconv_res) {
-            deconv_res %>%
-              extract2("errors") %>%
-              mean() %>%
-              {
-                data.frame(mean_rmse = .)
-              }
-          }
-        ) %>%
-        bind_rows(.id = "sigmat_thresh")
-    }
-  ) %>%
-  bind_rows(.id = "split")
-
 cancer_comp_df <- split_res_list %>%
   lapply(
     function(split_res) {
@@ -294,6 +275,7 @@ cor_meth <- "pearson"
 cancer_comp_df_sum <- cancer_comp_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
+    mean_rmse = mean(rmse),
     cor_resid_by_sigmat = cor(prop_true, by_sigmat, method = cor_meth),
     cor_resid_by_transcr_prop = cor(
       prop_true, by_transcr_prop,
@@ -302,8 +284,7 @@ cancer_comp_df_sum <- cancer_comp_df %>%
     cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
     cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth),
     cor_sum_res = cor(prop_true, sum_resid, method = cor_meth)
-  ) %>%
-  left_join(mean_rmses, by = c("split", "sigmat_thresh"))
+  )
 
 corr_cols <- c(
   "by_sigmat" = "cor_resid_by_sigmat",
