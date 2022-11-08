@@ -493,7 +493,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
 
   cancer_comp_df <- cancer_prop_from_resid_df %>%
     left_join(cancer_prop_df, by = "sample") %>%
-    left_join(resid_sum_df, by = "sample") %>%
+    left_join(deconv_corr_df, by = "sample") %>%
     mutate(rmse = deconv_err_vec)
 
   return(list(
