@@ -310,8 +310,12 @@ plot_err <- celltype_rmse_df %>%
   geom_text(aes(
     x = length(unique(celltype)) / 2,
     y = max(celltype_rmse) * 1.1,
-    label = round(mean_bulk_rmse, 3)
-  )) +
+    label = paste0(
+      "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
+      "Mean r: ", round(mean_canc_expr_corr, 3)
+    )
+  ),
+  vjust = 1) +
   labs(
     x = "Cell types",
     y = "Per celltype RMSE"
