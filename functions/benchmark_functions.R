@@ -20,8 +20,12 @@ library("utils")
 load_experiment <- function(count_mat_file, rowname_file, colname_file,
                             meta_file, testing = FALSE) {
   # FIXME Make this function more general
-  data_full_meta <- fread(meta_file) %>%
-    rename(cell = V1)
+  data_full_meta <- fread(meta_file)
+
+  if ("V1" %in% names(data_full_meta)) {
+    data_full_meta %<>%
+      dplyr::rename(cell = V1)
+  }
 
   data_full_rownames <- readLines(rowname_file)
 
