@@ -274,7 +274,7 @@ cancer_comp_df <- split_res_list %>%
 cancer_comp_df_sum <- cancer_comp_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
-    ovarall_rmse = mean(rmse),
+    mean_bulk_rmse = mean(rmse),
     mean_canc_expr_corr = mean(cancer_expr_corr),
     .groups = "drop_last"
   )
@@ -310,7 +310,7 @@ plot_err <- celltype_rmse_df %>%
   geom_text(aes(
     x = length(unique(celltype)) / 2,
     y = max(celltype_rmse) * 1.1,
-    label = round(overall_rmse, 3)
+    label = round(mean_bulk_rmse, 3)
   )) +
   labs(
     x = "Cell types",
