@@ -271,21 +271,11 @@ cancer_comp_df <- split_res_list %>%
   ) %>%
   bind_rows(.id = "split")
 
-cor_meth <- "pearson"
-
 cancer_comp_df_sum <- cancer_comp_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
     mean_rmse = mean(rmse),
     mean_canc_expr_corr = mean(cancer_expr_corr),
-    cor_resid_by_sigmat = cor(prop_true, by_sigmat, method = cor_meth),
-    cor_resid_by_transcr_prop = cor(
-      prop_true, by_transcr_prop,
-      method = cor_meth
-    ),
-    cor_sum_sq_res = cor(prop_true, sum_sq_resid, method = cor_meth),
-    cor_sum_abs_res = cor(prop_true, sum_abs_resid, method = cor_meth),
-    cor_sum_res = cor(prop_true, sum_resid, method = cor_meth),
     .groups = "drop_last"
   )
 
