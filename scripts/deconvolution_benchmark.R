@@ -77,8 +77,8 @@ seed %<>%
 base_width <- 3
 base_height <- 2
 
-facet_height <- 1
-facet_width <- 4.5
+facet_height <- 2
+facet_width <- 5.5
 
 param_sep <- "_"
 pair_sep <- "-"
