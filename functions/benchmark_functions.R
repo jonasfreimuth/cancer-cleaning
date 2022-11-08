@@ -491,7 +491,6 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
   return(list(
     "deconv_res" = all_prop_df,
     "deconv_sum" = all_prop_sum_df,
-    "cancer_comp" = cancer_comp_df,
-    "cancer_corr" = mean(deconv_corr_vec)
+    "cancer_comp" = cancer_comp_df
   ))
 }
