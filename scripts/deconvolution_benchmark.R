@@ -406,7 +406,8 @@ celltype_rmse_df <- split_res_list %>%
               extract2("deconv_res") %>%
               group_by(celltype) %>%
               summarise(
-                rmse = rmse(prop_true, prop_deconv),
+                # per celltype rmse, across all samples
+                celltype_rmse = rmse(prop_true, prop_deconv),
                 .groups = "drop_last"
               ) %>%
               mutate(overall_rmse = mean_rmse)
@@ -419,11 +420,11 @@ celltype_rmse_df <- split_res_list %>%
 
 plot_err <- celltype_rmse_df %>%
   mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
-  ggplot(aes(celltype, rmse)) +
+  ggplot(aes(celltype, celltype_rmse)) +
   geom_col(alpha = 0.5, position = position_identity()) +
   geom_text(aes(
     x = length(unique(celltype)) / 2,
-    y = max(rmse) * 1.1,
+    y = max(celltype_rmse) * 1.1,
     label = round(overall_rmse, 3)
   )) +
   labs(
