@@ -274,7 +274,7 @@ cancer_comp_df <- split_res_list %>%
 cancer_comp_df_sum <- cancer_comp_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
-    mean_rmse = mean(rmse),
+    ovarall_rmse = mean(rmse),
     mean_canc_expr_corr = mean(cancer_expr_corr),
     .groups = "drop_last"
   )
@@ -286,9 +286,6 @@ celltype_rmse_df <- split_res_list %>%
       split_res %>%
         lapply(
           function(deconv_res) {
-            deconv_sum <- deconv_res %>%
-              extract2("deconv_sum")
-
             deconv_res %>%
               extract2("deconv_res") %>%
               group_by(celltype) %>%
@@ -296,14 +293,15 @@ celltype_rmse_df <- split_res_list %>%
                 # per celltype rmse, across all samples
                 celltype_rmse = rmse(prop_true, prop_deconv),
                 .groups = "drop_last"
-              ) %>%
-              mutate(overall_rmse = mean(deconv_sum$rmse))
+              )
           }
         ) %>%
         bind_rows(.id = "sigmat_thresh")
     }
   ) %>%
-  bind_rows(.id = "split")
+  bind_rows(.id = "split") %>%
+  left_join(cancer_comp_df_sum, by = c("split", "sigmat_thresh"))
+
 
 plot_err <- celltype_rmse_df %>%
   mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
