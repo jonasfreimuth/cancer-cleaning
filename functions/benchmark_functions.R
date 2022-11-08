@@ -409,9 +409,10 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     extract(!unlist(lapply(., is.null)))
 
   deconv_prop_list <- deconv_res_list %>%
-    lapply(function(deconv_res) {
-      deconv_res$res
-    })
+    lapply(
+      extract2,
+      "res"
+    )
 
   # Compute deconvolution errors
   deconv_err_vec <- deconv_prop_list %>%
@@ -460,9 +461,10 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
 
   # Compute cancer comp df
   cancer_prop_from_resid_df <- deconv_res_list %>%
-    lapply(function(deconv_res) {
-      deconv_res$cancer_prop
-    }) %>%
+    lapply(
+      extract2,
+      "cancer_prop"
+    ) %>%
     bind_rows(.id = "sample")
 
   cancer_prop_df <- all_prop_df %>%
