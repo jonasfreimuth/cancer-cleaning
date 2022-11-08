@@ -277,6 +277,7 @@ cancer_comp_df_sum <- cancer_comp_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
     mean_rmse = mean(rmse),
+    mean_canc_expr_corr = mean(cancer_expr_corr),
     cor_resid_by_sigmat = cor(prop_true, by_sigmat, method = cor_meth),
     cor_resid_by_transcr_prop = cor(
       prop_true, by_transcr_prop,
