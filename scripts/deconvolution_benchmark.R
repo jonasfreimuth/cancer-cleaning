@@ -119,7 +119,7 @@ run_info <- paste0(
   "Outputs will be found at ", run_path, "\n"
 )
 
-cat(run_info, here(run_path, "run_info.txt"))
+cat(run_info, file = here(run_path, "run_info.txt"))
 
 cat(run_info)
 
