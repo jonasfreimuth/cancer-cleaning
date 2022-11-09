@@ -106,7 +106,7 @@ run_path <- here(
 dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
 run_info <- paste0(
-  "\nRun params:\n",
+  "Run params:\n",
   "\tDataset used: ", data_path, "\n",
   "\tRandomization seed: ", seed, "\n",
   "\tDeconvolution method: ", deconv_method, "\n",
