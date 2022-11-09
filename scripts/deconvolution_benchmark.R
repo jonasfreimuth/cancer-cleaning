@@ -107,14 +107,14 @@ dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
 run_info <- paste0(
   "Run params:\n",
-  "\tDataset used: ", data_path, "\n",
-  "\tRandomization seed: ", seed, "\n",
-  "\tDeconvolution method: ", deconv_method, "\n",
-  "\tIndependent normalization of count matrix for bulk and reference: ",
+  "\tDataset used:\t", data_path, "\n",
+  "\tRandomization seed:\t", seed, "\n",
+  "\tDeconvolution method:\t", deconv_method, "\n",
+  "\tIndependent normalization of count matrix for bulk and reference:\t",
   normalize_independently, "\n",
-  "\tCount matrix threshold step size: ", count_thresh_step_frac, "\n",
-  "\tNumber of repeat samplings: ", n_repeat, "\n",
-  "\tFraction of ground truth sampled per pseudobulk: ", pseudobulk_cell_frac,
+  "\tCount matrix threshold step size:\t", count_thresh_step_frac, "\n",
+  "\tNumber of repeat samplings:\t", n_repeat, "\n",
+  "\tFraction of ground truth sampled per pseudobulk:\t", pseudobulk_cell_frac,
   "\n", "\n",
   "Outputs will be found at ", run_path, "\n"
 )
