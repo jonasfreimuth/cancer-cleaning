@@ -65,7 +65,8 @@ dedupe_sigmut_mat <- function(sigmut_mat, var_sep = "_") {
       set_names(new_names)
 
     # generate deduped signature matrix
-    # is a col was duplicated this contains only the first col of each dupe group
+    # is a col was duplicated this contains only the first col of each dupe
+    # group
     dedupe_res <- sigmut_mat_df[, !is_dupe, drop = FALSE] %>%
       rename(!!dupe_group_names) %>%
       replace(is.na(.), 0)
