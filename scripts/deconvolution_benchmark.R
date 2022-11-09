@@ -306,8 +306,8 @@ celltype_df_sum <- celltype_rmse_df %>%
   mutate(sigmat_thresh = as.numeric(sigmat_thresh))
 
 
-plot_err <- celltype_df_sum %>%
-  ggplot(aes(celltype, celltype_rmse)) +
+plot_err <- ggplot(celltype_df_sum,
+  aes(celltype, celltype_rmse)) +
   geom_col(alpha = 0.5, position = position_identity()) +
   geom_text(aes(
     x = length(unique(celltype)) / 2,
