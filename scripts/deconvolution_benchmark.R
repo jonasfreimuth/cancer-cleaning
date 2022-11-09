@@ -287,24 +287,26 @@ celltype_rmse_df <- split_res_list %>%
         lapply(
           function(deconv_res) {
             deconv_res %>%
-              extract2("deconv_res") %>%
-              group_by(celltype) %>%
-              summarise(
-                # per celltype rmse, across all samples
-                celltype_rmse = rmse(prop_true, prop_deconv),
-                .groups = "drop_last"
-              )
+              extract2("deconv_res")
           }
         ) %>%
         bind_rows(.id = "sigmat_thresh")
     }
   ) %>%
-  bind_rows(.id = "split") %>%
-  left_join(cancer_comp_df_sum, by = c("split", "sigmat_thresh"))
+  bind_rows(.id = "split")
+
+celltype_df_sum <- celltype_rmse_df %>%
+  group_by(split, sigmat_thresh, celltype) %>%
+  summarise(
+    # per celltype rmse, across all samples
+    celltype_rmse = rmse(prop_true, prop_deconv),
+    .groups = "drop_last"
+  ) %>%
+  left_join(cancer_comp_df_sum, by = c("split", "sigmat_thresh")) %>%
+  mutate(sigmat_thresh = as.numeric(sigmat_thresh))
 
 
-plot_err <- celltype_rmse_df %>%
-  mutate(sigmat_thresh = as.numeric(sigmat_thresh)) %>%
+plot_err <- celltype_df_sum %>%
   ggplot(aes(celltype, celltype_rmse)) +
   geom_col(alpha = 0.5, position = position_identity()) +
   geom_text(aes(
