@@ -302,8 +302,25 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     }
 
   if (split_cancer) {
+    # TODO Think about removal of cancer_cols from true props
+    ref_names_clean <- deconv_ref %>%
+      names() %>%
+      str_replace_all(
+        pattern = paste0(
+          "(", paste(cancer_cols, collapse = "|"), ")"
+        ),
+        replacement = ""
+      ) %>%
+      str_replace_all(
+        pattern = "(^_|(?<=_)_|_$)",
+        replacement = ""
+      )
+
+    clean_ref_name_idx <- ref_names_clean != ""
+
     deconv_ref <- deconv_ref %>%
-      select(-all_of(cancer_cols))
+      extract(clean_ref_name_idx) %>%
+      set_names(ref_names_clean[clean_ref_name_idx])
   }
 
   if (ncol(deconv_ref) < 3) {
