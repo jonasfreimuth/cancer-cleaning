@@ -141,7 +141,8 @@ seq_base <- function(start, stop, step_frac, base = 10) {
 }
 
 
-uniquify_sigmat <- function(sigmat) {
+clean_sigmat <- function(sigmat) {
+  # TODO Include uniquely uncounted transcripts
   .row_is_identifiying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
     # is the case is determined by whether a fraction of elements is non-zero.
@@ -179,7 +180,7 @@ reference_from_thresh <- function(count_thresh, proto_sigmat) {
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.
     multiply_by(1) %>%
-    uniquify_sigmat() %>%
+    clean_sigmat() %>%
     dedupe_sigmut_mat()
 
   # sigmats with colSums equal 0 lead to deconv troubles
