@@ -394,6 +394,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     separate_rows(celltype, sep = "_")
 
   deconv_prop_df <- dp_vec %>%
+    split_deconv_res() %>%
     {
       data.frame(celltype = names(.), prop = .)
     }
