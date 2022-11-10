@@ -147,21 +147,37 @@ clean_sigmat <- function(sigmat) {
   # TODO Include uniquely uncounted transcripts
   .row_is_identifiying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
-    # is the case is determined by whether a fraction of elements is non-zero.
-    # The fraction maps to the number of elements which is at minimum 1 and
-    # at maximum the length of the row.
-    len <- length(row)
-    len_allowed <- len * frac
+    # is the case is determined by whether a fraction of elements is either
+    # non-zero or zero. The fraction maps to the number of elements which is at
+    # minimum 1 and at maximum the length of the row.
+    .test_row <- function(row, frac) {
+      len <- length(row)
+      len_allowed <- len * frac
 
-    if (len_allowed < 1) {
-      len_allowed <- 1
-    } else if (len_allowed > len) {
-      len_allowed <- len
+      if (len_allowed < 1) {
+        len_allowed <- 1
+      } else if (len_allowed > len) {
+        len_allowed <- len
+      }
+
+      row_sum <- sum(row > 0)
+
+      row_sum <= len_allowed && row_sum > 0
     }
 
-    row_sum <- sum(row > 0)
+    test_row_list <- list(
+      f = row,
+      r = 1 - row
+    )
 
-    row_sum <= len_allowed && row_sum > 0
+    res <- test_row_list %>%
+      lapply(
+        .test_row,
+        frac = frac
+      ) %>%
+      purrr::reduce(or)
+
+    return(res)
   }
 
   unique_transcript_idx_vec <- sigmat %>%
