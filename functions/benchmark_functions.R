@@ -301,9 +301,6 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       )
     }
 
-  cancer_ref <- deconv_ref %>%
-    select(IDs, all_of(cancer_cols))
-
   if (split_cancer) {
     deconv_ref <- deconv_ref %>%
       select(-all_of(cancer_cols))
