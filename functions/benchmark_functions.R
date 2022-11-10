@@ -1,3 +1,5 @@
+library("purrr")
+library("stringr")
 library("BiocGenerics")
 library("base")
 library("dplyr")
@@ -253,6 +255,33 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
       transcript_counts_cancer = cancer_expression
     )
   )
+}
+
+
+split_deconv_res <- function(deconv_prop_vec, sep = "_") {
+  if (is.null(names(deconv_prop_vec))) {
+    stop(paste0(
+      "deconv_prop_vec needs to be a named numeric vector, but is unnamed."
+    ))
+  }
+
+  if (!any(str_detect(names(deconv_prop_vec), sep))) {
+    return(deconv_prop_vec)
+  }
+
+  prop_df <- data.frame(
+    name = names(deconv_prop_vec),
+    prop = deconv_prop_vec
+  ) %>%
+    mutate(group_size = str_count(name, sep) + 1) %>%
+    separate_rows(name, sep = sep) %>%
+    mutate(prop = prop / group_size)
+
+  deconv_prop_split <- prop_df %>%
+    extract2("prop") %>%
+    set_names(prop_df$name)
+
+  return(deconv_prop_split)
 }
 
 
