@@ -317,12 +317,20 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     extract(names(.) %in% deconv_ref$IDs) %>%
     divide_by(sum(.)) %>%
     extract(!is.na(.))
-  celltype_props <- pseudobulk[["celltype_counts"]] %>%
-    divide_by(sum(.)) %>%
-    extract(!is.na(.))
   # Subsetting is necessary as the residuals' length won't match otherwise.
   transcript_props_cancer <- pseudobulk[["transcript_counts_cancer"]] %>%
     extract(names(.) %in% deconv_ref$IDs) %>%
+    divide_by(sum(.)) %>%
+    extract(!is.na(.))
+
+  celltype_counts <- pseudobulk[["celltype_counts"]]
+
+  if (split_cancer) {
+    celltype_counts <- celltype_counts %>%
+      extract(!(names(.) %in% cancer_cols))
+  }
+
+  celltype_props <- celltype_counts %>%
     divide_by(sum(.)) %>%
     extract(!is.na(.))
 
@@ -347,7 +355,6 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     }
 
   if (split_cancer) {
-    # TODO Think about removal of cancer_cols from true props
     ref_names_clean <- deconv_ref %>%
       names() %>%
       str_replace_all(
