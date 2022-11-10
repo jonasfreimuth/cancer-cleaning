@@ -151,17 +151,17 @@ clean_sigmat <- function(sigmat) {
     # The fraction maps to the number of elements which is at minimum 1 and
     # at maximum the length of the row.
     len <- length(row)
-    len_out <- len * frac
+    len_allowed <- len * frac
 
-    if (len_out < 1) {
-      len_out <- 1
-    } else if (len_out > len) {
-      len_out <- len
+    if (len_allowed < 1) {
+      len_allowed <- 1
+    } else if (len_allowed > len) {
+      len_allowed <- len
     }
 
     row_sum <- sum(row > 0)
 
-    row_sum <= len_out && row_sum > 0
+    row_sum <= len_allowed && row_sum > 0
   }
 
   unique_transcript_idx_vec <- sigmat %>%
