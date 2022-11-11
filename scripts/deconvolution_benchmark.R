@@ -315,6 +315,32 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
   width = base_width + (length(split_vals) * facet_width)
 )
 
+# Resid vs Expr Plot ------------------------------------------------------
+resid_expr_df <- split_res_list %>%
+  dfextract2("resid_expr_df", "sigmat_thresh", "split")
+
+plot_resid_expr <- ggplot(resid_expr_df,
+                          aes(prop, resid, col = sample)) +
+  geom_point() +
+  labs(
+    x = "Transcript Proportion",
+    y = "Transcript Residual"
+  ) +
+  facet_wrap(~sample) +
+  facet_grid(
+    cols = vars(split),
+    rows = vars(sigmat_thresh),
+    scales = "free"
+  ) +
+  theme_benchmark() +
+  theme(legend.position = "none")
+
+dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
+
+ggsave(here(run_path, "plots", "resid_expr_plot.png"), plot_resid_expr,
+       height = base_height + (length(count_thresh_vec) * facet_height),
+       width = base_width + (length(split_vals) * facet_width)
+)
 
 # ----Data saving---------------------------------------------------------------
 file.copy(
