@@ -316,8 +316,7 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 )
 
 
-# Data saving -------------------------------------------------------------
-
+# ----Data saving---------------------------------------------------------------
 file.copy(
   here("scripts/deconvolution_benchmark.R"),
   here(run_path, "deconvolution_benchmark.R")
