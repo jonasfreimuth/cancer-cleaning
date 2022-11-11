@@ -18,6 +18,28 @@ library("utils")
 
 # TODO Once it is clear which functions are actually useful, add proper
 # docstrings.
+dfextract <- function(list, name, .id) {
+  list %>%
+    lapply(
+      function(list_el) {
+        list_el %>%
+          extract2(name)
+      }
+    ) %>%
+    bind_rows(.id = .id)
+}
+
+
+dfextract2 <- function(list, name, .id_inner, .id_outer) {
+  list %>%
+    lapply(
+      dfextract,
+      name,
+      .id = .id_inner
+    ) %>%
+    bind_rows(.id = .id_outer)
+}
+
 
 load_experiment <- function(count_mat_file, rowname_file, colname_file,
                             meta_file, testing = FALSE) {
