@@ -243,6 +243,104 @@ reference_from_thresh <- function(count_thresh, proto_sigmat) {
 }
 
 
+hampel_intervall <- function(x, mad_mult = 3) {
+  x_median <- median(x)
+  x_mad_mult <- mad(x) * mad_mult
+
+  return(c(x_median - x_mad_mult, x_median + x_mad_mult))
+}
+
+
+is_uniform <- function(x) {
+  all(x == x[1])
+}
+
+
+clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
+  ctypes <- colnames(sigmat)
+  # remove rows that are all the same
+  sigmat_wip <- sigmat %>%
+    extract(i = !apply(., 1, is_uniform), j = , drop = FALSE)
+
+  # calc per col/ctype outliers
+  outlier_intervals <- sigmat_wip %>%
+    apply(
+      2,
+      hampel_intervall
+    )
+
+  outlying_transcripts <- ctypes %>%
+    lapply(
+      function(celltype, sigmat, interval_mat) {
+        sel_vec <- colnames(sigmat) == celltype
+        list(
+          count_vec = sigmat[, sel_vec],
+          range_vec = interval_mat[, sel_vec]
+        )
+      },
+      sigmat_wip,
+      outlier_intervals
+    ) %>%
+    set_names(ctypes) %>%
+    lapply(
+      function(count_range_el, trim) {
+        count_vec <- count_range_el %>%
+          extract2("count_vec")
+        range_vec <- count_range_el %>%
+          extract2("range_vec")
+
+        outlier_vec <- count_vec %>%
+          extract(. < range_vec[1] | . > range_vec[2]) %>%
+          sort()
+
+        trim_vec <- outlier_vec %>%
+          {
+            c(length(.) * (trim / 2), length(.) * (1 - trim / 2))
+          }
+
+        idx_vec <- seq_along(outlier_vec)
+
+        trim_vec <- outlier_vec %>%
+          extract(idx_vec < trim_vec[1] | idx_vec > trim_vec[2])
+
+        return(trim_vec)
+      },
+      trim_used
+    ) %>%
+    lapply(names) %>%
+    unlist() %>%
+    unique()
+
+  sigmat_wip <- sigmat_wip %>%
+    extract(i = rownames(.) %in% outlying_transcripts, j = , drop = FALSE)
+
+  # use top / botton n percent?
+  sigmat_clean <- sigmat_wip
+  return(sigmat_clean)
+}
+
+
+reference_non_binary <- function(proto_sigmat) {
+  sigmat <- proto_sigmat %>%
+    clean_nbin_sigmat() %>%
+    dedupe_sigmut_mat()
+
+  # sigmats with colSums equal 0 lead to deconv troubles
+  # TODO check what problems this causes, e.g. leading to
+  # 1 or 0 col sigmats.
+  col_sums <- colSums(sigmat)
+
+  sigmat <- sigmat[, col_sums > 0, drop = FALSE]
+
+  deconv_ref <- sigmat %>%
+    as.data.frame() %>%
+    mutate(IDs = rownames(.)) %>%
+    select(IDs, everything())
+
+  return(deconv_ref)
+}
+
+
 create_celltype_map <- function(celltype, meta_df, cell_colname,
                                 celltype_colname) {
   meta_df %>%
