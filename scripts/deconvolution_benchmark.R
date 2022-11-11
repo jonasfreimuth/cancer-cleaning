@@ -347,12 +347,14 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 file.copy(
   here("scripts/deconvolution_benchmark.R"),
   here(run_path, "deconvolution_benchmark.R")
-)
+) %>%
+  invisible()
 
 file.copy(
   here("functions/benchmark_functions.R"),
   here(run_path, "benchmark_functions.R")
-)
+) %>%
+  invisible()
 
 print(parameter_sum_df)
 
