@@ -256,29 +256,6 @@ split_res_list <- lapply(
 ) %>%
   set_names(split_vals)
 
-cancer_comp_df <- split_res_list %>%
-  lapply(
-    function(split_res) {
-      split_res %>%
-        lapply(
-          function(deconv_res) {
-            deconv_res %>%
-              extract2("cancer_comp")
-          }
-        ) %>%
-        bind_rows(.id = "sigmat_thresh")
-    }
-  ) %>%
-  bind_rows(.id = "split")
-
-cancer_comp_df_sum <- cancer_comp_df %>%
-  group_by(split, sigmat_thresh) %>%
-  summarize(
-    mean_bulk_rmse = mean(rmse),
-    mean_canc_expr_corr = mean(cancer_expr_corr),
-    .groups = "drop_last"
-  )
-
 ## ----plot_deconv_err----------------------------------------------------------
 sample_sum_df <- split_res_list %>%
   lapply(

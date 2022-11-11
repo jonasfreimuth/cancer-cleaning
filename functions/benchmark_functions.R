@@ -496,18 +496,8 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
     left_join(deconv_corr_df, by = "sample") %>%
     mutate(rmse = deconv_err_vec)
 
-  # Compute cancer comp df
-  cancer_prop_df <- all_prop_df %>%
-    filter(celltype == "Cancer Epithelial") %>%
-    select(sample, prop_true, prop_deconv, abs_err)
-
-  cancer_comp_df <- cancer_prop_df %>%
-    left_join(deconv_corr_df, by = "sample") %>%
-    mutate(rmse = deconv_err_vec)
-
   return(list(
     "deconv_res" = all_prop_df,
-    "deconv_sum" = all_prop_sum_df,
-    "cancer_comp" = cancer_comp_df
+    "deconv_sum" = all_prop_sum_df
   ))
 }
