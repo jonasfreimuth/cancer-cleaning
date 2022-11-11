@@ -18,6 +18,8 @@ source(here("functions/rmse.R"))
 
 source(here("functions/benchmark_functions.R"))
 
+source(here("etc/plot_themes.R"))
+
 ## ----parameters --------------------------------------------------------------
 if (!exists("script_args")) {
   script_args <- commandArgs(trailingOnly = TRUE)
