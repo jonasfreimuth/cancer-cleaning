@@ -280,8 +280,10 @@ celltype_df_sum <- celltype_rmse_df %>%
   mutate(sigmat_thresh = as.numeric(sigmat_thresh))
 
 
-plot_err <- ggplot(celltype_df_sum,
-  aes(celltype, celltype_rmse)) +
+plot_err <- ggplot(
+  celltype_df_sum,
+  aes(celltype, celltype_rmse)
+) +
   geom_col(alpha = 0.5, position = position_identity()) +
   geom_text(aes(
     x = length(unique(celltype)) / 2,
@@ -291,7 +293,8 @@ plot_err <- ggplot(celltype_df_sum,
       "Mean r: ", round(mean_canc_expr_corr, 3)
     )
   ),
-  vjust = 1) +
+  vjust = 1
+  ) +
   labs(
     x = "Cell types",
     y = "Per celltype RMSE"
@@ -314,8 +317,10 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 resid_expr_df <- split_res_list %>%
   dfextract2("resid_expr_df", "sigmat_thresh", "split")
 
-plot_resid_expr <- ggplot(resid_expr_df,
-                          aes(prop, resid, col = sample)) +
+plot_resid_expr <- ggplot(
+  resid_expr_df,
+  aes(prop, resid, col = sample)
+) +
   geom_point() +
   labs(
     x = "Transcript Proportion",
@@ -333,8 +338,8 @@ plot_resid_expr <- ggplot(resid_expr_df,
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "resid_expr_plot.png"), plot_resid_expr,
-       height = base_height + (length(count_thresh_vec) * facet_height),
-       width = base_width + (length(split_vals) * facet_width)
+  height = base_height + (length(count_thresh_vec) * facet_height),
+  width = base_width + (length(split_vals) * facet_width)
 )
 
 # ----Data saving---------------------------------------------------------------
