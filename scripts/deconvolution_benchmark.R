@@ -28,6 +28,7 @@ if (!exists("script_args")) {
 # names must match script params
 arg_names <- c(
   "data_path",
+  "binary_sigmat",
   "count_thresh_step_frac",
   "n_repeat",
   "pseudobulk_cell_frac",
@@ -45,10 +46,16 @@ if (length(script_args) > 0) {
   script_args <- c(
     data_path = "datasets/Wu_etal_downsampled_test/",
 
+    # Whether the signature matrix is supposed to be binary. This is achieved
+    # via thresholding along a equally spaced exponential sequence.
+    # There are also some finer difference how feature selection is performed.
+    binary_sigmat = "FALSE",
+
     # Step size for exploring the effect of the count threshold, i.e. the
     # threshold for which transcript count is necessary for a transcript to be
     # considered as an indicator for a cell type (strict greater than, applied
     # after normalization)
+    # Has no effect if a non-binary signature matrix is requested.
     count_thresh_step_frac = "0.3",
     n_repeat = "200",
     pseudobulk_cell_frac = "0.2",
@@ -65,6 +72,8 @@ for (i in seq_along(script_args)) {
 }
 
 normalize_independently %<>%
+  as.logical()
+binary_sigmat %<>%
   as.logical()
 count_thresh_step_frac %<>%
   as.numeric()
@@ -92,6 +101,7 @@ parameter_string <- paste(
   paste0("indepnorm", pair_sep, normalize_independently),
   paste0("normtype", pair_sep, normalization_type),
   paste0("nrepeat", pair_sep, n_repeat),
+  paste0("binary_sigmat", pair_sep, binary_sigmat),
   paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
   sep = param_sep
 )
@@ -114,6 +124,7 @@ run_info <- paste0(
   "\tDeconvolution method:\t", deconv_method, "\n",
   "\tIndependent normalization of count matrix for bulk and reference:\t",
   normalize_independently, "\n",
+  "\tBinary signature matrix:\t", binary_sigmat, "\n",
   "\tCount matrix threshold step size:\t", count_thresh_step_frac, "\n",
   "\tNumber of repeat samplings:\t", n_repeat, "\n",
   "\tFraction of ground truth sampled per pseudobulk:\t", pseudobulk_cell_frac,
@@ -190,27 +201,37 @@ count_mat <- count_mat %>%
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Add Others col?
-count_range <- proto_sigmat %>%
-  as.vector() %>%
-  extract(. > 0) %>%
-  range()
+if (binary_sigmat) {
+  count_range <- proto_sigmat %>%
+    as.vector() %>%
+    extract(. > 0) %>%
+    range()
 
-count_thresh_vec <- seq_base(
-  count_range[1],
-  count_range[2],
-  count_thresh_step_frac,
-  base = 3
-) %>%
-  {
-    c(0, .)
-  } %>%
-  set_names(as.character(round(., 2)))
+  count_thresh_vec <- seq_base(
+    count_range[1],
+    count_range[2],
+    count_thresh_step_frac,
+    base = 3
+  ) %>%
+    {
+      c(0, .)
+    } %>%
+    set_names(as.character(round(., 2)))
 
-deconv_ref_list <- lapply(
-  count_thresh_vec,
-  reference_from_thresh,
-  proto_sigmat = proto_sigmat
-)
+  deconv_ref_list <- lapply(
+    count_thresh_vec,
+    reference_from_thresh,
+    proto_sigmat = proto_sigmat
+  )
+} else {
+  count_thresh_vec <- 0 %>%
+    set_names(as.character(round(., 2)))
+
+  deconv_ref_list <- proto_sigmat %>%
+    reference_non_binary() %>%
+    list() %>%
+    set_names("0")
+}
 
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
