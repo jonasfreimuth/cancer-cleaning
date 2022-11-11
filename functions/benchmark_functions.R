@@ -55,17 +55,13 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
 
   data_full_colnames <- readLines(colname_file)
 
-  # FIXME Turn this hack for saving time into something robust
-  if (!exists("data_full_matrix")) {
-    data_full_matrix <- readMM(count_mat_file)
+  data_full_matrix <- readMM(count_mat_file)
 
-    data_full_matrix@Dimnames <- list(
-      data_full_rownames,
-      data_full_colnames
-    )
-  }
+  data_full_matrix@Dimnames <- list(
+    data_full_rownames,
+    data_full_colnames
+  )
 
-  ## ----set_data_used----------------------------------------------------------
   if (testing) {
     sample_perc <- 0.01
 
