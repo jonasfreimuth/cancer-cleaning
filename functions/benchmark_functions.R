@@ -493,6 +493,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       med_abs_err = median(abs_err),
       unq_n_ct = paste(unique(n_ctypes), sep = "_")
     ) %>%
+    left_join(deconv_corr_df, by = "sample") %>%
     mutate(rmse = deconv_err_vec)
 
   # Compute cancer comp df
