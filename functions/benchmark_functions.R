@@ -516,6 +516,9 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       )
     }
 
+  resid_expr_df <- deconv_res_list %>%
+    dfextract("resid_expr_df", "sample")
+
   # Generate overall result df
   all_prop_df <- deconv_prop_list %>%
     bind_rows(.id = "sample")
@@ -534,6 +537,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
 
   return(list(
     "deconv_res" = all_prop_df,
-    "deconv_sum" = all_prop_sum_df
+    "deconv_sum" = all_prop_sum_df,
+    "resid_expr_df" = resid_expr_df
   ))
 }
