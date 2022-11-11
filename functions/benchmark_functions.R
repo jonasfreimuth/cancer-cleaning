@@ -491,9 +491,9 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
         "prop_true", "prop_deconv"
       )), sum),
       med_abs_err = median(abs_err),
-      unq_n_ct = paste(unique(n_ctypes), sep = "_"),
-      rmse = rmse(prop_true, prop_deconv)
-    )
+      unq_n_ct = paste(unique(n_ctypes), sep = "_")
+    ) %>%
+    mutate(rmse = deconv_err_vec)
 
   # Compute cancer comp df
   cancer_prop_df <- all_prop_df %>%
