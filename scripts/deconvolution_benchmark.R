@@ -280,6 +280,30 @@ cancer_comp_df_sum <- cancer_comp_df %>%
   )
 
 ## ----plot_deconv_err----------------------------------------------------------
+sample_sum_df <- split_res_list %>%
+  lapply(
+    function(split_res) {
+      split_res %>%
+        lapply(
+          function(deconv_res) {
+            deconv_res %>%
+              extract2("deconv_sum")
+          }
+        ) %>%
+        bind_rows(.id = "sigmat_thresh")
+    }
+  ) %>%
+  bind_rows(.id = "split")
+
+parameter_sum_df <- sample_sum_df %>%
+  group_by(split, sigmat_thresh) %>%
+  summarize(
+    mean_bulk_rmse = mean(rmse),
+    mean_canc_expr_corr = mean(cancer_expr_corr),
+    .groups = "drop_last"
+  )
+
+
 celltype_rmse_df <- split_res_list %>%
   lapply(
     function(split_res) {
