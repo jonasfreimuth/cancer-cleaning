@@ -432,6 +432,12 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   cancer_expr_cor <- cor(transcript_props_cancer, as.vector(deconv_resid))
 
+  resid_expr_df <- data.frame(
+    transcript = names(transcript_props_cancer),
+    prop = transcript_props_cancer,
+    resid = deconv_resid
+  )
+
   true_prop_df <- celltype_props %>%
     {
       data.frame(celltype = names(.), prop = .)
@@ -464,7 +470,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   return(list(
     res = deconv_res,
-    cancer_expr_corr = cancer_expr_cor
+    cancer_expr_corr = cancer_expr_cor,
+    resid_expr_df = resid_expr_df
   ))
 }
 
