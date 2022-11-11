@@ -326,7 +326,7 @@ celltype_df_sum <- celltype_rmse_df %>%
     celltype_rmse = rmse(prop_true, prop_deconv),
     .groups = "drop_last"
   ) %>%
-  left_join(cancer_comp_df_sum, by = c("split", "sigmat_thresh")) %>%
+  left_join(parameter_sum_df, by = c("split", "sigmat_thresh")) %>%
   mutate(sigmat_thresh = as.numeric(sigmat_thresh))
 
 
@@ -377,6 +377,6 @@ file.copy(
   here(run_path, "benchmark_functions.R")
 )
 
-print(cancer_comp_df_sum)
+print(parameter_sum_df)
 
-fwrite(cancer_comp_df_sum, here(run_path, "cancer_comparison_summary.csv"))
+fwrite(parameter_sum_df, here(run_path, "cancer_comparison_summary.csv"))
