@@ -305,11 +305,7 @@ plot_err <- ggplot(celltype_df_sum,
     cols = vars(split),
     rows = vars(sigmat_thresh)
   ) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.line = element_line()
-  ) +
+  theme_benchmark() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
