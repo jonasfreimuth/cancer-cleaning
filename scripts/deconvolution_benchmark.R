@@ -187,6 +187,9 @@ proto_sigmat <- count_mat %>%
 count_mat <- count_mat %>%
   as.matrix()
 
+## ----signature_matrix_generation----------------------------------------------
+# TODO: Consider transcript counts as weights.
+# TODO: Add Others col?
 count_range <- proto_sigmat %>%
   as.vector() %>%
   extract(. > 0) %>%
@@ -202,10 +205,6 @@ count_thresh_vec <- seq_base(
     c(0, .)
   } %>%
   set_names(as.character(round(., 2)))
-
-## ----signature_matrix_generation----------------------------------------------
-# TODO: Consider transcript counts as weights.
-# TODO: Add Others col?
 
 deconv_ref_list <- lapply(
   count_thresh_vec,
