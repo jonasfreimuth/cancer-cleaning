@@ -258,19 +258,7 @@ split_res_list <- lapply(
 
 ## ----plot_deconv_err----------------------------------------------------------
 sample_sum_df <- split_res_list %>%
-  lapply(
-    function(split_res) {
-      split_res %>%
-        lapply(
-          function(deconv_res) {
-            deconv_res %>%
-              extract2("deconv_sum")
-          }
-        ) %>%
-        bind_rows(.id = "sigmat_thresh")
-    }
-  ) %>%
-  bind_rows(.id = "split")
+  dfextract2("deconv_sum", "sigmat_thresh", "split")
 
 parameter_sum_df <- sample_sum_df %>%
   group_by(split, sigmat_thresh) %>%
@@ -282,19 +270,7 @@ parameter_sum_df <- sample_sum_df %>%
 
 
 celltype_rmse_df <- split_res_list %>%
-  lapply(
-    function(split_res) {
-      split_res %>%
-        lapply(
-          function(deconv_res) {
-            deconv_res %>%
-              extract2("deconv_res")
-          }
-        ) %>%
-        bind_rows(.id = "sigmat_thresh")
-    }
-  ) %>%
-  bind_rows(.id = "split")
+  dfextract2("deconv_res", "sigmat_thresh", "split")
 
 celltype_df_sum <- celltype_rmse_df %>%
   group_by(split, sigmat_thresh, celltype) %>%
