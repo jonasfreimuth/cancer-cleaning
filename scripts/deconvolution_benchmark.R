@@ -203,10 +203,6 @@ count_thresh_vec <- seq_base(
   } %>%
   set_names(as.character(round(., 2)))
 
-# # temp solution
-# count_thresh_vec <- c(7323) %>%
-#   set_names(as.character(.))
-
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Add Others col?
