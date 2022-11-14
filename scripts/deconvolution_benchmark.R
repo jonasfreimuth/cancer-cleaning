@@ -341,12 +341,12 @@ resid_expr_df <- split_res_list %>%
 
 plot_resid_expr <- ggplot(
   resid_expr_df,
-  aes(prop, resid, col = sample)
+  aes(cancer_expr, resid, col = sample)
 ) +
   geom_point() +
   geom_text(
     aes(
-      x = mean(c(min(prop), max(prop))),
+      x = mean(c(min(cancer_expr), max(cancer_expr))),
       y = max(resid) * 1.1,
       label = paste0(
         "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",

@@ -560,7 +560,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   resid_expr_df <- data.frame(
     transcript = names(transcript_props_cancer),
-    prop = transcript_props_cancer,
+    cancer_expr = transcript_props_cancer,
     resid = deconv_resid
   )
 
