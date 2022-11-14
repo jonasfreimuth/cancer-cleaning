@@ -336,13 +336,26 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 
 # Resid vs Expr Plot ------------------------------------------------------
 resid_expr_df <- split_res_list %>%
-  dfextract2("resid_expr_df", "sigmat_thresh", "split")
+  dfextract2("resid_expr_df", "sigmat_thresh", "split") %>% 
+  left_join(parameter_sum_df, by = c("split", "sigmat_thresh"))
 
 plot_resid_expr <- ggplot(
   resid_expr_df,
   aes(prop, resid, col = sample)
 ) +
   geom_point() +
+  geom_text(
+    aes(
+      x = mean(c(min(prop), max(prop))),
+      y = max(resid) * 1.1,
+      label = paste0(
+        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
+        "Mean r: ", round(mean_canc_expr_corr, 3)
+      )
+    ),
+    vjust = 1,
+    col = "gray33"
+  ) +
   labs(
     x = "Transcript Proportion",
     y = "Transcript Residual"
