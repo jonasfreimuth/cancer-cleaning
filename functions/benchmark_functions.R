@@ -97,6 +97,18 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
 }
 
 
+norm_row <- function(count_row) {
+  row_sum <- sum(count_row)
+
+  # Remove rows without transcripts (might happen if down sampling)
+  if (row_sum == 0) {
+    return(NULL)
+  }
+
+  return(count_row / row_sum)
+}
+
+
 lognorm_row <- function(count_row, base = 10) {
   row_sum <- sum(count_row)
 
