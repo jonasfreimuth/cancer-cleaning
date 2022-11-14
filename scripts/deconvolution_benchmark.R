@@ -376,6 +376,43 @@ ggsave(here(run_path, "plots", "resid_expr_plot.png"), plot_resid_expr,
   width = base_width + (length(split_vals) * facet_width)
 )
 
+
+plot_pred_prop_expr <- ggplot(
+  resid_expr_df,
+  aes(cancer_expr, deconv_pred, col = sample)
+) +
+  geom_point() +
+  geom_text(
+    aes(
+      x = mean(c(min(cancer_expr), max(cancer_expr))),
+      y = max(deconv_pred) * 1.2,
+      label = paste0(
+        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
+        "Mean r: ", round(mean_canc_expr_corr, 3)
+      )
+    ),
+    vjust = 1,
+    col = "gray33"
+  ) +
+  geom_abline(slope = 1, intercept = 0) +
+  labs(
+    x = "Cancer expression",
+    y = "Deconvolution model prediction"
+  ) +
+  facet_wrap(~sample) +
+  facet_grid(
+    cols = vars(split),
+    rows = vars(sigmat_thresh),
+    scales = "free"
+  ) +
+  theme_benchmark() +
+  theme(legend.position = "none")
+
+ggsave(here(run_path, "plots", "pred_prop_expr_plot.png"), plot_pred_prop_expr,
+  height = base_height + (length(count_thresh_vec) * facet_height),
+  width = base_width + (length(split_vals) * facet_width)
+)
+
 # ----Data saving---------------------------------------------------------------
 file.copy(
   here("scripts/deconvolution_benchmark.R"),
