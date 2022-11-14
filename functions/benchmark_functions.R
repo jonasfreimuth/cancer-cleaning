@@ -561,7 +561,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   resid_expr_df <- data.frame(
     transcript = names(transcript_props_cancer),
     cancer_expr = transcript_props_cancer,
-    resid = deconv_resid
+    resid = deconv_resid,
+    deconv_pred = transcript_props_pred
   )
 
   true_prop_df <- celltype_props %>%
