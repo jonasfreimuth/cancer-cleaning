@@ -357,8 +357,8 @@ plot_resid_expr <- ggplot(
     col = "gray33"
   ) +
   labs(
-    x = "Transcript Proportion",
-    y = "Transcript Residual"
+    x = "Cancer expression",
+    y = "Transcript residual"
   ) +
   facet_wrap(~sample) +
   facet_grid(
