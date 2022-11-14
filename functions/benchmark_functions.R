@@ -270,6 +270,7 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
     )
 
   outlying_transcripts <- ctypes %>%
+    # assign each col its range
     lapply(
       function(celltype, sigmat, interval_mat) {
         sel_vec <- colnames(sigmat) == celltype
@@ -282,6 +283,7 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
       outlier_intervals
     ) %>%
     set_names(ctypes) %>%
+    # extract the trim fraction of most extreme outliers
     lapply(
       function(count_range_el, trim) {
         count_vec <- count_range_el %>%
@@ -289,21 +291,31 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
         range_vec <- count_range_el %>%
           extract2("range_vec")
 
-        outlier_vec <- count_vec %>%
-          extract(. < range_vec[1] | . > range_vec[2]) %>%
-          sort()
-
-        trim_vec <- outlier_vec %>%
+        outlier_list <- count_vec %>%
           {
-            c(length(.) * (trim / 2), length(.) * (1 - trim / 2))
-          }
+            list(
+              "lower" = extract(., . < range_vec[1]) %>%
+                sort(),
+              "upper" = extract(., . > range_vec[2]) %>%
+                sort(decreasing = TRUE)
+            )
+          } %>%
+          lapply(
+            function(outlier_vec, trim) {
+              trim_cut <- length(outlier_vec) * (trim / 2)
+              outlier_vec[seq_len(trim_cut)]
+            },
+            trim
+          )
 
-        idx_vec <- seq_along(outlier_vec)
+        outlier_vec <- unlist(outlier_list) %>%
+          set_names(str_replace_all(
+            names(.),
+            "(upper.|lower.)",
+            ""
+          ))
 
-        trim_vec <- outlier_vec %>%
-          extract(idx_vec < trim_vec[1] | idx_vec > trim_vec[2])
-
-        return(trim_vec)
+        return(outlier_vec)
       },
       trim_used
     ) %>%
