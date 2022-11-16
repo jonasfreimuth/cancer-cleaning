@@ -155,7 +155,7 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
     ))
   }
 
-  return(count_mat)
+  return(norm_mat)
 }
 
 
