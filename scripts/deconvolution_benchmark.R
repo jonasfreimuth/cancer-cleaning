@@ -384,6 +384,7 @@ plot_resid_expr <- ggplot(
   aes(cancer_expr, resid, col = sample)
 ) +
   geom_point() +
+  geom_abline(slope = 1, intercept = 0) +
   geom_text(
     aes(
       x = mean(c(min(cancer_expr), max(cancer_expr))),
