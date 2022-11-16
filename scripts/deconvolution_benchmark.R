@@ -198,6 +198,46 @@ proto_sigmat <- count_mat %>%
 count_mat <- count_mat %>%
   as.matrix()
 
+
+# count_mat_qc ------------------------------------------------------------
+count_df <- count_mat %>%
+  t() %>%
+  as.data.frame() %>%
+  mutate(
+    cell = rownames(.),
+    celltype = names(celltype_cell_map)
+  ) %>%
+  select(celltype, cell, everything()) %>%
+  pivot_longer(
+    !all_of(c("celltype", "cell")),
+    names_to = "transcript",
+    values_to = "count"
+  )
+
+count_qc_plot <- ggplot(
+  count_df,
+  aes(transcript, count)
+) +
+  geom_boxplot() +
+  theme_benchmark() +
+  labs(
+    x = "Transcript",
+    title = paste("Normalized with", normalization_type)
+  ) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
+
+dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
+
+ggsave(here(run_path, "plots", "count_qc_plot.png"), count_qc_plot,
+  height = base_height + 3 * facet_height,
+  width = base_width + 5 * facet_width
+)
+
 ## ----signature_matrix_generation----------------------------------------------
 # TODO: Consider transcript counts as weights.
 # TODO: Add Others col?
