@@ -123,42 +123,60 @@ lognorm_row <- function(count_row, base = 10) {
   return(count_row)
 }
 
-quantnorm_mat <- function(x) {
-  # NOTE Old implementation from a Uni course.
-  # sort each column in descending order
-  # ranks are also in order afterwards
-  x_sort <- apply(x, 2, sort, na.last = TRUE)
+quantnorm_mat <- function(x, MAR = 1) {
+  # FIXME This assumes a simple 2D matrix, if it gets more complicated this
+  # needs to be adapted.
+  CMAR <- 2
 
-  # calculate the average for each row in the column sorted
-  # matrix
-  # i.e. calculate the average for each rank
-  x_rankavg <- sort(apply(x_sort, 1, mean, na.rm = TRUE))
+  if (MAR != 1) {
+    CMAR <- 1
+  }
 
-  # match rank averages back to individual columns
-  # in cases where multiple cells have the same ranks
-  # use the mean rank average for all tied cells
-  x <- apply(x, 2, function(x_col) {
-    x_col_new <- x_col
+  # Get per rank averages.
+  rank_avg <- x %>%
+    # Ensure rank order
+    apply(CMAR, sort, na.last = TRUE) %>%
+    t() %>%
+    apply(MAR, mean, na.rm = TRUE) %>%
+    # FIXME Check if this is necessary
+    sort()
 
-    # go through every unique rank (group tied cells together)
-    for (rank in unique(rank(x_col, na.last = TRUE))) {
-      # generate selection vector where x_col has the current rank
-      rank_select <- rank(x_col, na.last = TRUE) == rank
+  # Match rank averages back to individual rows
+  # In cases where multiple cells have the same ranks,
+  # use the mean rank average for all tied cells.
+  x_normed <- x %>%
+    apply(MAR, function(vec, rank_avg) {
+      # TEHE let's build a df for EVERY col in the data, I'm sure that's great
+      # for performance.
+      data.frame(
+        rank = rank(vec, na.last = TRUE, ties.method = "first"),
+        group = rank(vec, na.last = TRUE),
+        rank_avg = rank_avg
+      ) %>%
+        group_by(group) %>%
+        summarize(
+          group_avg = mean(rank_avg),
+          group_ranks = paste(rank, sep = "_"),
+          .groups = "drop_last"
+        ) %>%
+        separate_rows(
+          group_ranks,
+          sep = "_"
+        ) %>%
+        extract2("group_avg") %>%
+        return()
+    },
+    rank_avg = rank_avg
+    )
 
-      # find the indices of the rank average corresponding to the rows
-      # in x_col sharing the same rank
-      rank_avg_idcs <- rank(x_col,
-        na.last = TRUE,
-        ties.method = "first"
-      )[rank_select]
+  if (MAR == 1) {
+    x_normed %<>%
+      t()
+  }
+  
+  dimnames(x_normed) <- dimnames(x)
 
-      # match the mean rank average to its corresponding rows
-      x_col_new[rank_select] <- mean(x_rankavg[rank_avg_idcs])
-    }
-    return(x_col_new)
-  })
-
-  return(x)
+  return(x_normed)
 }
 
 
