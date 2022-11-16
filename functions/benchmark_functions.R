@@ -123,6 +123,44 @@ lognorm_row <- function(count_row, base = 10) {
   return(count_row)
 }
 
+quantnorm_mat <- function(x) {
+  # NOTE Old implementation from a Uni course.
+  # sort each column in descending order
+  # ranks are also in order afterwards
+  x_sort <- apply(x, 2, sort, na.last = TRUE)
+
+  # calculate the average for each row in the column sorted
+  # matrix
+  # i.e. calculate the average for each rank
+  x_rankavg <- sort(apply(x_sort, 1, mean, na.rm = TRUE))
+
+  # match rank averages back to individual columns
+  # in cases where multiple cells have the same ranks
+  # use the mean rank average for all tied cells
+  x <- apply(x, 2, function(x_col) {
+    x_col_new <- x_col
+
+    # go through every unique rank (group tied cells together)
+    for (rank in unique(rank(x_col, na.last = TRUE))) {
+      # generate selection vector where x_col has the current rank
+      rank_select <- rank(x_col, na.last = TRUE) == rank
+
+      # find the indices of the rank average corresponding to the rows
+      # in x_col sharing the same rank
+      rank_avg_idcs <- rank(x_col,
+        na.last = TRUE,
+        ties.method = "first"
+      )[rank_select]
+
+      # match the mean rank average to its corresponding rows
+      x_col_new[rank_select] <- mean(x_rankavg[rank_avg_idcs])
+    }
+    return(x_col_new)
+  })
+
+  return(x)
+}
+
 
 normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
   if (is.null(type)) {
