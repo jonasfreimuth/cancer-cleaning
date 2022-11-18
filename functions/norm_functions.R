@@ -18,30 +18,30 @@ library("scuttle")
 library("utils")
 
 
-norm_row <- function(count_row) {
-  row_sum <- sum(count_row)
+norm_vec <- function(count_vec) {
+  vec_sum <- sum(count_vec)
 
-  # Remove rows without transcripts (might happen if down sampling)
-  if (row_sum == 0) {
+  # Remove vecs without transcripts (might happen if down sampling)
+  if (vec_sum == 0) {
     return(NULL)
   }
 
-  return(count_row / row_sum)
+  return(count_vec / vec_sum)
 }
 
 
-lognorm_row <- function(count_row, base = 10) {
-  row_sum <- sum(count_row)
+lognorm_vec <- function(count_vec, base = 10) {
+  vec_sum <- sum(count_vec)
 
-  # Remove rows without transcripts (might happen if down sampling)
-  if (row_sum == 0) {
+  # Remove vecs without transcripts (might happen if down sampling)
+  if (vec_sum == 0) {
     return(NULL)
   }
 
   # log normalize counts
-  count_row <- log((count_row / row_sum) + 1, base = base) * 10^4
+  count_vec <- log((count_vec / vec_sum) + 1, base = base) * 10^4
 
-  return(count_row)
+  return(count_vec)
 }
 
 quantnorm_mat <- function(x, MAR = 1) {
@@ -111,7 +111,7 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
     norm_mat <- count_mat %>%
       apply(
         2,
-        norm_row,
+        norm_vec,
         simplify = TRUE,
         ...
       )
