@@ -205,6 +205,10 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
   } else if (type == "tpm") {
     norm_mat <- count_mat %>%
       scuttle::calculateTPM(...)
+  } else if (type == "quantile") {
+    norm_mat <- count_mat %>%
+      # as.matrix() %>%
+      quantnorm_mat()
   } else {
     stop(paste0(
       "Normalization type \"", type, "\" is not supported."
