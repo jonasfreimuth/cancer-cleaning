@@ -31,9 +31,9 @@ norm_vec <- function(count_vec, type, base = 10, scale = 10^4) {
   # fragile.
   if (str_detect(type, "^log")) {
     norm_vec <- log(norm_vec + 1, base = base)
-
-    norm_vec <- norm_vec * scale
   }
+
+  norm_vec <- norm_vec * scale
 
   return(norm_vec)
 }
