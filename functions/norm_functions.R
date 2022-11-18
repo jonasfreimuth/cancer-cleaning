@@ -21,9 +21,8 @@ library("utils")
 norm_vec <- function(count_vec, type, base = 10, scale = 10^4) {
   vec_sum <- sum(count_vec)
 
-  # Remove vecs without transcripts (might happen if down sampling)
   if (vec_sum == 0) {
-    return(NULL)
+    return(count_vec)
   }
 
   norm_vec <- count_vec / vec_sum
