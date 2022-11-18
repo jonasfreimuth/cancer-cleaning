@@ -76,7 +76,7 @@ quantnorm_mat <- function(x, MAR = 2) {
         group_by(group) %>%
         summarize(
           group_avg = mean(rank_avg),
-          group_ranks = paste(rank, sep = "_"),
+          group_ranks = paste(rank, collapse = "_"),
           .groups = "drop_last"
         ) %>%
         separate_rows(
