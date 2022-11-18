@@ -61,13 +61,18 @@ quantnorm_mat <- function(x, MAR = 2) {
   # use the mean rank average for all tied cells.
   x_normed <- x %>%
     apply(MAR, function(vec, rank_avg) {
+      avg_df <- data.frame(
+        rank_avg = rank_avg,
+        rank = rank(rank_avg)
+      )
+
       # TEHE let's build a df for EVERY col in the data, I'm sure that's great
       # for performance.
       data.frame(
         rank = rank(vec, na.last = TRUE, ties.method = "first"),
-        group = rank(vec, na.last = TRUE),
-        rank_avg = rank_avg
+        group = rank(vec, na.last = TRUE)
       ) %>%
+        left_join(avg_df, by = "rank") %>%
         group_by(group) %>%
         summarize(
           group_avg = mean(rank_avg),
