@@ -50,10 +50,10 @@ quantnorm_mat <- function(x, MAR = 2) {
   # Get per rank averages.
   rank_avg <- x %>%
     # Ensure rank order
-    apply(CMAR, sort, na.last = TRUE) %>%
-    t() %>%
-    apply(MAR, mean, na.rm = TRUE) %>%
-    # FIXME Check if this is necessary
+    apply(MAR, sort, na.last = TRUE) %>%
+    # After the first apply, this will always be rows that need averaging.
+    apply(1, mean, na.rm = TRUE) %>%
+    # TODO Remove, might mess up the ordering
     sort()
 
   # Match rank averages back to individual rows
