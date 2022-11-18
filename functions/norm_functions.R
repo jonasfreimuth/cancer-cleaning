@@ -68,7 +68,7 @@ quantnorm_mat <- function(x, MAR = 2) {
 
       # TEHE let's build a df for EVERY col in the data, I'm sure that's great
       # for performance.
-      data.frame(
+      out <- data.frame(
         rank = rank(vec, na.last = TRUE, ties.method = "first"),
         group = rank(vec, na.last = TRUE)
       ) %>%
@@ -83,8 +83,11 @@ quantnorm_mat <- function(x, MAR = 2) {
           group_ranks,
           sep = "_"
         ) %>%
-        extract2("group_avg") %>%
-        return()
+        # Ensure original ordering
+        extract(i = rank(vec, ties.method = "first"), j = ) %>%
+        extract2("group_avg")
+
+      return(out)
     },
     rank_avg = rank_avg
     )
