@@ -186,7 +186,15 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
     return(count_mat)
   }
 
-  if (type == "lognorm") {
+  if (type == "norm") {
+    norm_mat <- count_mat %>%
+      apply(
+        2,
+        norm_row,
+        simplify = TRUE,
+        ...
+      )
+  } else if (type == "lognorm") {
     norm_mat <- count_mat %>%
       apply(
         2,
@@ -197,14 +205,6 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
   } else if (type == "tpm") {
     norm_mat <- count_mat %>%
       scuttle::calculateTPM(...)
-  } else if (type == "norm") {
-    norm_mat <- count_mat %>%
-      apply(
-        2,
-        norm_row,
-        simplify = TRUE,
-        ...
-      )
   } else {
     stop(paste0(
       "Normalization type \"", type, "\" is not supported."
