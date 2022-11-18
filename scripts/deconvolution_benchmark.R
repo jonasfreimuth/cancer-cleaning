@@ -272,8 +272,8 @@ proto_count_qc_plot <- ggplot(
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "proto_count_qc_plot.png"), proto_count_qc_plot,
-       height = base_height + 3 * facet_height,
-       width = base_width + 5 * facet_width
+  height = base_height + 3 * facet_height,
+  width = base_width + 5 * facet_width
 )
 
 ## ----signature_matrix_generation----------------------------------------------
@@ -384,15 +384,16 @@ plot_err <- ggplot(
   aes(celltype, celltype_rmse)
 ) +
   geom_col(alpha = 0.5, position = position_identity()) +
-  geom_text(aes(
-    x = length(unique(celltype)) / 2,
-    y = max(celltype_rmse) * 1.1,
-    label = paste0(
-      "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
-      "Mean r: ", round(mean_canc_expr_corr, 3)
-    )
-  ),
-  vjust = 1
+  geom_text(
+    aes(
+      x = length(unique(celltype)) / 2,
+      y = max(celltype_rmse) * 1.1,
+      label = paste0(
+        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
+        "Mean r: ", round(mean_canc_expr_corr, 3)
+      )
+    ),
+    vjust = 1
   ) +
   labs(
     x = "Cell types",
@@ -414,7 +415,7 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 
 # Resid vs Expr Plot ------------------------------------------------------
 resid_expr_df <- split_res_list %>%
-  dfextract2("resid_expr_df", "sigmat_thresh", "split") %>% 
+  dfextract2("resid_expr_df", "sigmat_thresh", "split") %>%
   left_join(parameter_sum_df, by = c("split", "sigmat_thresh"))
 
 plot_resid_expr <- ggplot(

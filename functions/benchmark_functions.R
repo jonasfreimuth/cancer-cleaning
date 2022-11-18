@@ -173,7 +173,7 @@ quantnorm_mat <- function(x, MAR = 1) {
     x_normed %<>%
       t()
   }
-  
+
   dimnames(x_normed) <- dimnames(x)
 
   return(x_normed)
@@ -291,7 +291,8 @@ clean_sigmat <- function(sigmat) {
 }
 
 
-reference_from_thresh <- function(count_thresh, proto_sigmat) {
+reference_from_thresh <- function(count_thresh,
+                                  proto_sigmat) {
   sigmat <- proto_sigmat %>%
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.
