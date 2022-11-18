@@ -16,6 +16,7 @@ here::i_am("scripts/deconvolution_benchmark.R")
 source(here("functions/dedupe_sigmut_mat.R"))
 source(here("functions/rmse.R"))
 
+source(here("functions/util_functions.R"))
 source(here("functions/norm_functions.R"))
 source(here("functions/benchmark_functions.R"))
 
