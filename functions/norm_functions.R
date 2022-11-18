@@ -18,7 +18,7 @@ library("scuttle")
 library("utils")
 
 
-norm_vec <- function(count_vec, type, base = 10, scale = 10^4) {
+norm_vec <- function(count_vec, type, base = 10, scale = 10^6) {
   vec_sum <- sum(count_vec)
 
   if (vec_sum == 0) {
