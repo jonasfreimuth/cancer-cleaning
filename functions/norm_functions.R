@@ -38,7 +38,7 @@ norm_vec <- function(count_vec, type, base = 10, scale = 10^6) {
   return(norm_vec)
 }
 
-quantnorm_mat <- function(x, MAR = 1) {
+quantnorm_mat <- function(x, MAR = 2) {
   # FIXME This assumes a simple 2D matrix, if it gets more complicated this
   # needs to be adapted.
   CMAR <- 2
