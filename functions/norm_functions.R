@@ -18,7 +18,7 @@ library("scuttle")
 library("utils")
 
 
-norm_vec <- function(count_vec) {
+norm_vec <- function(count_vec, type, base = 10, scale = 10^4) {
   vec_sum <- sum(count_vec)
 
   # Remove vecs without transcripts (might happen if down sampling)
@@ -26,22 +26,17 @@ norm_vec <- function(count_vec) {
     return(NULL)
   }
 
-  return(count_vec / vec_sum)
-}
+  norm_vec <- count_vec / vec_sum
 
+  # TODO Check if this check if log taking should be performed is not too
+  # fragile.
+  if (str_detect(type, "^log")) {
+    norm_vec <- log(norm_vec + 1, base = base)
 
-lognorm_vec <- function(count_vec, base = 10) {
-  vec_sum <- sum(count_vec)
-
-  # Remove vecs without transcripts (might happen if down sampling)
-  if (vec_sum == 0) {
-    return(NULL)
+    norm_vec <- norm_vec * scale
   }
 
-  # log normalize counts
-  count_vec <- log((count_vec / vec_sum) + 1, base = base) * 10^4
-
-  return(count_vec)
+  return(norm_vec)
 }
 
 quantnorm_mat <- function(x, MAR = 1) {
@@ -102,25 +97,19 @@ quantnorm_mat <- function(x, MAR = 1) {
 
 
 normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
+  # FIXME Be a bit more clever with matchig type to normalization performed.
   if (is.null(type)) {
     # NULL means do nothing.
     return(count_mat)
   }
 
-  if (type == "norm") {
+  if (type %in% c("lognorm", "norm")) {
     norm_mat <- count_mat %>%
       apply(
         2,
         norm_vec,
         simplify = TRUE,
-        ...
-      )
-  } else if (type == "lognorm") {
-    norm_mat <- count_mat %>%
-      apply(
-        2,
-        lognorm_row,
-        simplify = TRUE,
+        type = type,
         ...
       )
   } else if (type == "tpm") {
