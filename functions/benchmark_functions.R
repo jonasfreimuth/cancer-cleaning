@@ -224,13 +224,14 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
                                 norm_type = "tpm",
                                 scale = norm_scale,
                                 cancer_cols = "Cancer Epithelial") {
-  bulk_count_mat <- count_mat[, idx_vec] %>%
-    normalize_count_mat(
+  bulk_count_mat <- count_mat[, idx_vec]
+
+  transcript_counts <- bulk_count_mat %>%
+    rowSums() %>%
+    norm_vec(
       type = norm_type,
       scale = scale
     )
-
-  transcript_counts <- rowSums(bulk_count_mat)
 
   # NOTE This relies on celltype_map being ordered by count_mat cells
   cancer_idx <- intersect(
