@@ -310,14 +310,10 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   }
 
   transcript_props <- pseudobulk[["transcript_counts"]] %>%
-    extract(names(.) %in% deconv_ref$IDs) %>%
-    divide_by(sum(.)) %>%
-    extract(!is.na(.))
+    extract(names(.) %in% deconv_ref$IDs)
   # Subsetting is necessary as the residuals' length won't match otherwise.
   transcript_props_cancer <- pseudobulk[["transcript_counts_cancer"]] %>%
-    extract(names(.) %in% deconv_ref$IDs) %>%
-    divide_by(sum(.)) %>%
-    extract(!is.na(.))
+    extract(names(.) %in% deconv_ref$IDs)
 
   celltype_counts <- pseudobulk[["celltype_counts"]]
 
@@ -333,9 +329,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     extract(!is.na(.))
 
   input_list <- list(
-    tp = transcript_props,
-    cp = celltype_props,
-    kp = transcript_props_cancer
+    cp = celltype_props
   )
 
   input_lens <- lapply(input_list, length)
