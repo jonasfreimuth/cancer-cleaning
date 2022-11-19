@@ -239,7 +239,11 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
   )
 
   cancer_expression <- count_mat[, cancer_idx] %>%
-    rowSums()
+    rowSums() %>%
+    norm_vec(
+      type = norm_type,
+      scale = scale
+    )
 
   bulk_cells <- colnames(bulk_count_mat)
 
