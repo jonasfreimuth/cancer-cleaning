@@ -195,14 +195,14 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
-  normalize_count_mat(
-    type = sub_norm_type,
-    scale = norm_scale
-  ) %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
-  t()
+  t() %>%
+  normalize_count_mat(
+    type = sub_norm_type,
+    scale = norm_scale
+  )
 
 count_mat <- count_mat %>%
   as.matrix()
