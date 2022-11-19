@@ -86,6 +86,7 @@ pseudobulk_cell_frac %<>%
 seed %<>%
   as.numeric()
 
+norm_scale <- 10^6
 
 base_width <- 3
 base_height <- 2
@@ -166,7 +167,10 @@ data <- load_experiment(
 )
 
 count_mat <- data$count_mat %>%
-  normalize_count_mat(type = super_norm_type)
+  normalize_count_mat(
+    type = super_norm_type,
+    scale = norm_scale
+  )
 meta <- data$meta
 
 ## ----convert_count_mat_to_proto_sigmat----------------------------------------
@@ -191,7 +195,10 @@ celltype_group <- celltype_cell_map %>%
   names()
 
 proto_sigmat <- count_mat %>%
-  normalize_count_mat(type = sub_norm_type) %>%
+  normalize_count_mat(
+    type = sub_norm_type,
+    scale = norm_scale
+  ) %>%
   t() %>%
   as.matrix() %>%
   rowsum(group = celltype_group) %>%
@@ -333,7 +340,8 @@ pseudobulk_list <-
   lapply(
     pseudobulk_from_idx,
     count_mat, celltype_cell_map,
-    norm_type = sub_norm_type
+    norm_type = sub_norm_type,
+    scale = norm_scale
   )
 
 

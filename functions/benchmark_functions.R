@@ -221,9 +221,13 @@ create_celltype_map <- function(celltype, meta_df, cell_colname,
 
 
 pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
-                                norm_type = "tpm") {
+                                norm_type = "tpm",
+                                scale = norm_scale) {
   bulk_count_mat <- count_mat[, idx_vec] %>%
-    normalize_count_mat(type = norm_type)
+    normalize_count_mat(
+      type = norm_type,
+      scale = scale
+    )
 
   transcript_counts <- rowSums(bulk_count_mat)
 
