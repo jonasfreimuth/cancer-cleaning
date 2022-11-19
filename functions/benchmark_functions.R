@@ -327,6 +327,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   }
 
   celltype_props <- celltype_counts %>%
+    # NOTE The celltype_props need to be on the same scale as what we get from
+    # deconvolution, that is why this normalization happens here.
     divide_by(sum(.)) %>%
     extract(!is.na(.))
 
