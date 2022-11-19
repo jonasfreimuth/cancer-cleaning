@@ -222,7 +222,8 @@ create_celltype_map <- function(celltype, meta_df, cell_colname,
 
 pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
                                 norm_type = "tpm",
-                                scale = norm_scale) {
+                                scale = norm_scale,
+                                cancer_cols = "Cancer Epithelial") {
   bulk_count_mat <- count_mat[, idx_vec] %>%
     normalize_count_mat(
       type = norm_type,
@@ -234,7 +235,7 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
   # NOTE This relies on celltype_map being ordered by count_mat cells
   cancer_idx <- intersect(
     idx_vec,
-    which(names(celltype_map) == "Cancer Epithelial")
+    which(names(celltype_map) %in% cancer_cols)
   )
 
   cancer_expression <- count_mat[, cancer_idx] %>%
