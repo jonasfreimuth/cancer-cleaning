@@ -23,6 +23,7 @@ source(here("functions/benchmark_functions.R"))
 source(here("etc/plot_themes.R"))
 
 ## ----parameters --------------------------------------------------------------
+# TODO Clean up args after normalization fixing.
 if (!exists("script_args")) {
   script_args <- commandArgs(trailingOnly = TRUE)
 }
@@ -61,7 +62,7 @@ if (length(script_args) > 0) {
     count_thresh_step_frac = "0.3",
     n_repeat = "200",
     pseudobulk_cell_frac = "0.2",
-    normalization_type = "tpm",
+    normalization_type = "lognorm",
     normalize_independently = "TRUE",
     deconv_method = "qp",
     seed = "123"
