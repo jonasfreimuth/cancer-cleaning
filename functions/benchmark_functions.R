@@ -18,6 +18,41 @@ library("scuttle")
 library("utils")
 
 
+sigmat_qc_plot <- function(sigmat, title) {
+  count_df <- sigmat %>%
+    t() %>%
+    as.data.frame() %>%
+    mutate(
+      celltype = rownames(.)
+    ) %>%
+    select(celltype, everything()) %>%
+    pivot_longer(
+      !all_of(c("celltype")),
+      names_to = "transcript",
+      values_to = "abundance"
+    )
+
+  qc_plot <- ggplot(
+    count_df,
+    aes(celltype, abundance)
+  ) +
+    geom_boxplot() +
+    theme_benchmark() +
+    labs(
+      x = "Celltype",
+      title = title
+    ) +
+    theme(
+      axis.text.x = element_text(
+        angle = 45,
+        hjust = 1
+      )
+    )
+
+  return(qc_plot)
+}
+
+
 remove_unidentifying_bin_rows <- function(sigmat) {
   .row_is_identifying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
