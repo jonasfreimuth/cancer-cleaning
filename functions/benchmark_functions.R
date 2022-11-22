@@ -114,14 +114,13 @@ is_uniform <- function(x) {
 }
 
 
-clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
-  ctypes <- colnames(sigmat)
+find_marker_transcripts <- function(sigmat, trim = 0.1) {
+  # Input should be a signature matrix with cols normalized to the same scale.
   # remove rows that are all the same
-  sigmat_wip <- sigmat %>%
-    extract(i = !apply(., 1, is_uniform), j = , drop = FALSE)
+  ctypes <- colnames(sigmat)
 
   # calc per col/ctype outliers
-  outlier_intervals <- sigmat_wip %>%
+  outlier_intervals <- sigmat %>%
     apply(
       2,
       hampel_intervall
@@ -137,7 +136,7 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
           range_vec = interval_mat[, sel_vec]
         )
       },
-      sigmat_wip,
+      sigmat,
       outlier_intervals
     ) %>%
     set_names(ctypes) %>%
@@ -175,16 +174,30 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
 
         return(outlier_vec)
       },
-      trim_used
+      trim
     ) %>%
     lapply(names) %>%
     unlist() %>%
     unique()
 
+  return(outlying_transcripts)
+}
+
+
+clean_nbin_sigmat <- function(sigmat, trim = 0.1) {
+  # remove rows that are all the same
+  sigmat_wip <- sigmat %>%
+    extract(i = !apply(., 1, is_uniform), j = , drop = FALSE)
+
+  outlying_transcripts <- find_marker_transcripts(
+    sigmat_wip,
+    trim = trim
+  )
+
   sigmat_wip <- sigmat_wip %>%
     extract(i = rownames(.) %in% outlying_transcripts, j = , drop = FALSE)
 
-  # use top / botton n percent?
+  # use top / bottom n percent?
   sigmat_clean <- sigmat_wip
   return(sigmat_clean)
 }
