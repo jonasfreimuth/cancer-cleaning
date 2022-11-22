@@ -220,10 +220,24 @@ find_marker_transcripts <- function(sigmat, trim = 0.1) {
 }
 
 
-clean_nbin_sigmat <- function(sigmat, trim = 0.1) {
+clean_nbin_sigmat <- function(sigmat, trim = 0.1, qc_plot_path = NULL) {
   # remove rows that are all the same
+  # Also includes rows that are all zero-counts
   sigmat_wip <- sigmat %>%
     extract(i = !apply(., 1, is_uniform), j = , drop = FALSE)
+
+  if (!is.null(qc_plot_path)) {
+    dir.create(dirname(qc_plot_path), recursive = TRUE, showWarnings = FALSE)
+
+    qc_plot <- sigmat_qc_plot(sigmat_wip,
+      title = "Transcript abundances before feature selection"
+    )
+
+    ggsave(qc_plot_path, qc_plot,
+      height = 10,
+      width = 1 + 0.7 * ncol(sigmat_wip)
+    )
+  }
 
   outlying_transcripts <- find_marker_transcripts(
     sigmat_wip,
@@ -239,9 +253,9 @@ clean_nbin_sigmat <- function(sigmat, trim = 0.1) {
 }
 
 
-reference_non_binary <- function(proto_sigmat) {
+reference_non_binary <- function(proto_sigmat, plot_path = NULL) {
   sigmat <- proto_sigmat %>%
-    clean_nbin_sigmat() %>%
+    clean_nbin_sigmat(qc_plot_path = plot_path) %>%
     # It sould be unlikely that columns are duplicated if feature selection
     # was done properly.
     dedupe_sigmut_mat()
