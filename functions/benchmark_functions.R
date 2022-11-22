@@ -193,6 +193,8 @@ clean_nbin_sigmat <- function(sigmat, trim_used = 0.1) {
 reference_non_binary <- function(proto_sigmat) {
   sigmat <- proto_sigmat %>%
     clean_nbin_sigmat() %>%
+    # It sould be unlikely that columns are duplicated if feature selection
+    # was done properly.
     dedupe_sigmut_mat()
 
   # sigmats with colSums equal 0 lead to deconv troubles
