@@ -19,7 +19,6 @@ library("utils")
 
 
 clean_sigmat <- function(sigmat) {
-  # TODO Include uniquely uncounted transcripts
   .row_is_identifiying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
     # is the case is determined by whether a fraction of elements is either
