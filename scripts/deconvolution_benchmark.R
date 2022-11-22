@@ -280,7 +280,9 @@ if (params$binary_sigmat) {
     set_names(as.character(round(., 2)))
 
   deconv_ref_list <- proto_sigmat %>%
-    reference_non_binary() %>%
+    reference_non_binary(
+      plot_path = here(run_path, "plots", "pre_feature_select_qc_plot.png")
+    ) %>%
     list() %>%
     set_names("0")
 }
