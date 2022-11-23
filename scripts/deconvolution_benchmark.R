@@ -348,12 +348,12 @@ ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
 )
 
 # Resid vs Expr Plot ------------------------------------------------------
-resid_expr_df <- split_res_list %>%
-  dfextract2("resid_expr_df", "sigmat_thresh", "split") %>%
+resid_expr_marker_df <- split_res_list %>%
+  dfextract2("resid_expr_marker_df", "sigmat_thresh", "split") %>%
   left_join(parameter_sum_df, by = c("split", "sigmat_thresh"))
 
-plot_resid_expr <- ggplot(
-  resid_expr_df,
+plot_resid_expr_marker <- ggplot(
+  resid_expr_marker_df,
   aes(cancer_expr, resid, col = sample)
 ) +
   geom_point() +
@@ -384,14 +384,15 @@ plot_resid_expr <- ggplot(
 
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
-ggsave(here(run_path, "plots", "resid_expr_plot.png"), plot_resid_expr,
+ggsave(here(run_path, "plots", "resid_expr_marker_plot.png"),
+  plot_resid_expr_marker,
   height = base_height + (length(count_thresh_vec) * facet_height),
   width = base_width + (length(split_vals) * facet_width)
 )
 
 
-plot_pred_prop_expr <- ggplot(
-  resid_expr_df,
+plot_pred_prop_expr_marker <- ggplot(
+  resid_expr_marker_df,
   aes(cancer_expr, deconv_pred, col = sample)
 ) +
   geom_point() +
@@ -420,7 +421,8 @@ plot_pred_prop_expr <- ggplot(
   theme_benchmark() +
   theme(legend.position = "none")
 
-ggsave(here(run_path, "plots", "pred_prop_expr_plot.png"), plot_pred_prop_expr,
+ggsave(here(run_path, "plots", "pred_prop_expr_marker_plot.png"),
+  plot_pred_prop_expr_marker,
   height = base_height + (length(count_thresh_vec) * facet_height),
   width = base_width + (length(split_vals) * facet_width)
 )
