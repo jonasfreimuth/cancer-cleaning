@@ -324,8 +324,7 @@ plot_err <- ggplot(
       x = length(unique(celltype)) / 2,
       y = max(celltype_rmse) * 1.1,
       label = paste0(
-        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
-        "Mean r: ", round(mean_canc_expr_corr, 3)
+        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3)
       )
     ),
     vjust = 1
@@ -364,7 +363,6 @@ plot_resid_expr <- ggplot(
       x = mean(c(min(cancer_expr), max(cancer_expr))),
       y = max(resid) * 1.1,
       label = paste0(
-        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
         "Mean r: ", round(mean_cexpr_v_resid, 3)
       )
     ),
@@ -402,7 +400,6 @@ plot_pred_prop_expr <- ggplot(
       x = mean(c(min(cancer_expr), max(cancer_expr))),
       y = max(deconv_pred) * 1.2,
       label = paste0(
-        "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
         "Mean r: ", round(mean_cexpr_v_deconv_pred, 3)
       )
     ),
