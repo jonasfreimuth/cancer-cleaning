@@ -400,8 +400,14 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   deconv_resid <- transcript_props - transcript_props_pred
 
-  cancer_expr_cor <- cor(transcript_props_cancer, as.vector(deconv_resid))
-
+  cor_df <- data.frame(
+    cancer_expr_v_resid = cor(
+      transcript_props_cancer, as.vector(deconv_resid)
+    ),
+    cancer_expr_v_deconv_pred = cor(
+      transcript_props_cancer, as.vector(transcript_props_pred)
+    )
+  )
   resid_expr_df <- data.frame(
     transcript = names(transcript_props_cancer),
     cancer_expr = transcript_props_cancer,
@@ -441,7 +447,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   return(list(
     res = deconv_res,
-    cancer_expr_corr = cancer_expr_cor,
+    cor_df = cor_df,
     resid_expr_df = resid_expr_df
   ))
 }
@@ -473,19 +479,16 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       }
     ) %>%
     unlist()
-
   deconv_corr_df <- deconv_res_list %>%
     lapply(
       extract2,
-      "cancer_expr_corr"
+      "cor_df"
     ) %>%
-    unlist() %>%
-    {
-      data.frame(
-        sample = as.character(seq_along(.)),
-        cancer_expr_corr = .
-      )
-    }
+    bind_rows() %>%
+    mutate(
+      sample = as.character(seq_len(nrow(.)))
+    )
+
 
   resid_expr_df <- deconv_res_list %>%
     dfextract("resid_expr_df", "sample")

@@ -294,7 +294,8 @@ parameter_sum_df <- sample_sum_df %>%
   group_by(split, sigmat_thresh) %>%
   summarize(
     mean_bulk_rmse = mean(rmse),
-    mean_canc_expr_corr = mean(cancer_expr_corr),
+    mean_cexpr_v_resid = mean(cancer_expr_v_resid),
+    mean_cexpr_v_deconv_pred = mean(cancer_expr_v_deconv_pred),
     .groups = "drop_last"
   )
 
@@ -364,7 +365,7 @@ plot_resid_expr <- ggplot(
       y = max(resid) * 1.1,
       label = paste0(
         "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
-        "Mean r: ", round(mean_canc_expr_corr, 3)
+        "Mean r: ", round(mean_cexpr_v_resid, 3)
       )
     ),
     vjust = 1,
@@ -402,7 +403,7 @@ plot_pred_prop_expr <- ggplot(
       y = max(deconv_pred) * 1.2,
       label = paste0(
         "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
-        "Mean r: ", round(mean_canc_expr_corr, 3)
+        "Mean r: ", round(mean_cexpr_v_resid, 3)
       )
     ),
     vjust = 1,
