@@ -18,7 +18,8 @@ library("scuttle")
 library("utils")
 
 
-sigmat_qc_plot <- function(sigmat, title) {
+sigmat_qc_plot <- function(sigmat, title = NULL) {
+  # Input must be a celltype count matrix
   count_df <- sigmat %>%
     t() %>%
     as.data.frame() %>%
