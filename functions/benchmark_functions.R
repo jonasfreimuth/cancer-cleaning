@@ -330,6 +330,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   transcript_props_marker_cancer <- transcript_props_all_cancer %>%
     extract(names(.) %in% deconv_ref$IDs)
 
+  bulk_proto_sigmat <- pseudobulk[["bulk_proto_sigmat"]]
+
   celltype_counts <- pseudobulk[["celltype_counts"]]
 
   if (split_cancer) {
@@ -380,6 +382,12 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     deconv_ref <- deconv_ref %>%
       extract(clean_ref_name_idx) %>%
       set_names(ref_names_clean[clean_ref_name_idx])
+
+    # NOTE The entries corresponding to IDs col need to be dropped. They are
+    # assumed to be at pos 1, hence the [-1] subsetting.
+    bulk_proto_sigmat <- bulk_proto_sigmat %>%
+      extract(i = , j = clean_ref_name_idx[-1], drop = FALSE) %>%
+      set_colnames(ref_names_clean[-1][clean_ref_name_idx[-1]])
   }
 
   if (ncol(deconv_ref) < 3) {
@@ -432,6 +440,28 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     deconv_pred = transcript_props_marker_pred
   )
 
+  # All transcript residuals
+  transcript_props_all_pred <- bulk_proto_sigmat %*% dp_vec
+
+  deconv_resid_all <- transcript_props_all - transcript_props_all_pred
+
+  cor_all_df <- data.frame(
+    cancer_expr_v_resid = cor(
+      transcript_props_all_cancer, as.vector(deconv_resid_all)
+    ),
+    cancer_expr_v_deconv_pred = cor(
+      transcript_props_all_cancer, as.vector(transcript_props_all_pred)
+    )
+  )
+
+  resid_expr_all_df <- data.frame(
+    transcript = names(transcript_props_all_cancer),
+    cancer_expr = transcript_props_all_cancer,
+    resid = deconv_resid_all,
+    deconv_pred = transcript_props_all_pred
+  )
+
+
   true_prop_df <- celltype_props %>%
     {
       data.frame(celltype = names(.), prop = .)
@@ -465,7 +495,9 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   return(list(
     res = deconv_res,
     cor_marker_df = cor_marker_df,
-    resid_expr_marker_df = resid_expr_marker_df
+    resid_expr_marker_df = resid_expr_marker_df,
+    cor_all_df = cor_all_df,
+    resid_expr_all_df = resid_expr_all_df
   ))
 }
 
@@ -508,9 +540,31 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
       sample = as.character(seq_len(nrow(.)))
     )
 
+  deconv_corr_all_df <- deconv_res_list %>%
+    lapply(
+      extract2,
+      "cor_all_df"
+    ) %>%
+    bind_rows() %>%
+    mutate(
+      sample = as.character(seq_len(nrow(.)))
+    )
+
 
   resid_expr_marker_df <- deconv_res_list %>%
     dfextract("resid_expr_marker_df", "sample")
+
+  resid_expr_all_df <- deconv_res_list %>%
+    dfextract("resid_expr_all_df", "sample")
+
+
+  cor_both_df <- left_join(
+    deconv_corr_marker_df,
+    deconv_corr_all_df,
+    by = "sample",
+    suffix = c("_marker", "_all")
+  )
+
 
   # Generate overall result df
   all_prop_df <- deconv_prop_list %>%
@@ -531,6 +585,7 @@ benchmark_reference <- function(deconv_ref, pseudobulk_list,
   return(list(
     "deconv_res" = all_prop_df,
     "deconv_sum" = all_prop_sum_df,
-    "resid_expr_marker_df" = resid_expr_marker_df
+    "resid_expr_marker_df" = resid_expr_marker_df,
+    "resid_expr_all_df" = resid_expr_all_df
   ))
 }
