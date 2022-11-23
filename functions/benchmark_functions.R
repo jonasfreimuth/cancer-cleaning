@@ -260,11 +260,24 @@ pseudobulk_from_idx <- function(idx_vec, count_mat, celltype_map,
     as.vector() %>%
     set_names(bulk_celltypes)
 
+  bulk_proto_sigmat <- bulk_count_mat %>%
+    t() %>%
+    as.matrix() %>%
+    # NOTE This relies on celltype_map being ordered by count_mat cells
+    rowsum(group = names(celltype_map)[idx_vec]) %>%
+    t() %>%
+    # TODO Check if this is right.
+    normalize_count_mat(
+      type = norm_type,
+      scale = scale
+    )
+
   return(
     list(
       transcript_counts = transcript_counts,
       celltype_counts = celltype_counts,
-      transcript_counts_cancer = cancer_expression
+      transcript_counts_cancer = cancer_expression,
+      bulk_proto_sigmat = bulk_proto_sigmat
     )
   )
 }
