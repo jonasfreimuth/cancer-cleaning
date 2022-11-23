@@ -322,10 +322,12 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     ))
   }
 
-  transcript_props <- pseudobulk[["transcript_counts"]] %>%
+  transcript_props_all <- pseudobulk[["transcript_counts"]]
+  transcript_props_all_cancer <- pseudobulk[["transcript_counts_cancer"]]
+
+  transcript_props <- transcript_props_all %>%
     extract(names(.) %in% deconv_ref$IDs)
-  # Subsetting is necessary as the residuals' length won't match otherwise.
-  transcript_props_cancer <- pseudobulk[["transcript_counts_cancer"]] %>%
+  transcript_props_cancer <- transcript_props_all_cancer %>%
     extract(names(.) %in% deconv_ref$IDs)
 
   celltype_counts <- pseudobulk[["celltype_counts"]]
@@ -409,6 +411,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     as.matrix() %>%
     extract(i = 1, j = )
 
+  # Marker residuals
+  # TODO Rename marker related stuff to reflect the marker relation
   transcript_props_pred <- sigmat %*% dp_vec
 
   deconv_resid <- transcript_props - transcript_props_pred
@@ -421,6 +425,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       transcript_props_cancer, as.vector(transcript_props_pred)
     )
   )
+
   resid_expr_df <- data.frame(
     transcript = names(transcript_props_cancer),
     cancer_expr = transcript_props_cancer,
