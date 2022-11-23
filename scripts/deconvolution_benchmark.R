@@ -405,7 +405,49 @@ ggsave(here(run_path, "plots", "resid_expr_marker_plot.png"),
   width = base_width + (length(split_vals) * facet_width)
 )
 
+resid_expr_all_df <- split_res_list %>%
+  dfextract2("resid_expr_all_df", "sigmat_thresh", "split") %>%
+  left_join(parameter_sum_df, by = c("split", "sigmat_thresh"))
 
+plot_resid_expr_all <- ggplot(
+  resid_expr_all_df,
+  aes(cancer_expr, resid, col = sample)
+) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_text(
+    aes(
+      x = mean(c(min(cancer_expr), max(cancer_expr))),
+      y = max(resid) * 1.1,
+      label = paste0(
+        "Mean r: ", round(mean_cexpr_v_resid_all, 3)
+      )
+    ),
+    vjust = 1,
+    col = "gray33"
+  ) +
+  labs(
+    x = "Cancer expression",
+    y = "Transcript residual"
+  ) +
+  facet_wrap(~sample) +
+  facet_grid(
+    cols = vars(split),
+    rows = vars(sigmat_thresh),
+    scales = "free"
+  ) +
+  theme_benchmark() +
+  theme(legend.position = "none")
+
+dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
+
+ggsave(here(run_path, "plots", "resid_expr_all_plot.png"), plot_resid_expr_all,
+  height = base_height + (length(count_thresh_vec) * facet_height),
+  width = base_width + (length(split_vals) * facet_width)
+)
+
+
+# Pred Trans Abund vs Expr Plot -------------------------------------------
 plot_pred_prop_expr_marker <- ggplot(
   resid_expr_marker_df,
   aes(cancer_expr, deconv_pred, col = sample)
@@ -438,6 +480,43 @@ plot_pred_prop_expr_marker <- ggplot(
 
 ggsave(here(run_path, "plots", "pred_prop_expr_marker_plot.png"),
   plot_pred_prop_expr_marker,
+  height = base_height + (length(count_thresh_vec) * facet_height),
+  width = base_width + (length(split_vals) * facet_width)
+)
+
+
+plot_pred_prop_expr_all <- ggplot(
+  resid_expr_all_df,
+  aes(cancer_expr, deconv_pred, col = sample)
+) +
+  geom_point() +
+  geom_text(
+    aes(
+      x = mean(c(min(cancer_expr), max(cancer_expr))),
+      y = max(deconv_pred) * 1.2,
+      label = paste0(
+        "Mean r: ", round(mean_cexpr_v_deconv_pred_all, 3)
+      )
+    ),
+    vjust = 1,
+    col = "gray33"
+  ) +
+  geom_abline(slope = 1, intercept = 0) +
+  labs(
+    x = "Cancer expression",
+    y = "Deconvolution model prediction"
+  ) +
+  facet_wrap(~sample) +
+  facet_grid(
+    cols = vars(split),
+    rows = vars(sigmat_thresh),
+    scales = "free"
+  ) +
+  theme_benchmark() +
+  theme(legend.position = "none")
+
+ggsave(here(run_path, "plots", "pred_prop_expr_all_plot.png"),
+  plot_pred_prop_expr_all,
   height = base_height + (length(count_thresh_vec) * facet_height),
   width = base_width + (length(split_vals) * facet_width)
 )
