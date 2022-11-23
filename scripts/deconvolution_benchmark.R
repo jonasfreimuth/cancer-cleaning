@@ -403,7 +403,7 @@ plot_pred_prop_expr <- ggplot(
       y = max(deconv_pred) * 1.2,
       label = paste0(
         "Mean bulk RMSE: ", round(mean_bulk_rmse, 3), ",\n",
-        "Mean r: ", round(mean_cexpr_v_resid, 3)
+        "Mean r: ", round(mean_cexpr_v_deconv_pred, 3)
       )
     ),
     vjust = 1,
