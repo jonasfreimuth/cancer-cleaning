@@ -290,12 +290,27 @@ split_res_list <- lapply(
 sample_sum_df <- split_res_list %>%
   dfextract2("deconv_sum", "sigmat_thresh", "split")
 
+rename_vec <- sample_sum_df %>%
+  head(n = 1) %>%
+  select(matches(c("rmse", "cancer_expr_v_*"))) %>%
+  names()
+
+rename_targets <- rename_vec %>%
+  str_replace_all(pattern = "cancer_expr", replacement = "cexpr") %>%
+  str_replace_all(pattern = "rmse", replacement = "bulk_rmse")
+
+rename_vec <- rename_vec %>%
+  set_names(rename_targets)
+
 parameter_sum_df <- sample_sum_df %>%
   group_by(split, sigmat_thresh) %>%
+  rename(!!!rename_vec) %>%
   summarize(
-    mean_bulk_rmse = mean(rmse),
-    mean_cexpr_v_resid = mean(cancer_expr_v_resid),
-    mean_cexpr_v_deconv_pred = mean(cancer_expr_v_deconv_pred),
+    across(
+      matches(c("bulk_rmse", "cexpr_v_*")),
+      list("mean" = mean),
+      .names = "{.fn}_{.col}"
+    ),
     .groups = "drop_last"
   )
 
@@ -363,7 +378,7 @@ plot_resid_expr_marker <- ggplot(
       x = mean(c(min(cancer_expr), max(cancer_expr))),
       y = max(resid) * 1.1,
       label = paste0(
-        "Mean r: ", round(mean_cexpr_v_resid, 3)
+        "Mean r: ", round(mean_cexpr_v_resid_marker, 3)
       )
     ),
     vjust = 1,
@@ -401,7 +416,7 @@ plot_pred_prop_expr_marker <- ggplot(
       x = mean(c(min(cancer_expr), max(cancer_expr))),
       y = max(deconv_pred) * 1.2,
       label = paste0(
-        "Mean r: ", round(mean_cexpr_v_deconv_pred, 3)
+        "Mean r: ", round(mean_cexpr_v_deconv_pred_marker, 3)
       )
     ),
     vjust = 1,
