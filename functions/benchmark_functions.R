@@ -455,7 +455,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       set_colnames(ref_names_clean[-1][clean_ref_name_idx[-1]])
   }
 
-  if (ncol(deconv_ref) < 3) {
+  if (ncol(deconv_ref) <= 2) {
     # Some deconvolution methods will fail when only a single celltype is
     # present. This ensures the correct output.
     deconv_props <- 1 %>%
