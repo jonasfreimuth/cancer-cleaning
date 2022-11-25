@@ -198,6 +198,10 @@ celltype_group <- celltype_cell_map %>%
 proto_sigmat <- count_mat %>%
   t() %>%
   as.matrix() %>%
+  # TODO Should cols instead be averaged?
+  # The case against would be that in bulks the number of celltypes has an
+  # effect on the expression values (i.e. more cells in bulk -> higher
+  # transcript counts)
   rowsum(group = celltype_group) %>%
   t() %>%
   normalize_count_mat(
