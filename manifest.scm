@@ -31,7 +31,6 @@
         "git"
         "bash"
         "findutils"
-        "guix"
         "zlib"
         "curl"
         "openssl"
