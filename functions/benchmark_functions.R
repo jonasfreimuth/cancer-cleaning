@@ -1,4 +1,6 @@
 # TODO Clean up loaded pacakges.
+library("glmGamPoi")
+library("DESeq2")
 library("purrr")
 library("stringr")
 library("BiocGenerics")
@@ -16,6 +18,59 @@ library("deconvR")
 library("magrittr")
 library("scuttle")
 library("utils")
+
+
+get_de_transcripts <- function(count_mat, meta, design) {
+  # TODO Get the functions in here to STFU.
+  meta <- meta %>%
+    arrange(cell) %>%
+    # Prevent DESeq fun from complaining
+    mutate(across(where(is.character), as.factor))
+  count_mat <- count_mat[, order(colnames(count_mat))]
+
+  # TODO Is prescaling useful here?
+  size_factors <- count_mat %>%
+    scuttle::pooledSizeFactors()
+
+  ds2_data <- DESeqDataSetFromMatrix(
+    countData = count_mat,
+    colData = meta,
+    design = design
+  )
+
+  if (length(design) >= 3) {
+    # This assumes the last term of the design formula is the only one of
+    # interest.
+    # TODO Enforce this assumption.
+    reduced_design <- design[-length(design)]
+  } else {
+    reduced_design <- ~1
+  }
+
+  ds2_data %>%
+    `sizeFactors<-`(value = size_factors) %>%
+    DESeq(
+      # Args are set according to
+      # https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis.
+      test = "LRT",
+      fitType = "glmGamPoi",
+
+      # This is recommended, but according to the source above shouldn't do
+      # anything with test = "LRT".
+      useT = TRUE,
+
+      # This should also be already set when using fitType = "glmGamPoi".
+      minmu = 10^-6,
+      reduced = reduced_design,
+      quiet = TRUE
+    ) %>%
+    results(
+      tidy = TRUE
+    ) %>%
+    # Caution, results may contain NAs, seems to mainly depend on whether
+    # zero cols were cleaned beforehand.
+    return()
+}
 
 
 sigmat_qc_plot <- function(sigmat, title = NULL) {
