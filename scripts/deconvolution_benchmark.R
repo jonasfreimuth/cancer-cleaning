@@ -121,7 +121,7 @@ params$pseudobulk_cell_frac %<>%
 params$seed %<>%
   as.numeric()
 
-params$norm_scale <- 10^6
+params$norm_scale <- 1
 
 params$base_width <- 3
 params$base_height <- 2
