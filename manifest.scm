@@ -5,7 +5,8 @@
 ;; See the "Replicating Guix" section in the manual.
 
 (specifications->manifest
-  (list "r-guix-install"
+  (list "r-glmgampoi"
+        "r-guix-install"
         "libxml2"
         "r-deseq2"
         "r-scuttle"
