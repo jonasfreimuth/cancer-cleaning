@@ -61,7 +61,6 @@ arg_names <- c(
   #   count.
   # * (quantile: Quantile normalization of transcript counts across cells.
   #    Will probably lead to weird results.)
-  # * (tpm & logtpm: Deprecated.)
   "normalization_type",
 
   # Whether normalization should be just once applied to the count mat, or to

@@ -119,19 +119,6 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
         type = type,
         ...
       )
-  } else if (type == "tpm") {
-    norm_mat <- count_mat %>%
-      scuttle::calculateTPM(...)
-  } else if (type == "logtpm") {
-    warning(paste0(
-      "The logtpm method is experimental. Double check whether it does what ",
-      "you want."
-    ))
-    norm_mat <- count_mat %>%
-      scuttle::calculateTPM(...) %>%
-      # TODO Check if this should not be integrated into the tpm fun.
-      add(1) %>%
-      apply(2, log2)
   } else if (type == "quantile") {
     norm_mat <- count_mat %>%
       # as.matrix() %>%
