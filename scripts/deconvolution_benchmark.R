@@ -129,25 +129,18 @@ run_path <- here(
 
 dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
-run_info <- paste0(
-  "Run params:\n",
-  "\tDataset used:\t", params$data_path, "\n",
-  "\tRandomization seed:\t", params$seed, "\n",
-  "\tDeconvolution method:\t", params$deconv_method, "\n",
-  "\tIndependent normalization of count matrix for bulk and reference:\t",
-  params$normalize_independently, "\n",
-  "\tBinary signature matrix:\t", params$binary_sigmat, "\n",
-  "\tCount matrix threshold step size:\t", params$count_thresh_step_frac, "\n",
-  "\tNumber of repeat samplings:\t", params$n_repeat, "\n",
-  "\tFraction of ground truth sampled per pseudobulk:\t",
-  params$pseudobulk_cell_frac,
-  "\n", "\n",
-  "Outputs will be found at ", run_path, "\n"
-)
+param_txt <- params %>%
+  unlist() %>%
+  {
+    paste(names(.), ., sep = ": ")
+  } %>%
+  paste(collapse = "\n")
 
-cat(run_info, file = here(run_path, "run_info.txt"))
+# Display params
+cat(param_txt)
 
-cat(run_info)
+# Save final params
+cat(param_txt, file = here(run_path, "params.txt"))
 
 set.seed(params$seed)
 
