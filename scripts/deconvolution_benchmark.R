@@ -28,6 +28,12 @@ cmd_args <- commandArgs(trailingOnly = TRUE)
 
 # names must match script params
 arg_names <- c(
+  # From where ground truth data should be taken. The root of that directory
+  # needs to contain the files
+  # * count_matrix_sparse.mtx
+  # * count_matrix_genes.tsv
+  # * count_matrix_barcodes.tsv
+  # * "metadata.csv"
   "data_path",
 
   # Whether the signature matrix is supposed to be binary. This is achieved
@@ -41,11 +47,32 @@ arg_names <- c(
   # after normalization)
   # Has no effect if a non-binary signature matrix is requested.
   "count_thresh_step_frac",
+
+  # Number of pseudobulks
   "n_pseudobulk",
+
+  # Fraction of count_mat cells sampled per pseudobulk
   "pseudobulk_cell_frac",
+
+  # Possible types:
+  # * norm: Plain normalization, each per cell transcript count divided by total
+  #   per transcript counts.
+  # * lognorm: Same as norm, but the base 10 log is taken for each individual
+  #   count.
+  # * (quantile: Quantile normalization of transcript counts across cells.
+  #    Will probably lead to weird results.)
+  # * (tpm & logtpm: Deprecated.)
   "normalization_type",
+
+  # Whether normalization should be just once applied to the count mat, or to
+  # pseudobulk and signature matrix independently. The independent option is
+  # recommended, this option will probably be removed soon.
   "normalize_independently",
+
+  # The pseudobulk deconvolution method to be used. See deconvR for details.
   "deconv_method",
+
+  # Seed used for random sampling of pseudobulks.
   "seed"
 )
 
