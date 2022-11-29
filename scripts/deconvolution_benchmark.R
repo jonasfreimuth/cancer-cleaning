@@ -53,7 +53,7 @@ default_args <- c(
   # after normalization)
   # Has no effect if a non-binary signature matrix is requested.
   count_thresh_step_frac = "0.3",
-  n_repeat = "200",
+  n_repeat = "10",
   pseudobulk_cell_frac = "0.2",
   normalization_type = "lognorm",
   normalize_independently = "TRUE",
