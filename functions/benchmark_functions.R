@@ -19,7 +19,7 @@ library("utils")
 
 
 remove_unidentifying_bin_rows <- function(sigmat) {
-  .row_is_identifiying <- function(row, frac = 0) {
+  .row_is_identifying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
     # is the case is determined by whether a fraction of elements is either
     # non-zero or zero. The fraction maps to the number of elements which is at
@@ -57,7 +57,7 @@ remove_unidentifying_bin_rows <- function(sigmat) {
   unique_transcript_idx_vec <- sigmat %>%
     apply(
       1,
-      .row_is_identifiying
+      .row_is_identifying
     )
 
   sigmat_unique <- sigmat[unique_transcript_idx_vec, , drop = FALSE]
