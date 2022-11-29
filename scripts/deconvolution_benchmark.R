@@ -214,8 +214,6 @@ count_mat <- count_mat %>%
 
 
 ## ----signature_matrix_generation----------------------------------------------
-# TODO: Consider transcript counts as weights.
-# TODO: Add Others col?
 if (binary_sigmat) {
   count_range <- proto_sigmat %>%
     as.vector() %>%
