@@ -66,8 +66,8 @@ remove_unidentifying_bin_rows <- function(sigmat) {
 }
 
 
-reference_from_thresh <- function(count_thresh,
-                                  proto_sigmat) {
+bin_reference_from_thresh <- function(count_thresh,
+                                      proto_sigmat) {
   sigmat <- proto_sigmat %>%
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.

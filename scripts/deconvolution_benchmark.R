@@ -235,7 +235,7 @@ if (binary_sigmat) {
 
   deconv_ref_list <- lapply(
     count_thresh_vec,
-    reference_from_thresh,
+    bin_reference_from_thresh,
     proto_sigmat = proto_sigmat
   )
 } else {
