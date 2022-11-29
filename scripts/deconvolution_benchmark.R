@@ -26,10 +26,6 @@ source(here("etc/plot_themes.R"))
 # TODO Clean up args after normalization fixing.
 cmd_args <- commandArgs(trailingOnly = TRUE)
 
-if (!exists("script_args")) {
-  script_args <- cmd_args
-}
-
 # names must match script params
 arg_names <- c(
   "data_path",
@@ -65,9 +61,17 @@ default_args <- c(
   seed = "123"
 )
 
-if (length(script_args) == length(arg_names)) {
+# Priority:
+#   1. commandArgs (If provided correctly, i.e. the right length)
+#   2. script_args in the workspace (So that manual specification of non-default
+#      args can persist)
+#   3. default_args (As fallback.)
+if (length(cmd_args) == length(arg_names)) {
   cat("\nUsing provided args...\n")
+  script_args <- cmd_args
   names(script_args) <- arg_names
+} else if (exists("script_args")) {
+  cat("\nUsing existing script_args variable...\n")
 } else {
   cat("\nUsing default args...\n")
   script_args <- default_args
