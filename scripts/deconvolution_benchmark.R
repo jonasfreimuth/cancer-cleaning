@@ -29,7 +29,17 @@ cmd_args <- commandArgs(trailingOnly = TRUE)
 # names must match script params
 arg_names <- c(
   "data_path",
+
+  # Whether the signature matrix is supposed to be binary. This is achieved
+  # via thresholding along a equally spaced exponential sequence.
+  # There are also some finer difference how feature selection is performed.
   "binary_sigmat",
+
+  # Step size for exploring the effect of the count threshold, i.e. the
+  # threshold for which transcript count is necessary for a transcript to be
+  # considered as an indicator for a cell type (strict greater than, applied
+  # after normalization)
+  # Has no effect if a non-binary signature matrix is requested.
   "count_thresh_step_frac",
   "n_repeat",
   "pseudobulk_cell_frac",
@@ -41,17 +51,7 @@ arg_names <- c(
 
 default_args <- c(
   data_path = "datasets/Wu_etal_downsampled_test/",
-
-  # Whether the signature matrix is supposed to be binary. This is achieved
-  # via thresholding along a equally spaced exponential sequence.
-  # There are also some finer difference how feature selection is performed.
   binary_sigmat = "FALSE",
-
-  # Step size for exploring the effect of the count threshold, i.e. the
-  # threshold for which transcript count is necessary for a transcript to be
-  # considered as an indicator for a cell type (strict greater than, applied
-  # after normalization)
-  # Has no effect if a non-binary signature matrix is requested.
   count_thresh_step_frac = "0.3",
   n_repeat = "10",
   pseudobulk_cell_frac = "0.2",
