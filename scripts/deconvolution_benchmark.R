@@ -24,8 +24,10 @@ source(here("etc/plot_themes.R"))
 
 ## ----parameters --------------------------------------------------------------
 # TODO Clean up args after normalization fixing.
+cmd_args <- commandArgs(trailingOnly = TRUE)
+
 if (!exists("script_args")) {
-  script_args <- commandArgs(trailingOnly = TRUE)
+  script_args <- cmd_args
 }
 
 # names must match script params
