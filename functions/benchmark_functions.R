@@ -303,7 +303,6 @@ clean_nbin_sigmat <- function(sigmat, trim = 0.1, qc_plot_path = NULL) {
   sigmat_wip <- sigmat_wip %>%
     extract(i = rownames(.) %in% outlying_transcripts, j = , drop = FALSE)
 
-  # use top / bottom n percent?
   sigmat_clean <- sigmat_wip
   return(sigmat_clean)
 }
