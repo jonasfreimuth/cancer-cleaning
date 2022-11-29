@@ -77,44 +77,44 @@ if (length(cmd_args) == length(arg_names)) {
   script_args <- default_args
 }
 
-for (i in seq_along(script_args)) {
-  # FIXME Change the script to use args vector and get rid of this assign hack.
-  assign(names(script_args[i]), script_args[i])
-}
+# Change to list for nicer access to params. params will also include some
+# parameters that are to be tweaked just from within the script.
+params <- as.list(script_args)
 
-normalize_independently %<>%
+# Ensure correct types
+params$normalize_independently %<>%
   as.logical()
-binary_sigmat %<>%
+params$binary_sigmat %<>%
   as.logical()
-count_thresh_step_frac %<>%
+params$count_thresh_step_frac %<>%
   as.numeric()
-n_repeat %<>%
+params$n_repeat %<>%
   as.numeric()
-pseudobulk_cell_frac %<>%
+params$pseudobulk_cell_frac %<>%
   as.numeric()
-seed %<>%
+params$seed %<>%
   as.numeric()
 
-norm_scale <- 10^6
+params$norm_scale <- 10^6
 
-base_width <- 3
-base_height <- 2
+params$base_width <- 3
+params$base_height <- 2
 
-facet_height <- 2
-facet_width <- 5.5
+params$facet_height <- 2
+params$facet_width <- 5.5
 
 param_sep <- "_"
 pair_sep <- "-"
 
 parameter_string <- paste(
-  paste0("data_path", pair_sep, basename(data_path)),
-  paste0("seed", pair_sep, seed),
-  paste0("method", pair_sep, deconv_method),
-  paste0("indepnorm", pair_sep, normalize_independently),
-  paste0("normtype", pair_sep, normalization_type),
-  paste0("nrepeat", pair_sep, n_repeat),
-  paste0("binary_sigmat", pair_sep, binary_sigmat),
-  paste0("sizefrac", pair_sep, pseudobulk_cell_frac),
+  paste0("data_path", pair_sep, basename(params$data_path)),
+  paste0("seed", pair_sep, params$seed),
+  paste0("method", pair_sep, params$deconv_method),
+  paste0("indepnorm", pair_sep, params$normalize_independently),
+  paste0("normtype", pair_sep, params$normalization_type),
+  paste0("nrepeat", pair_sep, params$n_repeat),
+  paste0("binary_sigmat", pair_sep, params$binary_sigmat),
+  paste0("sizefrac", pair_sep, params$pseudobulk_cell_frac),
   sep = param_sep
 )
 
@@ -131,15 +131,16 @@ dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
 run_info <- paste0(
   "Run params:\n",
-  "\tDataset used:\t", data_path, "\n",
-  "\tRandomization seed:\t", seed, "\n",
-  "\tDeconvolution method:\t", deconv_method, "\n",
+  "\tDataset used:\t", params$data_path, "\n",
+  "\tRandomization seed:\t", params$seed, "\n",
+  "\tDeconvolution method:\t", params$deconv_method, "\n",
   "\tIndependent normalization of count matrix for bulk and reference:\t",
-  normalize_independently, "\n",
-  "\tBinary signature matrix:\t", binary_sigmat, "\n",
-  "\tCount matrix threshold step size:\t", count_thresh_step_frac, "\n",
-  "\tNumber of repeat samplings:\t", n_repeat, "\n",
-  "\tFraction of ground truth sampled per pseudobulk:\t", pseudobulk_cell_frac,
+  params$normalize_independently, "\n",
+  "\tBinary signature matrix:\t", params$binary_sigmat, "\n",
+  "\tCount matrix threshold step size:\t", params$count_thresh_step_frac, "\n",
+  "\tNumber of repeat samplings:\t", params$n_repeat, "\n",
+  "\tFraction of ground truth sampled per pseudobulk:\t",
+  params$pseudobulk_cell_frac,
   "\n", "\n",
   "Outputs will be found at ", run_path, "\n"
 )
@@ -148,13 +149,13 @@ cat(run_info, file = here(run_path, "run_info.txt"))
 
 cat(run_info)
 
-set.seed(seed)
+set.seed(params$seed)
 
-if (normalize_independently) {
+if (params$normalize_independently) {
   super_norm_type <- NULL
-  sub_norm_type <- normalization_type
+  sub_norm_type <- params$normalization_type
 } else {
-  super_norm_type <- normalization_type
+  super_norm_type <- params$normalization_type
   sub_norm_type <- NULL
 }
 
@@ -162,23 +163,23 @@ if (normalize_independently) {
 ## ----data_loading-------------------------------------------------------------
 data <- load_experiment(
   count_mat_file = here(
-    data_path, "count_matrix_sparse.mtx"
+    params$data_path, "count_matrix_sparse.mtx"
   ),
   rowname_file = here(
-    data_path, "count_matrix_genes.tsv"
+    params$data_path, "count_matrix_genes.tsv"
   ),
   colname_file = here(
-    data_path, "count_matrix_barcodes.tsv"
+    params$data_path, "count_matrix_barcodes.tsv"
   ),
   meta_file = here(
-    data_path, "metadata.csv"
+    params$data_path, "metadata.csv"
   )
 )
 
 count_mat <- data$count_mat %>%
   normalize_count_mat(
     type = super_norm_type,
-    scale = norm_scale
+    scale = params$norm_scale
   )
 meta <- data$meta
 
@@ -214,7 +215,7 @@ proto_sigmat <- count_mat %>%
   t() %>%
   normalize_count_mat(
     type = sub_norm_type,
-    scale = norm_scale
+    scale = params$norm_scale
   )
 
 count_mat <- count_mat %>%
@@ -222,7 +223,7 @@ count_mat <- count_mat %>%
 
 
 ## ----signature_matrix_generation----------------------------------------------
-if (binary_sigmat) {
+if (params$binary_sigmat) {
   count_range <- proto_sigmat %>%
     as.vector() %>%
     extract(. > 0) %>%
@@ -231,7 +232,7 @@ if (binary_sigmat) {
   count_thresh_vec <- seq_base(
     count_range[1],
     count_range[2],
-    count_thresh_step_frac,
+    params$count_thresh_step_frac,
     base = 3
   ) %>%
     {
@@ -254,6 +255,8 @@ if (binary_sigmat) {
     set_names("0")
 }
 
+# For the moment, the reference needs to always be a list of length 1 with the
+# name of the element
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
 
@@ -261,12 +264,12 @@ deconv_ref_list <- deconv_ref_list %>%
   extract(!is_null_reference)
 
 ## ----pseudobulk_generation----------------------------------------------------
-n_bulk_cells <- pseudobulk_cell_frac * ncol(count_mat)
+n_bulk_cells <- params$pseudobulk_cell_frac * ncol(count_mat)
 
 pseudobulk_list <-
   # predraw which cells are used in each pseudobulk
   lapply(
-    rep(list(seq_len(ncol(count_mat))), n_repeat),
+    rep(list(seq_len(ncol(count_mat))), params$n_repeat),
     sample,
     n_bulk_cells
   ) %>%
@@ -275,7 +278,7 @@ pseudobulk_list <-
     pseudobulk_from_idx,
     count_mat, celltype_cell_map,
     norm_type = sub_norm_type,
-    scale = norm_scale
+    scale = params$norm_scale
   )
 
 
@@ -290,7 +293,7 @@ split_res_list <- lapply(
       benchmark_reference,
       pseudobulk_list,
       split_cancer = split,
-      deconv_method = deconv_method
+      deconv_method = params$deconv_method
     )
   }
 ) %>%
@@ -368,8 +371,12 @@ plot_err <- ggplot(
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
-  height = base_height + (length(count_thresh_vec) * facet_height),
-  width = base_width + (length(split_vals) * facet_width)
+  height = params$base_height + (
+    length(count_thresh_vec) * params$facet_height
+  ),
+  width = params$base_width + (
+    length(split_vals) * params$facet_width
+  )
 )
 
 # Resid vs Expr Plot ------------------------------------------------------
@@ -411,8 +418,12 @@ dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "resid_expr_marker_plot.png"),
   plot_resid_expr_marker,
-  height = base_height + (length(count_thresh_vec) * facet_height),
-  width = base_width + (length(split_vals) * facet_width)
+  height = params$base_height + (
+    length(count_thresh_vec) * params$facet_height
+  ),
+  width = params$base_width + (
+    length(split_vals) * params$facet_width
+  )
 )
 
 resid_expr_all_df <- split_res_list %>%
@@ -452,8 +463,12 @@ plot_resid_expr_all <- ggplot(
 dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "resid_expr_all_plot.png"), plot_resid_expr_all,
-  height = base_height + (length(count_thresh_vec) * facet_height),
-  width = base_width + (length(split_vals) * facet_width)
+  height = params$base_height + (
+    length(count_thresh_vec) * params$facet_height
+  ),
+  width = params$base_width + (
+    length(split_vals) * params$facet_width
+  )
 )
 
 
@@ -490,8 +505,12 @@ plot_pred_prop_expr_marker <- ggplot(
 
 ggsave(here(run_path, "plots", "pred_prop_expr_marker_plot.png"),
   plot_pred_prop_expr_marker,
-  height = base_height + (length(count_thresh_vec) * facet_height),
-  width = base_width + (length(split_vals) * facet_width)
+  height = params$base_height + (
+    length(count_thresh_vec) * params$facet_height
+  ),
+  width = params$base_width + (
+    length(split_vals) * params$facet_width
+  )
 )
 
 
@@ -527,8 +546,12 @@ plot_pred_prop_expr_all <- ggplot(
 
 ggsave(here(run_path, "plots", "pred_prop_expr_all_plot.png"),
   plot_pred_prop_expr_all,
-  height = base_height + (length(count_thresh_vec) * facet_height),
-  width = base_width + (length(split_vals) * facet_width)
+  height = params$base_height + (
+    length(count_thresh_vec) * params$facet_height
+  ),
+  width = params$base_width + (
+    length(split_vals) * params$facet_width
+  )
 )
 
 # ----Data saving---------------------------------------------------------------
