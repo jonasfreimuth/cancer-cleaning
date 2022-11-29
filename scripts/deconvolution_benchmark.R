@@ -57,7 +57,7 @@ default_args <- c(
   pseudobulk_cell_frac = "0.2",
   normalization_type = "lognorm",
   normalize_independently = "TRUE",
-  deconv_method = "qp",
+  deconv_method = "nnls",
   seed = "123"
 )
 
