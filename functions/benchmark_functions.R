@@ -61,7 +61,6 @@ clean_sigmat <- function(sigmat) {
       .row_is_identifiying
     )
 
-  # if only one row is selected, we would get a vector
   sigmat_unique <- sigmat[unique_transcript_idx_vec, , drop = FALSE]
 
   return(sigmat_unique)
