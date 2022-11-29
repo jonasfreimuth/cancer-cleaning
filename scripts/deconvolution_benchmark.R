@@ -129,6 +129,17 @@ run_path <- here(
 
 dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
+# Create executable record of the args used in this script
+sink(file = here(run_path, "args.R"))
+cat("script_args <- c(\n\t")
+script_args %>%
+  {
+    paste0(names(.), " = \"", ., "\"")
+  } %>%
+  cat(sep = ",\n\t")
+cat(")")
+sink()
+
 param_txt <- params %>%
   unlist() %>%
   {
