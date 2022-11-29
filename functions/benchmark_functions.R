@@ -205,7 +205,7 @@ is_uniform <- function(x) {
 }
 
 
-find_marker_transcripts <- function(sigmat, trim = 0.1) {
+find_marker_transcripts_hampel <- function(sigmat, trim = 0.1) {
   # Input should be a signature matrix with cols normalized to the same scale.
   # remove rows that are all the same
   ctypes <- colnames(sigmat)
@@ -294,7 +294,7 @@ clean_nbin_sigmat <- function(sigmat, trim = 0.1, qc_plot_path = NULL) {
     )
   }
 
-  outlying_transcripts <- find_marker_transcripts(
+  outlying_transcripts <- find_marker_transcripts_hampel(
     sigmat_wip,
     trim = trim
   )
