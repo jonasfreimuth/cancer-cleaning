@@ -204,7 +204,8 @@ is_uniform <- function(x) {
   all(x == x[1])
 }
 
-
+# If this is used again, I would recommend recording the distance to the
+# median instead and treat it similar to the deseq pval and threshold from that.
 find_marker_transcripts_hampel <- function(sigmat, trim = 0.1) {
   # Input should be a signature matrix with cols normalized to the same scale.
   # remove rows that are all the same
