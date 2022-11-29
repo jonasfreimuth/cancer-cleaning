@@ -65,7 +65,7 @@ default_args <- c(
   seed = "123"
 )
 
-if (length(script_args) > 0) {
+if (length(script_args) == length(arg_names)) {
   cat("\nUsing provided args...\n")
   names(script_args) <- arg_names
 } else {
