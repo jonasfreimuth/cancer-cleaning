@@ -41,7 +41,7 @@ arg_names <- c(
   # after normalization)
   # Has no effect if a non-binary signature matrix is requested.
   "count_thresh_step_frac",
-  "n_repeat",
+  "n_pseudobulk",
   "pseudobulk_cell_frac",
   "normalization_type",
   "normalize_independently",
@@ -53,7 +53,7 @@ default_args <- c(
   data_path = "datasets/Wu_etal_downsampled_test/",
   binary_sigmat = "FALSE",
   count_thresh_step_frac = "0.3",
-  n_repeat = "10",
+  n_pseudobulk = "10",
   pseudobulk_cell_frac = "0.2",
   normalization_type = "lognorm",
   normalize_independently = "TRUE",
@@ -88,7 +88,7 @@ params$binary_sigmat %<>%
   as.logical()
 params$count_thresh_step_frac %<>%
   as.numeric()
-params$n_repeat %<>%
+params$n_pseudobulk %<>%
   as.numeric()
 params$pseudobulk_cell_frac %<>%
   as.numeric()
@@ -112,7 +112,7 @@ parameter_string <- paste(
   paste0("method", pair_sep, params$deconv_method),
   paste0("indepnorm", pair_sep, params$normalize_independently),
   paste0("normtype", pair_sep, params$normalization_type),
-  paste0("nrepeat", pair_sep, params$n_repeat),
+  paste0("npseudobulk", pair_sep, params$n_pseudobulk),
   paste0("binary_sigmat", pair_sep, params$binary_sigmat),
   paste0("sizefrac", pair_sep, params$pseudobulk_cell_frac),
   sep = param_sep
@@ -273,7 +273,7 @@ n_bulk_cells <- params$pseudobulk_cell_frac * ncol(count_mat)
 pseudobulk_list <-
   # predraw which cells are used in each pseudobulk
   lapply(
-    rep(list(seq_len(ncol(count_mat))), params$n_repeat),
+    rep(list(seq_len(ncol(count_mat))), params$n_pseudobulk),
     sample,
     n_bulk_cells
   ) %>%
