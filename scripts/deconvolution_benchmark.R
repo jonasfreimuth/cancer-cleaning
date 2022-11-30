@@ -281,48 +281,39 @@ if (params$binary_sigmat) {
   count_thresh_vec <- 0 %>%
     set_names(as.character(round(., 2)))
 
+  pval_thresh <- 0
+  lg2fch_thresh <- 0
 
-  if (tolower(sigmat_method) == "deseq2") {
-    pval_thresh <- 0
-    lg2fch_thresh <- 0
+  top_n_frac <- 1
 
-    top_n_frac <- 1
+  marker_transcripts <- count_mat %>%
+    # remove rows that are all the same
+    # Also includes rows that are all zero-counts
+    extract(i = !apply(., 1, is_uniform), j = , drop = FALSE) %>%
+    get_de_transcripts(
+      meta,
+      ~celltype_major
+    ) %>%
+    drop_na(!lfcSE) %>%
+    arrange(padj) %>%
+    filter(
+      padj >= pval_thresh,
+      log2FoldChange >= lg2fch_thresh
+    ) %>%
+    slice_max(padj, prop = top_n_frac)
 
-    marker_transcripts <- count_mat %>%
-      # remove rows that are all the same
-      # Also includes rows that are all zero-counts
-      extract(i = !apply(., 1, is_uniform), j = , drop = FALSE) %>%
-      get_de_transcripts(
-        meta,
-        ~celltype_major
-      ) %>%
-      drop_na(!lfcSE) %>%
-      arrange(padj) %>%
-      filter(
-        padj >= pval_thresh,
-        log2FoldChange >= lg2fch_thresh
-      ) %>%
-      slice_max(padj, prop = top_n_frac)
+  # TODO Move this into function
+  deconv_ref <- proto_sigmat %>%
+    extract(
+      i = rownames(.) %in% marker_transcripts$row, j = , drop = FALSE
+    ) %>%
+    as.data.frame() %>%
+    mutate(IDs = rownames(.)) %>%
+    select(IDs, everything())
 
-    deconv_ref <- proto_sigmat %>%
-      extract(
-        i = rownames(.) %in% marker_transcripts$row, j = , drop = FALSE
-      ) %>%
-      as.data.frame() %>%
-      mutate(IDs = rownames(.)) %>%
-      select(IDs, everything())
-
-    deconv_ref_list <- deconv_ref %>%
-      list() %>%
-      set_names("0")
-  } else {
-    deconv_ref_list <- proto_sigmat %>%
-      reference_non_binary(
-        plot_path = here(run_path, "plots", "pre_feature_select_qc_plot.png")
-      ) %>%
-      list() %>%
-      set_names("0")
-  }
+  deconv_ref_list <- deconv_ref %>%
+    list() %>%
+    set_names("0")
 }
 
 # For the moment, the reference needs to always be a list of length 1 with the
