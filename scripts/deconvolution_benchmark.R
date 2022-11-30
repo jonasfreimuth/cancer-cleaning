@@ -233,9 +233,17 @@ file.copy(
 ) %>%
   invisible()
 
-file.copy(
-  here("functions/benchmark_functions.R"),
-  here(run_path, "benchmark_functions.R")
+fun_target_path <- here(run_path, "functions")
+dir.create(fun_target_path, recursive = TRUE, showWarnings = FALSE)
+
+lapply(
+  dir("functions", full.names = TRUE),
+  function(file_path) {
+    file.copy(
+      file_path,
+      here(fun_target_path, basename(file_path))
+    )
+  }
 ) %>%
   invisible()
 
