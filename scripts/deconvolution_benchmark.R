@@ -202,7 +202,8 @@ param_txt <- params %>%
   {
     paste(names(.), ., sep = ": ")
   } %>%
-  paste(collapse = "\n")
+  paste(collapse = "\n") %>%
+  paste0("\n")
 
 # Display params
 cat(param_txt)
