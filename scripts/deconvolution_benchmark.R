@@ -36,10 +36,11 @@ arg_names <- c(
   # * "metadata.csv"
   "data_path",
 
-  # Whether the signature matrix is supposed to be binary. This is achieved
-  # via thresholding along a equally spaced exponential sequence.
-  # There are also some finer difference how feature selection is performed.
-  "binary_sigmat",
+  # Possible types:
+  # * binary: Produces a binary sigmat based on the threshold
+  # * deseq2: Selects the top n differentially expressed genes across the whole
+  #   count_mat, as determined by DESeq2. n is based on the threshold.
+  "sigmat_type",
 
   # Step size for exploring the effect of the count threshold, i.e. the
   # threshold for which transcript count is necessary for a transcript to be
@@ -77,7 +78,7 @@ arg_names <- c(
 
 default_args <- c(
   data_path = "datasets/Wu_etal_downsampled_test/",
-  binary_sigmat = "FALSE",
+  sigmat_type = "deseq2",
   count_thresh_step_frac = "0.3",
   n_pseudobulk = "10",
   pseudobulk_cell_frac = "0.2",
@@ -110,8 +111,6 @@ params <- as.list(script_args)
 # Ensure correct types
 params$normalize_independently %<>%
   as.logical()
-params$binary_sigmat %<>%
-  as.logical()
 params$count_thresh_step_frac %<>%
   as.numeric()
 params$n_pseudobulk %<>%
@@ -120,6 +119,8 @@ params$pseudobulk_cell_frac %<>%
   as.numeric()
 params$seed %<>%
   as.numeric()
+params$sigmat_type %<>%
+  tolower()
 
 params$norm_scale <- 1
 
@@ -132,8 +133,6 @@ params$facet_width <- 5.5
 param_sep <- "_"
 pair_sep <- "-"
 
-sigmat_method <- "DESeq2"
-
 parameter_string <- paste(
   paste0("data_path", pair_sep, basename(params$data_path)),
   paste0("seed", pair_sep, params$seed),
@@ -141,7 +140,7 @@ parameter_string <- paste(
   paste0("indepnorm", pair_sep, params$normalize_independently),
   paste0("normtype", pair_sep, params$normalization_type),
   paste0("npseudobulk", pair_sep, params$n_pseudobulk),
-  paste0("binary_sigmat", pair_sep, params$binary_sigmat),
+  paste0("sigmat_type", pair_sep, params$sigmat_type),
   paste0("sizefrac", pair_sep, params$pseudobulk_cell_frac),
   sep = param_sep
 )
@@ -255,7 +254,7 @@ count_mat <- count_mat %>%
 
 
 ## ----signature_matrix_generation----------------------------------------------
-if (params$binary_sigmat) {
+if (params$sigmat_type == "binary") {
   count_range <- proto_sigmat %>%
     as.vector() %>%
     extract(. > 0) %>%
