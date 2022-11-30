@@ -42,12 +42,12 @@ arg_names <- c(
   #   count_mat, as determined by DESeq2. n is based on the threshold.
   "sigmat_type",
 
-  # Step size for exploring the effect of the count threshold, i.e. the
-  # threshold for which transcript count is necessary for a transcript to be
-  # considered as an indicator for a cell type (strict greater than, applied
-  # after normalization)
-  # Has no effect if a non-binary signature matrix is requested.
-  "count_thresh_step_frac",
+  # Arguments for the sequence exploring the threshold parameter for the
+  # sigmat type. Everything except the base should be a fraction.
+  "thresh_start",
+  "thresh_stop",
+  "thresh_step",
+  "thresh_base",
 
   # Number of pseudobulks
   "n_pseudobulk",
@@ -78,8 +78,11 @@ arg_names <- c(
 
 default_args <- c(
   data_path = "datasets/Wu_etal_downsampled_test/",
+  thresh_start = 0.5,
+  thresh_stop = 0.5,
+  thresh_step = 0.1,
+  thresh_base = 1,
   sigmat_type = "deseq2",
-  count_thresh_step_frac = "0.3",
   n_pseudobulk = "10",
   pseudobulk_cell_frac = "0.2",
   normalization_type = "lognorm",
@@ -109,6 +112,10 @@ if (length(cmd_args) == length(arg_names)) {
 params <- as.list(script_args)
 
 # Ensure correct types
+# TODO Make this vectorized somehow, maybe give the arg_names vector the name
+# of the coercion function to be applied or something.
+# TODO Deal with params that might evaluate to something else than an atomic
+# vector.
 params$normalize_independently %<>%
   as.logical()
 params$count_thresh_step_frac %<>%
@@ -119,8 +126,31 @@ params$pseudobulk_cell_frac %<>%
   as.numeric()
 params$seed %<>%
   as.numeric()
+params$thresh_start %<>%
+  as.numeric()
+params$thresh_stop %<>%
+  as.numeric()
+params$thresh_step %<>%
+  as.numeric()
+params$thresh_base %<>%
+  as.numeric()
 params$sigmat_type %<>%
   tolower()
+
+if (params$thresh_base == 1) {
+  params$thresh_base <- NULL
+}
+
+params <- lapply(
+  params,
+  function(param) {
+    if (length(param) > 0) {
+      if (!is.null(param) & !is.na(param)) {
+        return(param)
+      }
+    }
+  }
+)
 
 params$norm_scale <- 1
 
@@ -255,35 +285,35 @@ count_mat <- count_mat %>%
 
 ## ----signature_matrix_generation----------------------------------------------
 if (params$sigmat_type == "binary") {
-  count_range <- proto_sigmat %>%
+  thresh_seq <- proto_sigmat %>%
     as.vector() %>%
-    extract(. > 0) %>%
-    range()
-
-  count_thresh_vec <- seq_base(
-    count_range[1],
-    count_range[2],
-    params$count_thresh_step_frac,
-    base = 3
-  ) %>%
+    range() %>%
     {
-      c(0, .)
+      seq_base(
+        start = params$thresh_start * .[1],
+        stop = params$thresh_stop * .[2],
+        step = params$thresh_step,
+        base = params$thresh_base
+      )
     } %>%
     set_names(as.character(round(., 2)))
 
   deconv_ref_list <- lapply(
-    count_thresh_vec,
+    thresh_seq,
     bin_reference_from_thresh,
     proto_sigmat = proto_sigmat
   )
 } else {
-  count_thresh_vec <- 0 %>%
+  thresh_seq <- seq_base(
+    start = params$thresh_start,
+    stop = params$thresh_stop,
+    step = params$thresh_step,
+    base = params$thresh_base
+  ) %>%
     set_names(as.character(round(., 2)))
 
   pval_thresh <- 0
   lg2fch_thresh <- 0
-
-  top_n_frac <- 1
 
   marker_transcripts <- count_mat %>%
     # remove rows that are all the same
@@ -299,20 +329,21 @@ if (params$sigmat_type == "binary") {
       padj >= pval_thresh,
       log2FoldChange >= lg2fch_thresh
     ) %>%
-    slice_max(padj, prop = top_n_frac)
+    # Transform to generic form of a df with a transcript col and a metric col,
+    # with the latter being some metric that can be thresholded to select
+    # most informative marker transcripts.
+    select(
+      transcript = row,
+      metric = padj
+    )
 
-  # TODO Move this into function
-  deconv_ref <- proto_sigmat %>%
-    extract(
-      i = rownames(.) %in% marker_transcripts$row, j = , drop = FALSE
+  deconv_ref_list <- thresh_seq %>%
+    lapply(
+      reference_from_marker_df,
+      proto_sigmat = proto_sigmat,
+      marker_df = marker_transcripts
     ) %>%
-    as.data.frame() %>%
-    mutate(IDs = rownames(.)) %>%
-    select(IDs, everything())
-
-  deconv_ref_list <- deconv_ref %>%
-    list() %>%
-    set_names("0")
+    set_names(names(.))
 }
 
 # For the moment, the reference needs to always be a list of length 1 with the
@@ -432,7 +463,7 @@ dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "rmse_plot.png"), plot_err,
   height = params$base_height + (
-    length(count_thresh_vec) * params$facet_height
+    length(thresh_seq) * params$facet_height
   ),
   width = params$base_width + (
     length(split_vals) * params$facet_width
@@ -479,7 +510,7 @@ dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 ggsave(here(run_path, "plots", "resid_expr_marker_plot.png"),
   plot_resid_expr_marker,
   height = params$base_height + (
-    length(count_thresh_vec) * params$facet_height
+    length(thresh_seq) * params$facet_height
   ),
   width = params$base_width + (
     length(split_vals) * params$facet_width
@@ -524,7 +555,7 @@ dir.create(here(run_path, "plots"), recursive = TRUE, showWarnings = FALSE)
 
 ggsave(here(run_path, "plots", "resid_expr_all_plot.png"), plot_resid_expr_all,
   height = params$base_height + (
-    length(count_thresh_vec) * params$facet_height
+    length(thresh_seq) * params$facet_height
   ),
   width = params$base_width + (
     length(split_vals) * params$facet_width
@@ -566,7 +597,7 @@ plot_pred_prop_expr_marker <- ggplot(
 ggsave(here(run_path, "plots", "pred_prop_expr_marker_plot.png"),
   plot_pred_prop_expr_marker,
   height = params$base_height + (
-    length(count_thresh_vec) * params$facet_height
+    length(thresh_seq) * params$facet_height
   ),
   width = params$base_width + (
     length(split_vals) * params$facet_width
@@ -607,7 +638,7 @@ plot_pred_prop_expr_all <- ggplot(
 ggsave(here(run_path, "plots", "pred_prop_expr_all_plot.png"),
   plot_pred_prop_expr_all,
   height = params$base_height + (
-    length(count_thresh_vec) * params$facet_height
+    length(thresh_seq) * params$facet_height
   ),
   width = params$base_width + (
     length(split_vals) * params$facet_width
