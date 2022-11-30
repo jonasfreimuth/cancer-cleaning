@@ -616,6 +616,7 @@ ggsave(here(run_path, "plots", "pred_prop_expr_all_plot.png"),
 )
 
 # ----Data saving---------------------------------------------------------------
+# TODO Move script saving to start, during long run times changes might happen.
 file.copy(
   here("scripts/deconvolution_benchmark.R"),
   here(run_path, "deconvolution_benchmark.R")
