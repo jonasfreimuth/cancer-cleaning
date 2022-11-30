@@ -99,6 +99,10 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
 
 
 seq_base <- function(start, stop, step_frac, base = 10) {
+  if (is.null(base)) {
+    return(seq(from = start, to = stop, by = step_frac * (stop - start)))
+  }
+
   start <- start + 1
   stop <- stop + 1
 
