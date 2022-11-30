@@ -224,6 +224,22 @@ if (params$normalize_independently) {
 }
 
 
+# Bundle the code used for the analysis with the results. Seems alright as long
+# as it is not too much code.
+# TODO Add guix repro info.
+file.copy(
+  here("scripts/deconvolution_benchmark.R"),
+  here(run_path, "deconvolution_benchmark.R")
+) %>%
+  invisible()
+
+file.copy(
+  here("functions/benchmark_functions.R"),
+  here(run_path, "benchmark_functions.R")
+) %>%
+  invisible()
+
+
 ## ----data_loading-------------------------------------------------------------
 data <- load_experiment(
   count_mat_file = here(
@@ -649,19 +665,6 @@ ggsave(here(run_path, "plots", "pred_prop_expr_all_plot.png"),
 )
 
 # ----Data saving---------------------------------------------------------------
-# TODO Move script saving to start, during long run times changes might happen.
-file.copy(
-  here("scripts/deconvolution_benchmark.R"),
-  here(run_path, "deconvolution_benchmark.R")
-) %>%
-  invisible()
-
-file.copy(
-  here("functions/benchmark_functions.R"),
-  here(run_path, "benchmark_functions.R")
-) %>%
-  invisible()
-
 print(parameter_sum_df)
 
 fwrite(parameter_sum_df, here(run_path, "cancer_comparison_summary.csv"))
