@@ -197,6 +197,23 @@ is_uniform <- function(x) {
 }
 
 
+reference_from_marker_df <- function(proto_sigmat, marker_df, thresh) {
+  marker_df_thresh <- marker_df %>%
+    slice_max(metric, prop = thresh)
+
+  # TODO Think about whether further cleaning is needed, maybe look at
+  # removed Hampel stuff for that.
+  proto_sigmat %>%
+    extract(
+      i = rownames(.) %in% marker_df_thresh$transcript, j = , drop = FALSE
+    ) %>%
+    as.data.frame() %>%
+    mutate(IDs = rownames(.)) %>%
+    select(IDs, everything()) %>%
+    return()
+}
+
+
 create_celltype_map <- function(celltype, meta_df, cell_colname,
                                 celltype_colname) {
   meta_df %>%
