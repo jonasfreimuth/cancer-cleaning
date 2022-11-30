@@ -81,7 +81,7 @@ default_args <- c(
   thresh_start = 0.5,
   thresh_stop = 0.5,
   thresh_step = 0.1,
-  thresh_base = 1,
+  thresh_base = NULL,
   sigmat_type = "deseq2",
   n_pseudobulk = "10",
   pseudobulk_cell_frac = "0.2",
