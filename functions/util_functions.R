@@ -99,15 +99,8 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
 
 
 seq_base <- function(start, stop, step_frac, base = 10) {
-  in_vec <- c(start, stop)
-  zero_ind_vec <- in_vec == 0
-  if (any(zero_ind_vec)) {
-    in_vec[zero_ind_vec] <- in_vec[zero_ind_vec] + 10^-16
-
-    start <- in_vec[1]
-    stop <- in_vec[2]
-  }
-
+  start <- start + 1
+  stop <- stop + 1
 
   start_base <- log(start, base = base)
   stop_base <- log(stop, base = base)
