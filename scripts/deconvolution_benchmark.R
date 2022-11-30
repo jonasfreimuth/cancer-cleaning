@@ -139,10 +139,6 @@ params$thresh_base %<>%
 params$sigmat_type %<>%
   tolower()
 
-if (params$thresh_base == 1) {
-  params$thresh_base <- NULL
-}
-
 params <- lapply(
   params,
   function(param) {
@@ -153,6 +149,12 @@ params <- lapply(
     }
   }
 )
+
+if (!is.null(params$thresh_base)) {
+  if (params$thresh_base == 1) {
+    params$thresh_base <- NULL
+  }
+}
 
 params$norm_scale <- 1
 
