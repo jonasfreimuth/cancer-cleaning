@@ -1,7 +1,7 @@
 library("data.table")
 library("here")
 
-here::i_am("scripts/generate_test_data.R")
+here::i_am("aux_scripts/generate_test_data.R")
 
 source(here("functions/util_functions.R"))
 source(here("functions/benchmark_functions.R"))
