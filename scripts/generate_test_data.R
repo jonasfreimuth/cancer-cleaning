@@ -3,7 +3,7 @@ library("here")
 
 here::i_am("scripts/generate_test_data.R")
 
-source("functions/benchmark_functions.R")
+source(here("functions/benchmark_functions.R"))
 
 seed <- 123
 
