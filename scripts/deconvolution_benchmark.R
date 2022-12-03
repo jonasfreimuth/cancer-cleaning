@@ -120,8 +120,6 @@ params <- as.list(script_args)
 # vector.
 params$normalize_independently %<>%
   as.logical()
-params$count_thresh_step_frac %<>%
-  as.numeric()
 params$n_pseudobulk %<>%
   as.numeric()
 params$pseudobulk_cell_frac %<>%
