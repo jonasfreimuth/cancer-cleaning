@@ -1,3 +1,4 @@
+# TODO Overhaul the output path handling / creating
 ## ----setup--------------------------------------------------------------------
 library("cowplot")
 library("scuttle")
