@@ -227,7 +227,12 @@ if (params$normalize_independently) {
 
 # Bundle the code used for the analysis with the results. Seems alright as long
 # as it is not too much code.
-# TODO Add guix repro info.
+file.copy(
+  here("manifest.scm"),
+  here(run_path, "manifest.scm")
+) %>%
+  invisible()
+
 file.copy(
   here("scripts/deconvolution_benchmark.R"),
   here(run_path, "deconvolution_benchmark.R")
