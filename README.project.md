@@ -37,7 +37,11 @@ Fine tuning is needed in selecting the marker genes for the signature matrix.
 
 ## Presentations & reports
 
-No link yet.
+Project folder on
+[google drive](https://drive.google.com/drive/folders/1Frjcame2IfcXbOmZiAKvL6Pxm2Voh6dn?usp=share_link).
+
+Current project description as
+[google slides](https://docs.google.com/presentation/d/1u1LPAYZJsJB9ybl-eJYHB3b0nZ1O_IZFpfnkWjXt-a8/edit?usp=sharing).
 
 ## Experiments & failed ideas
 
