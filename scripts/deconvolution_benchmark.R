@@ -1,5 +1,7 @@
 # TODO Overhaul the output path handling / creating
 ## ----setup--------------------------------------------------------------------
+library("doParallel")
+library("BiocParallel")
 library("cowplot")
 library("scuttle")
 library("tidyr", exclude = "extract")
@@ -252,6 +254,10 @@ lapply(
   }
 ) %>%
   invisible()
+
+# register global parallel execution parameter
+registerDoParallel()
+BiocParallel::register(DoparParam())
 
 
 ## ----data_loading-------------------------------------------------------------
