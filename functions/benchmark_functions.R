@@ -73,9 +73,11 @@ get_de_transcripts <- function(count_mat, meta, design) {
 }
 
 
-sigmat_qc_plot <- function(sigmat, title = NULL) {
-  # Input must be a celltype count matrix
-  count_df <- sigmat %>%
+sigmat_qc_plot <- function(reference, title = NULL) {
+  # Input must be a reference df, IDs needs to be present
+  count_df <- reference %>%
+    set_rownames(.$IDs) %>%
+    select(-IDs) %>%
     t() %>%
     as.data.frame() %>%
     mutate(
@@ -88,21 +90,56 @@ sigmat_qc_plot <- function(sigmat, title = NULL) {
       values_to = "abundance"
     )
 
+  celltype_means <- count_df %>%
+    group_by(celltype) %>%
+    summarize(
+      mean = mean(abundance),
+      .groups = "drop_last"
+    ) %>%
+    # Align to count_df for reorder
+    {
+      left_join(select(count_df, celltype), ., by = "celltype")
+    } %>%
+    extract2("mean")
+
+  transcript_means <- count_df %>%
+    group_by(transcript) %>%
+    summarize(
+      mean = mean(abundance),
+      .groups = "drop_last"
+    ) %>%
+    # Align to count_df for reorder
+    {
+      left_join(select(count_df, transcript), ., by = "transcript")
+    } %>%
+    extract2("mean")
+
+
   qc_plot <- ggplot(
     count_df,
-    aes(celltype, abundance)
+    aes(
+      x = reorder(celltype, -celltype_means),
+      y = reorder(transcript, transcript_means), fill = abundance
+    )
   ) +
-    geom_boxplot() +
-    theme_benchmark() +
+    geom_raster() +
     labs(
       x = "Celltype",
+      y = "Transcript",
       title = title
     ) +
+    scale_fill_continuous(name = "Abundance") +
+    theme_benchmark() +
     theme(
       axis.text.x = element_text(
         angle = 45,
         hjust = 1
-      )
+      ),
+      legend.text = element_text(
+        angle = 45,
+        hjust = 1
+      ),
+      legend.position = "bottom"
     )
 
   return(qc_plot)
