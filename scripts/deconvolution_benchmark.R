@@ -384,8 +384,16 @@ if (params$sigmat_type == "binary") {
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
 
+is_empty_reference <- lapply(
+  deconv_ref_list,
+  function(ref) {
+    nrow(ref) <= 0
+  }
+) %>%
+  unlist()
+
 deconv_ref_list <- deconv_ref_list %>%
-  extract(!is_null_reference)
+  extract(!is_null_reference & !is_empty_reference)
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- params$pseudobulk_cell_frac * ncol(count_mat)
