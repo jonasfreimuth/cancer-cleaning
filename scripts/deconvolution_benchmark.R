@@ -404,16 +404,21 @@ for (thresh in names(deconv_ref_list)) {
   ref <- deconv_ref_list[[thresh]]
   n_trans <- nrow(ref)
 
-  sigmat_qc_plot(ref, title = thresh) %>%
-    {
-      ggsave(
-        plot = .,
-        filename = here(heatmap_path, paste0("heatmaps", thresh, ".png")),
-        width = params$base_width + params$facet_width * 3,
-        height = params$base_height + n_trans * 0.15,
-        limitsize = FALSE
-      )
+  tryCatch(
+    sigmat_qc_plot(ref, title = thresh) %>%
+      {
+        ggsave(
+          plot = .,
+          filename = here(heatmap_path, paste0("heatmaps", thresh, ".png")),
+          width = params$base_width + params$facet_width * 3,
+          height = params$base_height + n_trans * 0.05,
+          limitsize = FALSE
+        )
+      },
+    error = function(e) {
+      warning(paste0("Error during heatmap plot: ", e, "\nContinuing..."))
     }
+  )
 }
 
 
