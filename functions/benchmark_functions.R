@@ -235,6 +235,11 @@ is_uniform <- function(x) {
 
 
 reference_from_marker_df <- function(proto_sigmat, marker_df, thresh) {
+  if (thresh == 0) {
+    # Set it to a small number, otherwise the whole proto sigmat will be
+    # returned.
+    thresh <- 10^-16
+  }
   marker_df_thresh <- marker_df %>%
     slice_max(metric, prop = thresh)
 
