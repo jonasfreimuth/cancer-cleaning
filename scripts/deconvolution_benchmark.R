@@ -395,6 +395,28 @@ is_empty_reference <- lapply(
 deconv_ref_list <- deconv_ref_list %>%
   extract(!is_null_reference & !is_empty_reference)
 
+# Generate heatmaps
+heatmap_path <- here(run_path, "plots/heatmaps")
+dir.create(heatmap_path, recursive = TRUE, showWarnings = FALSE)
+
+# FIXME Use lapply and figure out how to deal with the names.
+for (thresh in names(deconv_ref_list)) {
+  ref <- deconv_ref_list[[thresh]]
+  n_trans <- nrow(ref)
+
+  sigmat_qc_plot(ref, title = thresh) %>%
+    {
+      ggsave(
+        plot = .,
+        filename = here(heatmap_path, paste0("heatmaps", thresh, ".png")),
+        width = params$base_width + params$facet_width * 3,
+        height = params$base_height + n_trans * 0.15,
+        limitsize = FALSE
+      )
+    }
+}
+
+
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- params$pseudobulk_cell_frac * ncol(count_mat)
 
