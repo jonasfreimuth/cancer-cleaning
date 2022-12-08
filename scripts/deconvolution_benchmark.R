@@ -76,7 +76,11 @@ arg_names <- c(
   "deconv_method",
 
   # Seed used for random sampling of pseudobulks.
-  "seed"
+  "seed",
+
+  # Number of CPU cores the doPar backend is allowed to use.
+  # If it is sett to NULL, all cores will be used.
+  "n_cores"
 )
 
 default_args <- c(
@@ -93,7 +97,8 @@ default_args <- c(
 
   # TODO Investigate why QP fails.
   deconv_method = "nnls",
-  seed = "123"
+  seed = "123",
+  n_cores = "12"
 )
 
 # Priority:
@@ -137,6 +142,8 @@ params$thresh_step %<>%
   as.numeric()
 params$thresh_base %<>%
   as.numeric()
+params$n_cores %<>%
+  as.numeric()
 params$sigmat_type %<>%
   tolower()
 
@@ -155,6 +162,10 @@ if (!is.null(params$thresh_base)) {
   if (params$thresh_base == 1) {
     params$thresh_base <- NULL
   }
+}
+
+if (is.null(params$n_cores)) {
+  params$n_cores <- detectCores()
 }
 
 params$norm_scale <- 1
@@ -256,7 +267,7 @@ lapply(
   invisible()
 
 # register global parallel execution parameter
-registerDoParallel()
+registerDoParallel(cores = params$n_cores)
 BiocParallel::register(DoparParam())
 
 
