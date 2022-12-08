@@ -30,7 +30,7 @@ get_de_transcripts <- function(count_mat, meta, design) {
 
   # TODO Is prescaling useful here?
   size_factors <- count_mat %>%
-    scuttle::pooledSizeFactors()
+    scuttle::pooledSizeFactors(BPPARAM = registered("DoparParam"))
 
   ds2_data <- DESeqDataSetFromMatrix(
     countData = count_mat,
@@ -62,7 +62,8 @@ get_de_transcripts <- function(count_mat, meta, design) {
       # This should also be already set when using fitType = "glmGamPoi".
       minmu = 10^-6,
       reduced = reduced_design,
-      quiet = TRUE
+      quiet = TRUE,
+      BPPARAM = registered("DoparParam")
     ) %>%
     results(
       tidy = TRUE
