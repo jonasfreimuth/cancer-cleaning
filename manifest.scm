@@ -38,6 +38,8 @@
 
 (define %packages
   (list "r-glmgampoi"
+        "r-doparallel"
+        "r-biocparallel"
         "r-guix-install"
         "libxml2"
         "r-deseq2"
