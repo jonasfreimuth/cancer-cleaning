@@ -356,6 +356,8 @@ if (params$sigmat_type == "binary") {
       meta,
       ~celltype_major
     ) %>%
+
+    # This may be unncecessary if uniform rows have been previously removed.
     drop_na(!lfcSE) %>%
     arrange(padj) %>%
     filter(
