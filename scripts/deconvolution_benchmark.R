@@ -379,8 +379,6 @@ if (params$sigmat_type == "binary") {
     set_names(names(.))
 }
 
-# For the moment, the reference needs to always be a list of length 1 with the
-# name of the element
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
 
