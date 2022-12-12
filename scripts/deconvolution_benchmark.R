@@ -411,7 +411,7 @@ for (thresh in names(deconv_ref_list)) {
           plot = .,
           filename = here(heatmap_path, paste0("heatmaps", thresh, ".png")),
           width = params$base_width + params$facet_width * 3,
-          height = params$base_height + n_trans * 0.05,
+          height = params$base_height + n_trans * 0.005,
           limitsize = FALSE
         )
       },
