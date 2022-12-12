@@ -405,7 +405,7 @@ for (thresh in names(deconv_ref_list)) {
   n_trans <- nrow(ref)
 
   tryCatch(
-    sigmat_qc_plot(ref, title = thresh) %>%
+    sigmat_qc_plot(ref, title = thresh, feature_scale = TRUE) %>%
       {
         ggsave(
           plot = .,
