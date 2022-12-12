@@ -103,6 +103,14 @@ quantnorm_mat <- function(x, MAR = 2) {
 }
 
 
+feature_scale <- function(count_vec, scale = 1) {
+  min_count <- min(count_vec)
+  max_count <- max(count_vec)
+
+  ((count_vec - min_count) / (max_count - min_count)) * scale
+}
+
+
 normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
   # FIXME Be a bit more clever with matchig type to normalization performed.
   if (is.null(type)) {
