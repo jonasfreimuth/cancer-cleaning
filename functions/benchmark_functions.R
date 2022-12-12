@@ -1,4 +1,5 @@
 # TODO Clean up loaded pacakges.
+library("here")
 library("glmGamPoi")
 library("DESeq2")
 library("purrr")
@@ -18,6 +19,8 @@ library("deconvR")
 library("magrittr")
 library("scuttle")
 library("utils")
+
+source(here("functions/norm_functions.R"))
 
 
 get_de_transcripts <- function(count_mat, meta, design) {
@@ -73,7 +76,7 @@ get_de_transcripts <- function(count_mat, meta, design) {
 }
 
 
-sigmat_qc_plot <- function(reference, title = NULL) {
+sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
   # Input must be a reference df, IDs needs to be present
   count_df <- reference %>%
     set_rownames(.$IDs) %>%
@@ -89,6 +92,12 @@ sigmat_qc_plot <- function(reference, title = NULL) {
       names_to = "transcript",
       values_to = "abundance"
     )
+
+  if (feature_scale) {
+    count_df <- count_df %>%
+      group_by(transcript) %>%
+      mutate(abundance = feature_scale(abundance))
+  }
 
   celltype_means <- count_df %>%
     group_by(celltype) %>%
