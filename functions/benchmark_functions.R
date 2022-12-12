@@ -128,7 +128,11 @@ sigmat_qc_plot <- function(reference, title = NULL) {
       y = "Transcript",
       title = title
     ) +
-    scale_fill_continuous(name = "Abundance") +
+    scale_fill_gradient(
+      name = "Abundance",
+      low = "dodgerblue4",
+      high = "yellow"
+    ) +
     theme_benchmark() +
     theme(
       axis.text.x = element_text(
