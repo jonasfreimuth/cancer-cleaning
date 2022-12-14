@@ -379,6 +379,19 @@ if (params$sigmat_type == "binary") {
       marker_df = marker_transcripts
     ) %>%
     set_names(names(.))
+
+  top_10_transcripts <- marker_transcripts %>%
+    slice_max(metric, n = 10) %>%
+    extract2("transcript")
+
+  qc_top_boxplot <- outlier_plot(deconv_ref_list[[1]], top_10_transcripts)
+
+  qc_plot_path <- here(run_path, "plots/qc_plots")
+  dir.create(qc_plot_path, recursive = TRUE, showWarnings = FALSE)
+  ggsave(
+    plot = qc_top_boxplot,
+    filename = here(qc_plot_path, "top_DE_boxplot.png")
+  )
 }
 
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
