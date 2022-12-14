@@ -174,6 +174,18 @@ sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
 }
 
 
+outlier_plot <- function(reference, selection) {
+  reference %<>%
+    filter(IDs %in% selection)
+
+  count_df <- count_df_from_reference(reference, feature_scale = TRUE)
+
+  outlier_plot <- ggplot(count_df, aes(transcript, abundance)) +
+    geom_boxplot() +
+    theme_benchmark()
+}
+
+
 remove_unidentifying_bin_rows <- function(sigmat) {
   .row_is_identifying <- function(row, frac = 0) {
     # Determine if a row can be used to identify a column. Whether or not that
