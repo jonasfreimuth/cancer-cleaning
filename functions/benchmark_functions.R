@@ -76,7 +76,14 @@ get_de_transcripts <- function(count_mat, meta, design) {
 }
 
 
-sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
+count_df_from_reference <- function(reference, feature_scale = FALSE) {
+  if (!"IDs" %in% names(reference)) {
+    stop(paste0(
+      "IDs col needs to be present in reference, as it is assumed to contain ",
+      "transcript names."
+    ))
+  }
+
   # Input must be a reference df, IDs needs to be present
   count_df <- reference %>%
     set_rownames(.$IDs) %>%
@@ -98,6 +105,13 @@ sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
       group_by(transcript) %>%
       mutate(abundance = feature_scale(abundance))
   }
+
+  return(count_df)
+}
+
+
+sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
+  count_df <- count_df_from_reference(reference, feature_scale)
 
   celltype_means <- count_df %>%
     group_by(celltype) %>%
