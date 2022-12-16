@@ -1,4 +1,5 @@
 # TODO Clean up loaded pacakges.
+library("diptest")
 library("here")
 library("glmGamPoi")
 library("DESeq2")
@@ -273,7 +274,14 @@ bin_reference_from_thresh <- function(count_thresh,
 }
 
 
+is_unimodal <- function(x, p_thresh = 0.05) {
+  # Test whether x is multimodal using the diptest() function
+  diptest(x)$p.value > p_thres
+}
+
+
 is_uniform <- function(x) {
+  # Test whether all elements of x are the same.
   all(x == x[1])
 }
 
