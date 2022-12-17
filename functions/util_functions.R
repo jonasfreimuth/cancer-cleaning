@@ -193,4 +193,9 @@ seq_base <- function(start, stop, step_frac, base = 10) {
   return((base^step_seq) - 1)
 }
 
+
+frequency_bins <- function(x, prob_seq = seq(0, 1, 0.2)) {
+  x %>%
+    quantile(probs = prob_seq) %>%
+    set_names(as.character(round(., 2)))
 }
