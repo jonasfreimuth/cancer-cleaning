@@ -190,5 +190,7 @@ seq_base <- function(start, stop, step_frac, base = 10) {
   step_size <- seq_len * step_frac
   step_seq <- seq(from = start_base, to = stop_base, by = step_size)
 
-  return(base^step_seq)
+  return((base^step_seq) - 1)
+}
+
 }
