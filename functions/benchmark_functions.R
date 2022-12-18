@@ -247,8 +247,7 @@ bin_reference_from_thresh <- function(count_thresh,
     is_greater_than(count_thresh) %>%
     # Simple as.numeric() returns a vector.
     multiply_by(1) %>%
-    remove_unidentifying_bin_rows() %>%
-    dedupe_sigmut_mat()
+    remove_unidentifying_bin_rows()
 
   # sigmats with colSums equal 0 lead to deconv troubles
   # TODO check what problems this causes, e.g. leading to
@@ -499,7 +498,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
     capture.output(
       suppressMessages(
         deconv_props <- deconvolute(
-          reference = deconv_ref,
+          reference = deconv_ref %>%
+            dedupe_sigmut_mat(),
           bulk = deconv_bulk,
           model = method
         )$proportions
