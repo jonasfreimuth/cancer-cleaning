@@ -327,7 +327,11 @@ prob_vec <- seq_base(
 if (params$sigmat_type == "binary") {
   count_vec <- proto_sigmat %>%
     as.vector() %>%
-    unique()
+    unique() %>%
+    # Truncate most extreme values. Those values would lead to signature
+    # matrices that are all either 0 or 1 (As per the behaviour of
+    # `bin_reference_from_thresh()`).
+    extract(!(. %in% range(.)))
 
   thresh_seq <- count_vec %>%
     frequency_bins(prob_vec)
