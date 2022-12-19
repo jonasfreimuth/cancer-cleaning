@@ -464,11 +464,9 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       names() %>%
       clean_names(cancer_cols)
 
-    clean_ref_name_idx <- ref_names_clean != ""
-
     deconv_ref <- deconv_ref %>%
-      extract(clean_ref_name_idx) %>%
-      set_names(ref_names_clean[clean_ref_name_idx])
+      extract(names(.) %in% ref_names_clean) %>%
+      set_names(ref_names_clean)
 
 
     proto_sigmat_names_clean <- bulk_proto_sigmat %>%
