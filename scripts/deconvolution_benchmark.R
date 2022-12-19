@@ -318,17 +318,20 @@ count_mat <- count_mat %>%
 
 ## ----signature_matrix_generation----------------------------------------------
 if (params$sigmat_type == "binary") {
-  thresh_seq <- proto_sigmat %>%
-    as.vector() %>%
-    range() %>%
-    {
-      seq_base(
-        start = params$thresh_start * .[1],
-        stop = params$thresh_stop * .[2],
-        step = params$thresh_step,
-        base = params$thresh_base
-      )
-    } %>%
+  count_vec <- proto_sigmat %>%
+    as.vector()
+
+  count_range <- range(count_vec)
+  count_span <- diff(count_range)
+
+  prob_vec <- seq_base(
+    start = params$thresh_start,
+    stop = params$thresh_stop,
+    step = params$thresh_step,
+    base = params$thresh_base
+  )
+
+  thresh_seq <- (prob_vec * count_span) + count_range[1] %>%
     set_names(as.character(round(., 2)))
 
   deconv_ref_list <- lapply(
