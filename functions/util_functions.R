@@ -199,3 +199,19 @@ frequency_bins <- function(x, prob_seq = seq(0, 1, 0.2)) {
     quantile(probs = prob_seq) %>%
     set_names(as.character(round(., 2)))
 }
+
+
+seq_power <- function(start, stop, step_frac, power = 10) {
+  seq_span <- stop - start
+
+  if (seq_span == 0) {
+    proto_seq <- 0
+  } else {
+    proto_seq <- seq(0, 1, step_frac) %>%
+      raise_to_power(power) %>%
+      {
+        (. - min(.)) / (max(.) - min(.))
+      }
+  }
+  return((proto_seq * seq_span) + start)
+}
