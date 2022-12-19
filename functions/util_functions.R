@@ -98,6 +98,36 @@ load_experiment <- function(count_mat_file, rowname_file, colname_file,
 }
 
 
+clean_names <- function(names, cancer_names, sep = "_") {
+  # Remove cancer_names substring from names, assuming concatenated names are
+  # separe
+  # Input:
+  # * names: A vector of column names, potentially including cancer_names as
+  #   substrings.
+  # * cancer_names: A vector of strings (denoting cancer columns) that should
+  #   be removed from names.
+  # * sep: A string separating concatenated names. CAUTION: No sanitation is
+  #   performed! (I can't be asked)
+  # Output:
+  # names, but with all occurrences of cancer_names removed. Also removed are
+  # leading / trailing / duplicated '_' characters (The results of a removed
+  # cancer_names substring), and empty entries removed.
+  names %>%
+    str_replace_all(
+      pattern = paste0(
+        "(", paste(cancer_names, collapse = "|"), ")"
+      ),
+      replacement = ""
+    ) %>%
+    # Handle collapsed sigmat cols from deduping.
+    str_replace_all(
+      pattern = str_glue("(^{sep}|(?<={sep}){sep}|{sep}$)"),
+      replacement = ""
+    ) %>%
+    extract(. != "")
+}
+
+
 seq_base <- function(start, stop, step_frac, base = 10) {
   if (is.null(base)) {
     return(seq(from = start, to = stop, by = step_frac * (stop - start)))
