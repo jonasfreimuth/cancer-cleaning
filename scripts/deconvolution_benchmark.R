@@ -317,7 +317,7 @@ count_mat <- count_mat %>%
 
 
 ## ----signature_matrix_generation----------------------------------------------
-prob_vec <- seq_base(
+prob_vec <- seq_power(
   start = params$thresh_start,
   stop = params$thresh_stop,
   step = params$thresh_step,
