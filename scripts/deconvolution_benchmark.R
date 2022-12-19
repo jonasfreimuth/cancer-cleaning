@@ -328,11 +328,8 @@ if (params$sigmat_type == "binary") {
   count_vec <- proto_sigmat %>%
     as.vector()
 
-  count_range <- range(count_vec)
-  count_span <- diff(count_range)
-
-  thresh_seq <- (prob_vec * count_span) + count_range[1] %>%
-    set_names(as.character(round(., 2)))
+  thresh_seq <- count_vec %>%
+    frequency_bins(prob_vec)
 
   deconv_ref_list <- lapply(
     thresh_seq,
@@ -340,9 +337,6 @@ if (params$sigmat_type == "binary") {
     proto_sigmat = proto_sigmat
   )
 } else {
-  thresh_seq <- prob_vec %>%
-    set_names(as.character(round(., 2)))
-
   pval_thresh <- 0
   lg2fch_thresh <- 0
 
@@ -354,7 +348,6 @@ if (params$sigmat_type == "binary") {
       meta,
       ~celltype_major
     ) %>%
-
     # This may be unncecessary if uniform rows have been previously removed.
     drop_na(!lfcSE) %>%
     arrange(padj) %>%
@@ -369,6 +362,10 @@ if (params$sigmat_type == "binary") {
       transcript = row,
       metric = padj
     )
+
+  thresh_seq <- marker_transcripts %>%
+    extract2("metric") %>%
+    frequency_bins(prob_vec)
 
   deconv_ref_list <- thresh_seq %>%
     lapply(
