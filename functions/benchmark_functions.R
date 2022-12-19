@@ -462,16 +462,7 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
   if (split_cancer) {
     ref_names_clean <- deconv_ref %>%
       names() %>%
-      str_replace_all(
-        pattern = paste0(
-          "(", paste(cancer_cols, collapse = "|"), ")"
-        ),
-        replacement = ""
-      ) %>%
-      str_replace_all(
-        pattern = "(^_|(?<=_)_|_$)",
-        replacement = ""
-      )
+      clean_names(cancer_cols)
 
     clean_ref_name_idx <- ref_names_clean != ""
 
