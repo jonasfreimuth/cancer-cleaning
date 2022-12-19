@@ -38,6 +38,7 @@
 
 (define %packages
   (list "r-glmgampoi"
+        "r-r6"
         "r-diptest"
         "r-guix-install"
         "libxml2"
