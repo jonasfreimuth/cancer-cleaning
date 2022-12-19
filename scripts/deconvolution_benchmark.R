@@ -326,7 +326,8 @@ prob_vec <- seq_base(
 
 if (params$sigmat_type == "binary") {
   count_vec <- proto_sigmat %>%
-    as.vector()
+    as.vector() %>%
+    unique()
 
   thresh_seq <- count_vec %>%
     frequency_bins(prob_vec)
@@ -365,6 +366,7 @@ if (params$sigmat_type == "binary") {
 
   thresh_seq <- marker_transcripts %>%
     extract2("metric") %>%
+    unique() %>%
     frequency_bins(prob_vec)
 
   deconv_ref_list <- thresh_seq %>%
