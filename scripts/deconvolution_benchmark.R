@@ -44,11 +44,12 @@ arg_names <- c(
   "sigmat_type",
 
   # Arguments for the sequence exploring the threshold parameter for the
-  # sigmat type. Everything except the base should be a fraction.
+  # sigmat type. Everything except the power should be a fraction.
+  # Power gives the power law by which elements of the sequence are spaced.
   "thresh_start",
   "thresh_stop",
   "thresh_step",
-  "thresh_base",
+  "thresh_power",
 
   # Number of pseudobulks
   "n_pseudobulk",
@@ -82,7 +83,7 @@ default_args <- c(
   thresh_start = 0.5,
   thresh_stop = 0.5,
   thresh_step = 0.1,
-  thresh_base = NULL,
+  thresh_power = 1,
   sigmat_type = "deseq2",
   n_pseudobulk = "10",
   pseudobulk_cell_frac = "0.2",
@@ -133,7 +134,7 @@ params$thresh_stop %<>%
   as.numeric()
 params$thresh_step %<>%
   as.numeric()
-params$thresh_base %<>%
+params$thresh_power %<>%
   as.numeric()
 params$sigmat_type %<>%
   tolower()
@@ -148,12 +149,6 @@ params <- lapply(
     }
   }
 )
-
-if (!is.null(params$thresh_base)) {
-  if (params$thresh_base == 1) {
-    params$thresh_base <- NULL
-  }
-}
 
 params$norm_scale <- 1
 
@@ -321,7 +316,7 @@ prob_vec <- seq_power(
   start = params$thresh_start,
   stop = params$thresh_stop,
   step = params$thresh_step,
-  base = params$thresh_base
+  power = params$thresh_power
 )
 
 # TODO Handle thresh names that are same due to rounding.
