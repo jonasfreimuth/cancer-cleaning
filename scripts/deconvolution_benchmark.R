@@ -324,6 +324,7 @@ prob_vec <- seq_base(
   base = params$thresh_base
 )
 
+# TODO Handle thresh names that are same due to rounding.
 if (params$sigmat_type == "binary") {
   count_vec <- proto_sigmat %>%
     as.vector() %>%
