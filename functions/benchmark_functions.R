@@ -470,11 +470,17 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
       extract(clean_ref_name_idx) %>%
       set_names(ref_names_clean[clean_ref_name_idx])
 
-    # NOTE The entries corresponding to IDs col need to be dropped. They are
-    # assumed to be at pos 1, hence the [-1] subsetting.
+
+    proto_sigmat_names_clean <- bulk_proto_sigmat %>%
+      colnames() %>%
+      clean_names(cancer_cols)
+
     bulk_proto_sigmat <- bulk_proto_sigmat %>%
-      extract(i = , j = clean_ref_name_idx[-1], drop = FALSE) %>%
-      set_colnames(ref_names_clean[-1][clean_ref_name_idx[-1]])
+      extract(
+        i = ,
+        j = colnames(bulk_proto_sigmat) %in% proto_sigmat_names_clean,
+        drop = FALSE
+      )
   }
 
   if (ncol(deconv_ref) <= 2) {
