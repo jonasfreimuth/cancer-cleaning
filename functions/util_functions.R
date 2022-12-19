@@ -128,6 +128,53 @@ clean_names <- function(names, cancer_names, sep = "_") {
 }
 
 
+split_concat_celltype_props <- function(vec, sep = "_") {
+  # Adapted from pigx_sars_cov_2 pipeline approach to splitting variant props
+  # originating from variants with the same signature.
+  .split_cprop_row <- function(prop_group, sep = "_") {
+    group_members <- strsplit(prop_group["group_string"], sep)
+
+    group_len <- length(group_members)
+
+    # Assign each individual member the same fraction of the prop, for details
+    # see the pigx_sars_cov_2 publication. Something about an assumption of
+    # normal distribution among indistinguishable variants.
+    member_props <- rep(
+      as.numeric(prop_group["prop"]),
+      group_len
+    ) /
+      group_len
+
+    data.frame(
+      group_string = group_members,
+      prop = member_props
+    )
+  }
+
+  prop_df <- vec %>%
+    {
+      data.frame(
+        group_string = names(.),
+        prop = .
+      )
+    } %>%
+    # NOTE Inside the apply call we are dealing with a character matrix. Input
+    # is still a dataframe because it is easier and we get colnames in the apply
+    # call.
+    # FIXME Make this more explicit by having the input be a character matrix
+    # already.
+    apply(
+      1,
+      .split_cprop_row,
+      sep
+    ) %>%
+    bind_rows()
+
+  prop_df$prop %>%
+    set_names(prop_df$group_string)
+}
+
+
 seq_base <- function(start, stop, step_frac, base = 10) {
   if (is.null(base)) {
     return(seq(from = start, to = stop, by = step_frac * (stop - start)))
