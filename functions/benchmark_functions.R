@@ -509,7 +509,8 @@ deconvolute_pseudobulk <- function(pseudobulk, deconv_ref,
 
   dp_vec <- deconv_props %>%
     as.matrix() %>%
-    extract(i = 1, j = )
+    extract(i = 1, j = ) %>%
+    split_concat_celltype_props()
 
   # Marker residuals
   transcript_props_marker_pred <- sigmat %*% dp_vec
