@@ -3,6 +3,7 @@ library("R6")
 
 here::i_am("R6/ScRnaExperiment.R")
 
+source(here("R6/SigmatUtils"))
 source(here("R6/CountMatrix"))
 
 ScRnaExperiment <- R6Class(
@@ -13,6 +14,7 @@ ScRnaExperiment <- R6Class(
                           meta_file,
                           cell_col = "V1", celltype_col = "celltype_major",
                           downsample_frac) {
+      private$sigmat_utils <- SigmatUtils$new()
       rename_vec <- c(
         "cell" = cell_col,
         "celltype" = celltype_col
