@@ -11,6 +11,7 @@ Pseudobulk <- R6Class(
   inherit = CountMatrix,
   public = list(
     params = list(
+      id = NULL,
       # TODO Change this from logical to char vec giving cols to split.
       split_cancer = NULL,
       cancer_celltypes = NULL,
