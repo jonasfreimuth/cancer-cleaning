@@ -63,17 +63,6 @@ Pseudobulk <- R6Class(
           # Conversion from table to named vector.
           set_names(as.vector(.), names(.))
         }
-    },
-    celltype_count_matrix = function() {
-      self$matrix %>%
-        t() %>%
-        as.matrix() %>%
-        rowsum(group = self$celltypes) %>%
-        t() %>%
-        normalize_count_mat(
-          type = self$params$normalization$type,
-          scale = self$params$normalization$scale_factor
-        )
     }
   )
 )

@@ -41,6 +41,17 @@ CountMatrix <- R6Class(
       self$celltypes %>%
         unique() %>%
         length()
+    },
+    celltype_count_matrix = function() {
+      self$matrix %>%
+        t() %>%
+        as.matrix() %>%
+        rowsum(group = self$celltypes) %>%
+        t() %>%
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
+        )
     }
   )
 )
