@@ -1,28 +1,42 @@
+library("here")
 library("data.table")
 library("magrittr")
 library("dplyr")
 library("R6")
 
+here::i_am("R6/CountMatrix.R")
+
+source(here("functions/norm_functions.R"))
+
 CountMatrix <- R6Class(
   "CountMatrix",
   public = list(
-    matrix = NULL,
-    # TODO Ensure meta is sorted by matrix order of cells
-    meta = NULL,
+    params = list(
+      normalization = list(
+        type = NULL,
+        scale_factor = 1
+      )
+    ),
     initialize = function(matrix, meta) {
-      self$matrix <- matrix
-      self$meta <- meta
+      private$matrix <- matrix
+      private$meta <- meta
     },
+    get_matrix = function() {
+      private$normalize_mat()
+    },
+    get_matrix_orig = function() {
+      private$matrix
+    }
   ),
   active = list(
     cells = function() {
-      colnames(self$matrix)
+      colnames(private$matrix)
     },
     celltypes = function() {
       cell_colname <- "cell"
       celltype_colname <- "celltype_major"
 
-      celltype_map <- self$meta %>%
+      celltype_map <- private$meta %>%
         extract(c(cell_colname, celltype_colname))
 
       dataframe(cells = self$cells) %>%
@@ -30,7 +44,7 @@ CountMatrix <- R6Class(
         extract2(celltype_colname)
     },
     transcripts = function() {
-      rownames(self$matrix)
+      rownames(private$matrix)
     },
     n_cells = function() {
       self$cells %>%
@@ -43,7 +57,7 @@ CountMatrix <- R6Class(
         length()
     },
     celltype_count_matrix = function() {
-      self$matrix %>%
+      private$matrix %>%
         t() %>%
         as.matrix() %>%
         rowsum(group = self$celltypes) %>%
@@ -52,6 +66,18 @@ CountMatrix <- R6Class(
           type = self$params$normalization$type,
           scale = self$params$normalization$scale_factor
         )
+    }
+  ),
+  private = list(
+    matrix = NULL,
+    # TODO Ensure meta is sorted by matrix order of cells
+    meta = NULL,
+    normalize_mat = function() {
+      normalize_count_mat(
+        count_mat = private$matrix,
+        type = self$params$normalization$type,
+        scale = self$params$normalization$scale_factor
+      )
     }
   )
 )
