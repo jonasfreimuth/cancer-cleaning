@@ -132,6 +132,13 @@ normalize_count_mat <- function(count_mat, type = "lognorm", ...) {
         type = type,
         ...
       )
+  } else if (type == "feature_scale") {
+    norm_mat <- count_mat %>%
+      apply(
+        2,
+        feature_scale,
+        ...
+      )
   } else if (type == "quantile") {
     norm_mat <- count_mat %>%
       # as.matrix() %>%
