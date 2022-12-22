@@ -3,7 +3,7 @@ library("R6")
 
 here::i_am("R6/Pseudobulk.R")
 
-source(here("R6/CountMatrix"))
+source(here("R6/CountMatrix.R"))
 
 
 Pseudobulk <- R6Class(

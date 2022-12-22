@@ -4,9 +4,9 @@ library("R6")
 
 here::i_am("R6/ScRnaExperiment.R")
 
-source(here("R6/SigmatUtils"))
-source(here("R6/CountMatrix"))
-source(here("R6/Reference"))
+source(here("R6/SigmatUtils.R"))
+source(here("R6/CountMatrix.R"))
+source(here("R6/Reference.R"))
 
 ScRnaExperiment <- R6Class(
   "ScRnaExperiment",
