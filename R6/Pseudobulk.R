@@ -10,8 +10,6 @@ Pseudobulk <- R6Class(
   public = list(
     params = list(
       id = NULL,
-      # TODO Change this from logical to char vec giving cols to split.
-      split_cancer = NULL,
       cancer_celltypes = NULL,
       normalization = list(
         type = NULL,
@@ -19,15 +17,13 @@ Pseudobulk <- R6Class(
       )
     ),
     initialize = function(count_matrix, cell_indices,
-                          split_cancer,
-                          cancer_celltypes) {
+                          cancer_celltypes = NULL) {
       stopifnot(
         all(c("CountMatrix", "R6") %in% class(count_matrix))
       )
       private$count_matrix <- count_matrix
       private$cell_indices <- cell_indices
 
-      self$params$split_cancer <- split_cancer
       self$params$cancer_celltypes <- cancer_celltypes
     }
   ),
