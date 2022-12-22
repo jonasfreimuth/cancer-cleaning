@@ -89,7 +89,7 @@ ScRnaExperiment <- R6Class(
         filter(cell %in% private$cells)
     },
     reference_raw_counts = function(threshold) {
-
+      stop("Raw counts reference not implemented.")
     },
     reference_DESeq2 = function(threshold) {
       marker_thresh <- self$get_marker_df %>%
