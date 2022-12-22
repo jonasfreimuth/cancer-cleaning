@@ -57,6 +57,15 @@ Pseudobulk <- R6Class(
       self$transcript_abundances %>%
         set_names(self$transcripts)
     },
+    df = function() {
+      self$bulk %>%
+        {
+          data.frame(
+            IDs = names(.),
+            sample = .
+          )
+        }
+    },
     transcript_abundances = function() {
       self$matrix %>%
         rowSums() %>%
