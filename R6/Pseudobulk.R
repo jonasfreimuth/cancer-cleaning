@@ -43,8 +43,8 @@ Pseudobulk <- R6Class(
       self$matrix %>%
         rowSums() %>%
         norm_vec(
-          type = norm_type,
-          scale = scale
+          type = self$normalization$type,
+          scale = self$normalization$scale_factor
         )
     },
     transcript_counts_cancer = function() {
@@ -53,8 +53,8 @@ Pseudobulk <- R6Class(
       self$matrix[, cancer_idcs] %>%
         rowSums() %>%
         norm_vec(
-          type = norm_type,
-          scale = scale
+          type = self$normalization$type,
+          scale = self$normalization$scale_factor
         )
     },
     celltype_counts = function() {
