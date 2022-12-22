@@ -50,7 +50,7 @@ Pseudobulk <- R6Class(
       self$meta_raw %>%
         filter(cell %in% colnames(self$count_matrix))
     },
-    transcript_counts = function() {
+    transcript_abundances = function() {
       self$matrix %>%
         rowSums() %>%
         norm_vec(
@@ -58,7 +58,7 @@ Pseudobulk <- R6Class(
           scale = self$normalization$scale_factor
         )
     },
-    transcript_counts_cancer = function() {
+    transcript_abundances_cancer = function() {
       cancer_idcs <- self$meta$celltypes %in% self$params$cancer_celltypes
 
       self$matrix[, cancer_idcs] %>%
