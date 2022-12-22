@@ -88,15 +88,13 @@ CountMatrix <- R6Class(
         ncol(matrix) > 0,
         length(colnames(matrix)) > 0,
         length(rownames(matrix)) > 0,
-        is(matrix, "sparseMatrix"),
-        !is.unsorted(colnames(matrix))
+        is(matrix, "sparseMatrix")
       )
     },
     check_meta = function(meta) {
       stopifnot(
         is.data.frame(meta),
-        c("cell", "celltype") %in% names(meta),
-        !is.unsorted(meta$cell)
+        c("cell", "celltype") %in% names(meta)
       )
     },
     check_matrix_meta_fit = function(matrix, meta) {
