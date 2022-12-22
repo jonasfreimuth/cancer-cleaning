@@ -18,6 +18,10 @@ CountMatrix <- R6Class(
       )
     ),
     initialize = function(matrix, meta) {
+      private$check_matrix(matrix)
+      private$check_meta(meta)
+      private$check_matrix_meta_fit(matrix, meta)
+
       private$matrix <- matrix
       private$meta <- meta
     },
@@ -77,6 +81,29 @@ CountMatrix <- R6Class(
         count_mat = private$matrix,
         type = self$params$normalization$type,
         scale = self$params$normalization$scale_factor
+      )
+    },
+    check_matrix = function(matrix) {
+      stopifnot(
+        nrow(matrix) > 0,
+        ncol(matrix) > 0,
+        length(colnames(matrix)) > 0,
+        length(rownames(matrix)) > 0,
+        is(matrix, "sparseMatrix"),
+        !is.unsorted(colnames(matrix))
+      )
+    },
+    check_meta = function(meta) {
+      stopifnot(
+        is.data.frame(meta),
+        c("cell", "celltype") %in% names(meta),
+        !is.unsorted(meta$cell)
+      )
+    },
+    check_matrix_meta_fit = function(matrix, meta) {
+      stopifnot(
+        ncol(matrix) == nrow(meta),
+        all(colnames(matrix) == meta$cells)
       )
     }
   )
