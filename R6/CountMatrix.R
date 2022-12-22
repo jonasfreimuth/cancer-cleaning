@@ -37,15 +37,7 @@ CountMatrix <- R6Class(
       colnames(private$matrix)
     },
     celltypes = function() {
-      cell_colname <- "cell"
-      celltype_colname <- "celltype_major"
-
-      celltype_map <- private$meta %>%
-        extract(c(cell_colname, celltype_colname))
-
-      dataframe(cells = self$cells) %>%
-        left_join(celltype_map, by = c("cells", cell_colname)) %>%
-        extract2(celltype_colname)
+      private$meta$celltypes
     },
     transcripts = function() {
       rownames(private$matrix)
