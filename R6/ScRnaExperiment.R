@@ -24,24 +24,19 @@ ScRnaExperiment <- R6Class(
 
       meta <- fread(meta_file) %>%
         # See rlang::`!!!`.
-        rename(!!!rename_vec) %>%
-        # Ordering ensured here.
-        arrange(cell)
-
-      matrix <- readMM(count_mat_file)
-
-      super$initialize(matrix, meta)
+        rename(!!!rename_vec)
 
       transcripts <- readLines(rowname_file)
       cells <- readLines(colname_file)
 
-      private$matrix@Dimnames <- list(
+      matrix <- readMM(count_mat_file)
+
+      matrix@Dimnames <- list(
         transcripts,
         cells
       )
 
-      # Ordering ensured here.
-      private$matrix <- private$matrix[order(private$cells), ]
+      super$initialize(matrix, meta)
 
       if (!base::missing(downsample_frac)) {
         private$downsample()
