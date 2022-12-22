@@ -18,6 +18,13 @@ CountMatrix <- R6Class(
       )
     ),
     initialize = function(matrix, meta) {
+      meta <- meta %>%
+        # Ordering ensured here.
+        arrange(cell)
+
+      # Ordering ensured here.
+      matrix <- matrix[order(colnames(matrix)), ]
+
       private$check_matrix(matrix)
       private$check_meta(meta)
       private$check_matrix_meta_fit(matrix, meta)
