@@ -50,6 +50,9 @@ Pseudobulk <- R6Class(
       self$meta_raw %>%
         filter(cell %in% colnames(self$count_matrix))
     },
+    transcripts = function() {
+      rownames(self$matrix)
+    },
     transcript_abundances = function() {
       self$matrix %>%
         rowSums() %>%
