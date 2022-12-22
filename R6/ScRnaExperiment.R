@@ -10,7 +10,6 @@ source(here("R6/Reference.R"))
 
 ScRnaExperiment <- R6Class(
   "ScRnaExperiment",
-  inherit = CountMatrix,
   public(
     initialize = function(count_mat_file, rowname_file, colname_file,
                           meta_file,
@@ -36,7 +35,7 @@ ScRnaExperiment <- R6Class(
         cells
       )
 
-      super$init(matrix, meta, downsample_frac)
+      private$count_matrix <- CountMatrix(matrix, meta, downsample_frac)
     },
     create_reference = function(metric = c("raw_counts", "DESeq2"),
                                 threshold) {
@@ -53,6 +52,7 @@ ScRnaExperiment <- R6Class(
     }
   ),
   private = list(
+    count_matrix = NULL,
     sigmat_utils = NULL,
     # Marker dataframe is defined as a df with two cols:
     # metric and transcript.
@@ -60,7 +60,7 @@ ScRnaExperiment <- R6Class(
     get_marker_df = function() {
       if (is.null(private$marker_df)) {
         private$marker_df <-
-          private$sigmatutils$create_marker_df(private$matrix)
+          private$sigmatutils$create_marker_df(private$count_matrix$matrix)
       }
       private$marker_df
     },
@@ -71,15 +71,9 @@ ScRnaExperiment <- R6Class(
       marker_thresh <- self$get_marker_df %>%
         slice_max(metric, prop = threshold)
 
-      matrix <- private$matrix %>%
-        extract(
-          i = self$transcripts %in% marker_df_thresh$transcript,
-          j = , drop = FALSE
-        )
+      reference_transcripts <- marker_thresh$transcript
 
-      meta <- private$meta %>%
-        filter(rownames())
-      Reference$new()
+      Reference$new(private$count_matrix, reference_transcripts, threshold)
     }
   )
 )
