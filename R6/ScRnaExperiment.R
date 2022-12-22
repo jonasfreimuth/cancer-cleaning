@@ -15,7 +15,7 @@ ScRnaExperiment <- R6Class(
     initialize = function(count_mat_file, rowname_file, colname_file,
                           meta_file,
                           cell_col = "V1", celltype_col = "celltype_major",
-                          downsample_frac) {
+                          downsample_frac = NULL) {
       private$sigmat_utils <- SigmatUtils$new()
       rename_vec <- c(
         "cell" = cell_col,
@@ -36,11 +36,7 @@ ScRnaExperiment <- R6Class(
         cells
       )
 
-      super$initialize(matrix, meta)
-
-      if (!base::missing(downsample_frac)) {
-        private$downsample()
-      }
+      super$init(matrix, meta, downsample_frac)
     },
     create_reference = function(metric = c("raw_counts", "DESeq2"),
                                 threshold) {
@@ -67,21 +63,6 @@ ScRnaExperiment <- R6Class(
           private$sigmatutils$create_marker_df(private$matrix)
       }
       private$marker_df
-    },
-    downsample = function(cell_frac, transcript_frac) {
-      rnd_cell_idx <- self$n_cells %>%
-        {
-          sample(x = seq_len(.), size = cell_frac * .)
-        }
-      rnd_transcript_idx <- self$n_celltypes %>%
-        {
-          sample(x = seq_len(.), size = transcript_frac * .)
-        }
-
-      private$matrix <- private$matrix[rnd_cell_idx, rnd_transcript_idx]
-
-      private$meta <- private$meta %>%
-        filter(cell %in% private$cells)
     },
     reference_raw_counts = function(threshold) {
       stop("Raw counts reference not implemented.")

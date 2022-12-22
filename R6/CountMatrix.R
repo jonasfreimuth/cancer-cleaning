@@ -17,7 +17,8 @@ CountMatrix <- R6Class(
         scale_factor = 1
       )
     ),
-    initialize = function(matrix, meta) {
+    initialize = function(matrix, meta, downsample,
+                          downsample_frac) {
       meta <- meta %>%
         # Ordering ensured here.
         arrange(cell)
@@ -31,6 +32,10 @@ CountMatrix <- R6Class(
 
       private$matrix <- matrix
       private$meta <- meta
+
+      if (is.null(downsample_frac)) {
+        private$downsample(downsample_frac, downsample_frac)
+      }
     },
     get_matrix = function() {
       private$normalize_mat()
@@ -81,6 +86,21 @@ CountMatrix <- R6Class(
         type = self$params$normalization$type,
         scale = self$params$normalization$scale_factor
       )
+    },
+    downsample = function(cell_frac, transcript_frac) {
+      rnd_cell_idx <- self$n_cells %>%
+        {
+          sample(x = seq_len(.), size = cell_frac * .)
+        }
+      rnd_transcript_idx <- self$n_celltypes %>%
+        {
+          sample(x = seq_len(.), size = transcript_frac * .)
+        }
+
+      private$matrix <- private$matrix[rnd_cell_idx, rnd_transcript_idx]
+
+      private$meta <- private$meta %>%
+        filter(cell %in% private$cells)
     },
     check_matrix = function(matrix) {
       stopifnot(
