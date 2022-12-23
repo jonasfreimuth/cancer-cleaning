@@ -95,12 +95,12 @@ CountMatrix <- R6Class(
         {
           sample(x = seq_len(.), size = cell_frac * .)
         }
-      rnd_transcript_idx <- self$n_celltypes %>%
+      rnd_transcript_idx <- self$n_transcripts %>%
         {
           sample(x = seq_len(.), size = transcript_frac * .)
         }
 
-      private$.matrix <- private$.matrix[rnd_cell_idx, rnd_transcript_idx]
+      private$.matrix <- private$.matrix[rnd_transcript_idx, rnd_cell_idx]
 
       private$.meta <- private$.meta %>%
         filter(cell %in% colnames(private$.matrix))
