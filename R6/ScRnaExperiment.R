@@ -54,6 +54,11 @@ ScRnaExperiment <- R6Class(
       )
     }
   ),
+  active = list(
+    count_matrix = function() {
+      private$.count_matrix
+    }
+  ),
   private = list(
     .count_matrix = NULL,
     .sigmat_utils = NULL,
