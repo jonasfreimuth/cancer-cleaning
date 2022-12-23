@@ -15,7 +15,7 @@ ScRnaExperiment <- R6Class(
                           meta_file,
                           cell_col = "V1", celltype_col = "celltype_major",
                           downsample_frac = NULL) {
-      private$sigmat_utils <- SigmatUtils$new()
+      private$.sigmat_utils <- SigmatUtils$new()
 
       .rename_fun <- function(x) {
         recode_vec <- c("cell", "celltype") %>%
@@ -38,7 +38,7 @@ ScRnaExperiment <- R6Class(
         cells
       )
 
-      private$count_matrix <- CountMatrix$new(matrix, meta, downsample_frac)
+      private$.count_matrix <- CountMatrix$new(matrix, meta, downsample_frac)
     },
     create_reference = function(metric = c("raw_counts", "DESeq2"),
                                 threshold) {
@@ -49,34 +49,34 @@ ScRnaExperiment <- R6Class(
       metric <- match.arg(metric)
 
       switch(metric,
-        raw_counts = private$reference_raw_counts(threshold),
+        raw_counts = private$.reference_raw_counts(threshold),
         DESeq2 = reference_DESeq2(threshold)
       )
     }
   ),
   private = list(
-    count_matrix = NULL,
-    sigmat_utils = NULL,
+    .count_matrix = NULL,
+    .sigmat_utils = NULL,
     # Marker dataframe is defined as a df with two cols:
     # metric and transcript.
-    marker_df = NULL,
-    get_marker_df = function() {
-      if (is.null(private$marker_df)) {
-        private$marker_df <-
-          private$sigmatutils$create_marker_df(private$count_matrix$matrix)
+    .marker_df = NULL,
+    .get_marker_df = function() {
+      if (is.null(private$.marker_df)) {
+        private$.marker_df <-
+          private$.sigmatutils$create_marker_df(private$.count_matrix$matrix)
       }
-      private$marker_df
+      private$.marker_df
     },
-    reference_raw_counts = function(threshold) {
+    .reference_raw_counts = function(threshold) {
       stop("Raw counts reference not implemented.")
     },
-    reference_DESeq2 = function(threshold) {
+    .reference_DESeq2 = function(threshold) {
       marker_thresh <- self$get_marker_df %>%
         slice_max(metric, prop = threshold)
 
       reference_transcripts <- marker_thresh$transcript
 
-      Reference$new(private$count_matrix, reference_transcripts, threshold)
+      Reference$new(private$.count_matrix, reference_transcripts, threshold)
     }
   )
 )
