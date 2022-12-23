@@ -21,16 +21,16 @@ Pseudobulk <- R6Class(
       stopifnot(
         all(c("CountMatrix", "R6") %in% class(count_matrix))
       )
-      private$count_matrix <- count_matrix
-      private$cell_indices <- cell_indices
+      private$.count_matrix <- count_matrix
+      private$.cell_indices <- cell_indices
 
       self$params$cancer_celltypes <- cancer_celltypes
 
       cancer_indices <- which(
         count_matrix$celltypes %in% cancer_celltypes
       )
-      private$cancer_indices <- cancer_indices
-      private$clean_indices <- setdiff(
+      private$.cancer_indices <- cancer_indices
+      private$.clean_indices <- setdiff(
         cell_indices,
         cancer_indices
       )
@@ -38,23 +38,23 @@ Pseudobulk <- R6Class(
   ),
   active = list(
     matrix_raw = function() {
-      private$count_marix$matrix
+      private$.count_marix$matrix
     },
     matrix = function() {
       self$matrix_raw %>%
         extract(
           i = ,
-          j = private$good_indices,
+          j = private$.clean_indices,
           drop = FALSE
         )
     },
     meta_raw = function() {
-      private$count_matrix$meta
+      private$.count_matrix$meta
     },
     meta = function() {
       self$meta_raw %>%
         extract(
-          i = private$good_indices,
+          i = private$.clean_indices,
           j = ,
           drop = FALSE
         )
@@ -84,7 +84,7 @@ Pseudobulk <- R6Class(
         )
     },
     transcript_abundances_cancer = function() {
-      self$matrix[, private$cancer_indices] %>%
+      self$matrix[, private$.cancer_indices] %>%
         rowSums() %>%
         norm_vec(
           type = self$normalization$type,
@@ -101,9 +101,9 @@ Pseudobulk <- R6Class(
     }
   ),
   private = list(
-    count_matrix = NULL,
-    cell_indices = NULL,
-    cancer_indices = NULL,
-    good_indices = NULL
+    .count_matrix = NULL,
+    .cell_indices = NULL,
+    .cancer_indices = NULL,
+    .clean_indices = NULL
   )
 )
