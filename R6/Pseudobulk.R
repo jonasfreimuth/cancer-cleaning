@@ -79,16 +79,16 @@ Pseudobulk <- R6Class(
       self$matrix %>%
         rowSums() %>%
         norm_vec(
-          type = self$normalization$type,
-          scale = self$normalization$scale_factor
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
         )
     },
     transcript_abundances_cancer = function() {
       self$matrix[, private$.cancer_indices] %>%
         rowSums() %>%
         norm_vec(
-          type = self$normalization$type,
-          scale = self$normalization$scale_factor
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
         )
     },
     celltype_counts = function() {
