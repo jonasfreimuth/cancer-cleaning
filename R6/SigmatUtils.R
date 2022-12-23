@@ -8,7 +8,7 @@ here::i_am("R6/SigmatUtils.R")
 SigmatUtils <- R6Class(
   "SigmatUtils",
   public = list(
-    create_marker_df = function(matrix) {
+    create_marker_df = function(matrix, meta) {
       matrix %>%
         # remove rows that are all the same
         # Also includes rows that are all zero-counts
