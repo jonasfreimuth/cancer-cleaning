@@ -38,7 +38,7 @@ Pseudobulk <- R6Class(
   ),
   active = list(
     matrix_raw = function() {
-      private$.count_marix$matrix
+      private$.count_matrix$matrix
     },
     matrix = function() {
       self$matrix_raw %>%
