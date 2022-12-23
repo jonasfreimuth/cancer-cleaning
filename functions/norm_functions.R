@@ -19,6 +19,10 @@ library("utils")
 
 
 norm_vec <- function(count_vec, type, base = 10, scale = 10^6) {
+  if (is.null(type)) {
+    # Only scale
+    return(count_vec * scale)
+  }
   vec_sum <- sum(count_vec)
 
   if (vec_sum == 0) {
