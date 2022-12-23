@@ -35,11 +35,13 @@ CountMatrix <- R6Class(
       if (!is.null(downsample_frac)) {
         private$.downsample(downsample_frac, downsample_frac)
       }
-    },
-    get_matrix = function() {
+    }
+  ),
+  active = list(
+    matrix = function() {
       private$.normalize_mat()
     },
-    get_matrix_orig = function() {
+    matrix_orig = function() {
       private$.matrix
     }
   ),
