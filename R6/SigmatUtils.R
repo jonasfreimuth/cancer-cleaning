@@ -12,7 +12,7 @@ SigmatUtils <- R6Class(
       matrix %>%
         # remove rows that are all the same
         # Also includes rows that are all zero-counts
-        extract(
+        magrittr::extract(
           i = !apply(
             ., 1, private$is_uniform
           ), j = , drop = FALSE
