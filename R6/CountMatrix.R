@@ -45,13 +45,13 @@ CountMatrix <- R6Class(
   ),
   active = list(
     cells = function() {
-      colnames(private$matrix)
+      colnames(private$.matrix)
     },
     celltypes = function() {
-      private$meta$celltypes
+      private$.meta$celltype
     },
     transcripts = function() {
-      rownames(private$matrix)
+      rownames(private$.matrix)
     },
     n_cells = function() {
       self$cells %>%
