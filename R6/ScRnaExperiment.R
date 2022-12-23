@@ -41,7 +41,7 @@ ScRnaExperiment <- R6Class(
 
       private$.count_matrix <- CountMatrix$new(matrix, meta, downsample_frac)
     },
-    create_reference = function(metric = c("raw_counts", "DESeq2"),
+    create_reference = function(metric = c("DESeq2", "raw_counts"),
                                 threshold) {
       # Metrics:
       #   "raw_counts": Produces a binary sigmat
@@ -51,7 +51,7 @@ ScRnaExperiment <- R6Class(
 
       switch(metric,
         raw_counts = private$.reference_raw_counts(threshold),
-        DESeq2 = reference_DESeq2(threshold)
+        DESeq2 = private$.reference_DESeq2(threshold)
       )
     }
   ),
@@ -69,7 +69,10 @@ ScRnaExperiment <- R6Class(
     .get_marker_df = function() {
       if (is.null(private$.marker_df)) {
         private$.marker_df <-
-          private$.sigmatutils$create_marker_df(private$.count_matrix$matrix)
+          private$.sigmat_utils$create_marker_df(
+            private$.count_matrix$matrix_orig,
+            private$.count_matrix$meta
+          )
       }
       private$.marker_df
     },
@@ -77,12 +80,12 @@ ScRnaExperiment <- R6Class(
       stop("Raw counts reference not implemented.")
     },
     .reference_DESeq2 = function(threshold) {
-      marker_thresh <- self$get_marker_df %>%
+      marker_thresh <- private$.get_marker_df() %>%
         slice_max(metric, prop = threshold)
 
       reference_transcripts <- marker_thresh$transcript
 
-      Reference$new(private$.count_matrix, reference_transcripts, threshold)
+      Reference$new(private$.count_matrix, threshold, reference_transcripts)
     }
   )
 )
