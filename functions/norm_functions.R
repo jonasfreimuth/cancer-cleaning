@@ -26,7 +26,7 @@ norm_vec <- function(count_vec, type, base = 10, scale = 10^6) {
   vec_sum <- sum(count_vec)
 
   if (vec_sum == 0) {
-    return(count_vec)
+    return(count_vec * scale)
   }
 
   norm_vec <- count_vec / vec_sum
