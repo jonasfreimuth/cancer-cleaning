@@ -10,7 +10,7 @@ source(here("R6/Reference.R"))
 
 ScRnaExperiment <- R6Class(
   "ScRnaExperiment",
-  public(
+  public = list(
     initialize = function(count_mat_file, rowname_file, colname_file,
                           meta_file,
                           cell_col = "V1", celltype_col = "celltype_major",
