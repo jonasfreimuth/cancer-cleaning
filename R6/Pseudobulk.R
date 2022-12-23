@@ -13,7 +13,7 @@ Pseudobulk <- R6Class(
       cancer_celltypes = NULL,
       normalization = list(
         type = NULL,
-        scale_factor = NULL
+        scale_factor = 1
       )
     ),
     initialize = function(count_matrix, cell_indices,
