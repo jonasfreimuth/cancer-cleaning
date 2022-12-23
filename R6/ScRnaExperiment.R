@@ -6,7 +6,8 @@ here::i_am("R6/ScRnaExperiment.R")
 
 source(here("R6/SigmatUtils.R"))
 source(here("R6/CountMatrix.R"))
-source(here("R6/Reference.R"))
+source(here("R6/ReferenceDeseq2.R"))
+source(here("R6/Pseudobulk.R"))
 
 ScRnaExperiment <- R6Class(
   "ScRnaExperiment",
