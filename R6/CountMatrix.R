@@ -25,22 +25,22 @@ CountMatrix <- R6Class(
       # Ordering ensured here.
       matrix <- matrix[, order(colnames(matrix))]
 
-      private$check_matrix(matrix)
-      private$check_meta(meta)
-      private$check_matrix_meta_fit(matrix, meta)
+      private$.check_matrix(matrix)
+      private$.check_meta(meta)
+      private$.check_matrix_meta_fit(matrix, meta)
 
-      private$matrix <- matrix
-      private$meta <- meta
+      private$.matrix <- matrix
+      private$.meta <- meta
 
       if (!is.null(downsample_frac)) {
-        private$downsample(downsample_frac, downsample_frac)
+        private$.downsample(downsample_frac, downsample_frac)
       }
     },
     get_matrix = function() {
-      private$normalize_mat()
+      private$.normalize_mat()
     },
     get_matrix_orig = function() {
-      private$matrix
+      private$.matrix
     }
   ),
   active = list(
@@ -64,7 +64,7 @@ CountMatrix <- R6Class(
         length()
     },
     celltype_count_matrix = function() {
-      private$matrix %>%
+      private$.matrix %>%
         t() %>%
         as.matrix() %>%
         rowsum(group = self$celltypes) %>%
@@ -76,17 +76,17 @@ CountMatrix <- R6Class(
     }
   ),
   private = list(
-    matrix = NULL,
+    .matrix = NULL,
     # TODO Ensure meta is sorted by matrix order of cells
-    meta = NULL,
-    normalize_mat = function() {
+    .meta = NULL,
+    .normalize_mat = function() {
       normalize_count_mat(
-        count_mat = private$matrix,
+        count_mat = private$.matrix,
         type = self$params$normalization$type,
         scale = self$params$normalization$scale_factor
       )
     },
-    downsample = function(cell_frac, transcript_frac) {
+    .downsample = function(cell_frac, transcript_frac) {
       rnd_cell_idx <- self$n_cells %>%
         {
           sample(x = seq_len(.), size = cell_frac * .)
@@ -96,12 +96,12 @@ CountMatrix <- R6Class(
           sample(x = seq_len(.), size = transcript_frac * .)
         }
 
-      private$matrix <- private$matrix[rnd_cell_idx, rnd_transcript_idx]
+      private$.matrix <- private$.matrix[rnd_cell_idx, rnd_transcript_idx]
 
-      private$meta <- private$meta %>%
-        filter(cell %in% private$cells)
+      private$.meta <- private$.meta %>%
+        filter(cell %in% colnames(private$.matrix))
     },
-    check_matrix = function(matrix) {
+    .check_matrix = function(matrix) {
       stopifnot(
         nrow(matrix) > 0,
         ncol(matrix) > 0,
@@ -110,13 +110,13 @@ CountMatrix <- R6Class(
         is(matrix, "sparseMatrix")
       )
     },
-    check_meta = function(meta) {
+    .check_meta = function(meta) {
       stopifnot(
         is.data.frame(meta),
         c("cell", "celltype") %in% names(meta)
       )
     },
-    check_matrix_meta_fit = function(matrix, meta) {
+    .check_matrix_meta_fit = function(matrix, meta) {
       stopifnot(
         ncol(matrix) == nrow(meta),
         all(colnames(matrix) == meta$cells)
