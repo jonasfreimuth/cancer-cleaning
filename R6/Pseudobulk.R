@@ -40,11 +40,21 @@ Pseudobulk <- R6Class(
     matrix_raw = function() {
       private$.count_matrix$matrix
     },
-    matrix = function() {
+    matrix_clean = function() {
+      # TODO Change this to lazy field.
       self$matrix_raw %>%
         magrittr::extract(
           i = ,
           j = private$.clean_indices,
+          drop = FALSE
+        )
+    },
+    matrix_cancer = function() {
+      # TODO Change this to lazy field.
+      self$matrix_raw  %>%
+        magrittr::extract(
+          i = ,
+          j = private$.cancer_indices,
           drop = FALSE
         )
     },
@@ -76,7 +86,7 @@ Pseudobulk <- R6Class(
         }
     },
     transcript_abundances = function() {
-      self$matrix %>%
+      self$matrix_clean %>%
         rowSums() %>%
         norm_vec(
           type = self$params$normalization$type,
@@ -84,7 +94,8 @@ Pseudobulk <- R6Class(
         )
     },
     transcript_abundances_cancer = function() {
-      self$matrix[, private$.cancer_indices] %>%
+      # TODO Check if this makes sense wrt normalization.
+      self$matrix_cancer %>%
         rowSums() %>%
         norm_vec(
           type = self$params$normalization$type,
