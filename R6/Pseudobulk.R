@@ -42,7 +42,7 @@ Pseudobulk <- R6Class(
     },
     matrix = function() {
       self$matrix_raw %>%
-        extract(
+        magrittr::extract(
           i = ,
           j = private$.clean_indices,
           drop = FALSE
@@ -53,7 +53,7 @@ Pseudobulk <- R6Class(
     },
     meta = function() {
       self$meta_raw %>%
-        extract(
+        magrittr::extract(
           i = private$.clean_indices,
           j = ,
           drop = FALSE
