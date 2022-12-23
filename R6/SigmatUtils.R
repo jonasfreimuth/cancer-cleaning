@@ -43,6 +43,20 @@ SigmatUtils <- R6Class(
         mutate(across(where(is.character), as.factor))
       count_mat <- count_mat[, order(colnames(count_mat))]
 
+      zero_sum_cells <- colSums(count_mat) == 0
+
+      if (any(zero_sum_cells)) {
+        # TODO Make this a more helpfull message.
+        warning(paste(
+          "During calculation of size factors, cells",
+          paste(colnames(count_mat)[zero_sum_cells], collapse = ", "),
+          "had no transcript",
+          "expression after removal of uniform rows and were not considered."
+        ))
+        count_mat <- count_mat[, !zero_sum_cells]
+        meta <- meta[!zero_sum_cells, ]
+      }
+
       # TODO Is prescaling useful here?
       size_factors <- count_mat %>%
         scuttle::pooledSizeFactors()
