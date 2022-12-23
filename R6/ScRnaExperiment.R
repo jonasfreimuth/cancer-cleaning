@@ -16,14 +16,17 @@ ScRnaExperiment <- R6Class(
                           cell_col = "V1", celltype_col = "celltype_major",
                           downsample_frac = NULL) {
       private$sigmat_utils <- SigmatUtils$new()
-      rename_vec <- c(
-        "cell" = cell_col,
-        "celltype" = celltype_col
-      )
+
+      .rename_fun <- function(x) {
+        recode_vec <- c("cell", "celltype") %>%
+          set_names(cell_col, celltype_col)
+
+        # See rlang::`!!!`.
+        dplyr::recode(x, !!!recode_vec)
+      }
 
       meta <- fread(meta_file) %>%
-        # See rlang::`!!!`.
-        rename(!!!rename_vec)
+        dplyr::rename_with(.fn = .rename_fun)
 
       transcripts <- readLines(rowname_file)
       cells <- readLines(colname_file)
