@@ -92,7 +92,7 @@ Pseudobulk <- R6Class(
         )
     },
     celltype_counts = function() {
-      self$meta$celltypes %>%
+      self$meta$celltype %>%
         table() %>%
         {
           # Conversion from table to named vector.
