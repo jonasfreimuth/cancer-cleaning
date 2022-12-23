@@ -63,6 +63,10 @@ CountMatrix <- R6Class(
         unique() %>%
         length()
     },
+    n_transcripts = function() {
+      self$transcripts %>%
+        length()
+    },
     celltype_count_matrix = function() {
       private$.matrix %>%
         t() %>%
