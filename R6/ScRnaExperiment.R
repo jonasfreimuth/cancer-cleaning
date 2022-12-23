@@ -38,7 +38,7 @@ ScRnaExperiment <- R6Class(
         cells
       )
 
-      private$count_matrix <- CountMatrix(matrix, meta, downsample_frac)
+      private$count_matrix <- CountMatrix$new(matrix, meta, downsample_frac)
     },
     create_reference = function(metric = c("raw_counts", "DESeq2"),
                                 threshold) {
