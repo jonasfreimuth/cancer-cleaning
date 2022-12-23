@@ -17,8 +17,7 @@ CountMatrix <- R6Class(
         scale_factor = 1
       )
     ),
-    initialize = function(matrix, meta, downsample,
-                          downsample_frac) {
+    initialize = function(matrix, meta, downsample_frac = NULL) {
       meta <- meta %>%
         # Ordering ensured here.
         arrange(cell)
@@ -33,7 +32,7 @@ CountMatrix <- R6Class(
       private$matrix <- matrix
       private$meta <- meta
 
-      if (is.null(downsample_frac)) {
+      if (!is.null(downsample_frac)) {
         private$downsample(downsample_frac, downsample_frac)
       }
     },
