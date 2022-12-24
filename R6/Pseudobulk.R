@@ -21,7 +21,9 @@ Pseudobulk <- R6Class(
     initialize = function(count_matrix, cell_indices,
                           cancer_celltypes = NULL) {
       stopifnot(
-        all(c("CountMatrix", "R6") %in% class(count_matrix))
+        all(c("CountMatrix", "R6") %in% class(count_matrix)),
+        length(cell_indices) <= count_matrix$n_cells,
+        max(cell_indices) <= count_matrix$n_cells
       )
       private$.count_matrix <- count_matrix
       private$.cell_indices <- cell_indices
