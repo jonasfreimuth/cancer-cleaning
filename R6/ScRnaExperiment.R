@@ -55,6 +55,9 @@ ScRnaExperiment <- R6Class(
         raw_counts = private$.reference_raw_counts(threshold),
         DESeq2 = private$.reference_DESeq2(threshold)
       )
+    },
+    create_pseudobulk = function(cell_indices, cancer_celltypes = NULL) {
+      Pseudobulk$new(private$.count_matrix, cell_indices, cancer_celltypes)
     }
   ),
   active = list(
