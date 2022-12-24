@@ -115,6 +115,13 @@ Pseudobulk <- R6Class(
           # Conversion from table to named vector.
           set_names(as.vector(.), names(.))
         }
+    },
+    celltype_abundances = function() {
+      self$celltype_counts %>%
+        norm_vec(
+          type = "norm",
+          scale = 1
+        )
     }
   ),
   private = list(
