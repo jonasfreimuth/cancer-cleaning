@@ -43,8 +43,14 @@ Pseudobulk <- R6Class(
     }
   ),
   active = list(
+    # TODO Fix issues with different matrix versions:
+    # * Core Pseudobulk is per celltype transcript props normalized
+    #    (with or without cancer cells?).
+    # --> Celltype abundance matrix normalized (with or without cancer cells?).
+    # *
     matrix_raw = function() {
-      private$.count_matrix$matrix
+      # TODO Add normalization downstream
+      private$.count_matrix$matrix_orig
     },
     matrix_clean = function() {
       # TODO Change this to lazy field.
@@ -53,15 +59,23 @@ Pseudobulk <- R6Class(
           i = ,
           j = private$.clean_indices,
           drop = FALSE
+        ) %>%
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
         )
     },
     matrix_cancer = function() {
       # TODO Change this to lazy field.
-      self$matrix_raw  %>%
+      self$matrix_raw %>%
         magrittr::extract(
           i = ,
           j = private$.cancer_indices,
           drop = FALSE
+        ) %>%
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
         )
     },
     meta_raw = function() {
@@ -76,7 +90,8 @@ Pseudobulk <- R6Class(
         )
     },
     transcripts = function() {
-      rownames(self$matrix)
+      # TODO Should zero sum transcripts be removed?
+      rownames(self$matrix_clean)
     },
     bulk = function() {
       self$transcript_abundances %>%
@@ -122,6 +137,10 @@ Pseudobulk <- R6Class(
           type = "norm",
           scale = 1
         )
+    },
+    celltype_matrix_clean = function() {
+      # TODO Implement.
+      stop("Not implemented")
     }
   ),
   private = list(
