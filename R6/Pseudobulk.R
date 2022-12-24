@@ -7,6 +7,8 @@ suppressMessages(
 
 source(here("R6/CountMatrix.R"))
 
+source(here("functions/norm_functions.R"))
+
 Pseudobulk <- R6Class(
   "Pseudobulk",
   public = list(
