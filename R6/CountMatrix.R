@@ -4,7 +4,9 @@ library("magrittr")
 library("dplyr")
 library("R6")
 
-here::i_am("R6/CountMatrix.R")
+supressMessages(
+  here::i_am("R6/CountMatrix.R")
+)
 
 source(here("functions/norm_functions.R"))
 

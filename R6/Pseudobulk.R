@@ -1,7 +1,9 @@
 library("here")
 library("R6")
 
-here::i_am("R6/Pseudobulk.R")
+suppressMessages(
+  here::i_am("R6/Pseudobulk.R")
+)
 
 source(here("R6/CountMatrix.R"))
 

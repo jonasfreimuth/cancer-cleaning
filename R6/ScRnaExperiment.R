@@ -2,7 +2,9 @@ library("dplyr")
 library("here")
 library("R6")
 
-here::i_am("R6/ScRnaExperiment.R")
+suppressMessages(
+  here::i_am("R6/ScRnaExperiment.R")
+)
 
 source(here("R6/SigmatUtils.R"))
 source(here("R6/CountMatrix.R"))
