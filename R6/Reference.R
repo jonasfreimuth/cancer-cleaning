@@ -46,6 +46,9 @@ Reference <- R6Class(
     n_celltypes = function() {
       ncol(self$sigmat)
     },
+    markers = function() {
+      private$.markers
+    },
     df = function() {
       self$sigmat %>%
         {
