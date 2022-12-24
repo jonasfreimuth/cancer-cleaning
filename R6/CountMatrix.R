@@ -25,7 +25,7 @@ CountMatrix <- R6Class(
         arrange(cell)
 
       # Ordering ensured here.
-      matrix <- matrix[, order(colnames(matrix))]
+      matrix <- matrix[order(rownames(matrix)), order(colnames(matrix))]
 
       private$.check_matrix(matrix)
       private$.check_meta(meta)
