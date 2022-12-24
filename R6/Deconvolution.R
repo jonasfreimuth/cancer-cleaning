@@ -45,9 +45,15 @@ Deconvolution <- R6Class(
     },
     residuals_marker = function() {
       if (is.null(private$.residuals_marker)) {
-        private$.compute_rmse()
+        private$.compute_residuals_marker()
       }
-      private
+      private$.residuals_marker
+    },
+    residuals_all = function() {
+      if (is.null(private$.residuals_all)) {
+        private$.compute_residuals_all()
+      }
+      private$.residuals_all
     }
   ),
   private = list(
