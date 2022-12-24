@@ -21,7 +21,11 @@ Reference <- R6Class(
       )
     ),
     initialize = function(count_matrix, threshold, markers) {
-      # TODO Check args.
+      # TODO Check more args.
+      private$.check_markers(markers)
+      private$.check_threshold(threshold)
+      private$.check_count_matrix(count_matrix)
+
       private$.count_matrix <- count_matrix
       self$params$threshold <- threshold
       private$.markers <- markers
@@ -72,6 +76,22 @@ Reference <- R6Class(
   ),
   private = list(
     .count_matrix = NULL,
-    .markers = NULL
+    .markers = NULL,
+    .check_markers = function(markers) {
+      stopifnot(
+        is.character(markers)
+      )
+    },
+    .check_threshold = function(trheshold) {
+      stopifnot(
+        is.numeric(threshold),
+        length(threshold) == 1
+      )
+    },
+    .check_count_matrix = function(count_matrix) {
+      stopifnot(
+        c("R6", "CountMatrix") %in% class(count_matrix)
+      )
+    },
   )
 )
