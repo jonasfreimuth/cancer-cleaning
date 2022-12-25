@@ -64,6 +64,8 @@ Deconvolution <- R6Class(
     .rmse = NULL,
     .residuals_marker = NULL,
     .residuals_all = NULL,
+    .cor_marker = NULL,
+    .cor_all = NULL,
     .deconvolute = function() {
       if (self$reference$n_celltypes <= 1) {
         # Some deconvolution methods will fail if only a single celltype is
@@ -126,6 +128,23 @@ Deconvolution <- R6Class(
 
       private$.compute_residuals_all <- transcript_abundances_allr -
         transcript_predictions_all
+    },
+    .compute_cor_marker = function() {
+      method <- "pearson"
+      # TODO Trim transcript_abundances_cancer to residuals
+      private$.cor_marker <- cor(
+        self$residuals_marker,
+        private$.pseudobulk$transcript_abundances_cancer,
+        method = method
+      )
+    },
+    .compute_cor_all = function() {
+      method <- "pearson"
+      private$.cor_all <- cor(
+        self$residuals_all,
+        private$.pseudobulk$transcript_abundances_cancer,
+        method = method
+      )
     }
   )
 )
