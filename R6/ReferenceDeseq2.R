@@ -9,8 +9,8 @@ ReferenceDeseq2 <- R6Class(
   "ReferenceDeseq2",
   inherit = Reference,
   public = list(
-    initialize = function(count_mat, threshold, markers) {
-      super$initialize(count_mat, threshold, markers)
+    initialize = function(count_mat, markers, params) {
+      super$initialize(count_mat, markers, params)
     }
   )
 )

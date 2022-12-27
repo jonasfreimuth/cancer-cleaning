@@ -45,17 +45,17 @@ ScRnaExperiment <- R6Class(
 
       super$initialize(CountMatrix$new(matrix, meta, downsample_frac))
     },
-    create_reference = function(metric = c("DESeq2", "raw_counts"),
-                                threshold) {
+    create_reference = function(params) {
+      stopifnot(
+        all(c("R6", "Params", "ReferenceParams") %in% class(params))
+      )
       # Metrics:
       #   "raw_counts": Produces a binary sigmat
-      #   "DESeq2": *Selects* transcripts based on adjusted pvalue for
+      #   "deseq2": *Selects* transcripts based on adjusted pvalue for
       #       differential expression, as determined by DESeq2.
-      metric <- match.arg(metric)
-
-      switch(metric,
-        raw_counts = private$.reference_raw_counts(threshold),
-        DESeq2 = private$.reference_DESeq2(threshold)
+      switch(params$metric,
+        raw_counts = private$.reference_raw_counts(params),
+        deseq2 = private$.reference_deseq2(params)
       )
     },
     create_pseudobulk = function(cell_indices, cancer_celltypes = NULL) {
@@ -83,16 +83,16 @@ ScRnaExperiment <- R6Class(
       }
       private$.marker_df
     },
-    .reference_raw_counts = function(threshold) {
+    .reference_raw_counts = function(params) {
       stop("Raw counts reference not implemented.")
     },
-    .reference_DESeq2 = function(threshold) {
+    .reference_deseq2 = function(params) {
       marker_thresh <- private$.get_marker_df() %>%
-        slice_max(metric, prop = threshold)
+        slice_max(metric, prop = params$threshold)
 
       reference_transcripts <- marker_thresh$transcript
 
-      Reference$new(private$.count_matrix, threshold, reference_transcripts)
+      Reference$new(private$.count_matrix, reference_transcripts, params)
     }
   )
 )

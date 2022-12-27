@@ -11,14 +11,14 @@ Reference <- R6Class(
   "Reference",
   inherit = CountMatrixWrapper,
   public = list(
-    initialize = function(count_matrix, threshold, markers) {
+    initialize = function(count_matrix, markers, params) {
       # TODO Check more args.
       private$.check_markers(markers)
-      private$.check_threshold(threshold)
       private$.check_count_matrix(count_matrix)
+      private$.check_params(params)
 
       super$initialize(count_matrix)
-      private$.params$threshold <- threshold
+      private$.params <- params
       private$.markers <- markers
     }
   ),
@@ -71,26 +71,15 @@ Reference <- R6Class(
   private = list(
     .count_matrix = NULL,
     .markers = NULL,
-    .params = list(
-      metric = NULL,
-      threshold = NULL,
-      # TODO Change this from logical to char vec giving cols to split.
-      split_cancer = NULL,
-      cancer_celltypes = NULL,
-      normalization = list(
-        type = NULL,
-        scale_factor = NULL
-      )
-    ),
+    .params = NULL,
     .check_markers = function(markers) {
       stopifnot(
         is.character(markers)
       )
     },
-    .check_threshold = function(threshold) {
+    .check_params = function(params) {
       stopifnot(
-        is.numeric(threshold),
-        length(threshold) == 1
+        all(c("R6", "Params", "ReferenceParams") %in% class(params))
       )
     },
     .check_count_matrix = function(count_matrix) {
