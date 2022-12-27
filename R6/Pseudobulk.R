@@ -14,24 +14,23 @@ Pseudobulk <- R6Class(
   "Pseudobulk",
   inherit = CountMatrixWrapper,
   public = list(
-    initialize = function(count_matrix, cell_indices,
-                          cancer_celltypes = NULL) {
+    initialize = function(count_matrix, params) {
       stopifnot(
-        all(c("CountMatrix", "R6") %in% class(count_matrix)),
-        length(cell_indices) <= count_matrix$n_cells,
-        max(cell_indices) <= count_matrix$n_cells
+        all(c("CountMatrix", "R6") %in% class(count_matrix))
       )
-      super$initialize(count_matrix)
-      private$.cell_indices <- cell_indices
+      private$.check_params(params)
+      private$.check_params_count_matrix_fit(params, count_matrix)
 
-      private$.params$cancer_celltypes <- cancer_celltypes
+      super$initialize(count_matrix)
+
+      private$.params <- params
 
       cancer_indices <- which(
-        count_matrix$celltypes %in% cancer_celltypes
+        count_matrix$celltypes %in% params$cancer_celltypes
       )
       private$.cancer_indices <- cancer_indices
       private$.clean_indices <- setdiff(
-        cell_indices,
+        params$cell_indices,
         cancer_indices
       )
     }
@@ -142,16 +141,19 @@ Pseudobulk <- R6Class(
   ),
   private = list(
     .count_matrix = NULL,
-    .cell_indices = NULL,
     .cancer_indices = NULL,
     .clean_indices = NULL,
-    .params = list(
-      id = NULL,
-      cancer_celltypes = NULL,
-      normalization = list(
-        type = NULL,
-        scale_factor = 1
+    .params = NULL,
+    .check_params = function(params) {
+      stopifnot(
+        all(c("R6", "Params", "PseudobulkParams") %in% class(params))
       )
-    )
+    },
+    .check_params_count_matrix_fit = function(params, count_matrix) {
+      stopifnot(
+        length(params$cell_indices) <= count_matrix$n_cells,
+        max(params$cell_indices) <= count_matrix$n_cells
+      )
+    }
   )
 )
