@@ -4,7 +4,7 @@ library("magrittr")
 library("dplyr")
 library("R6")
 
-supressMessages(
+suppressMessages(
   here::i_am("R6/CountMatrix.R")
 )
 
