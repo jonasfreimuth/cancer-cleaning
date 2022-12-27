@@ -99,7 +99,7 @@ Pseudobulk <- R6Class(
     },
     transcripts = function() {
       # TODO Should zero sum transcripts be removed?
-      rownames(self$matrix_clean)
+      rownames(self$bulk_matrix_clean)
     },
     bulk = function() {
       self$transcript_abundances %>%
