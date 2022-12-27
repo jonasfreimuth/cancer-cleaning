@@ -5,8 +5,11 @@ suppressMessages(
   here::i_am("R6/Reference.R")
 )
 
+source(here("R6/CountMatrixWrapper.R"))
+
 Reference <- R6Class(
   "Reference",
+  inherit = CountMatrixWrapper,
   public = list(
     # TODO Consider getting params into private.
     params = list(
@@ -26,7 +29,7 @@ Reference <- R6Class(
       private$.check_threshold(threshold)
       private$.check_count_matrix(count_matrix)
 
-      private$.count_matrix <- count_matrix
+      super$initialize(count_matrix)
       self$params$threshold <- threshold
       private$.markers <- markers
     }
