@@ -26,7 +26,9 @@ DeconvolutionSummary <- R6Class(
         function(deconv) {
           all(c("Deconvolution", "R6") %in% class(deconv))
         }
-      )
+      ) %>%
+        unlist() %>%
+        all()
 
       stopifnot(
         all_deconvolution
