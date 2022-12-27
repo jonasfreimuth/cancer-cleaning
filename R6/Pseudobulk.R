@@ -14,14 +14,6 @@ Pseudobulk <- R6Class(
   "Pseudobulk",
   inherit = CountMatrixWrapper,
   public = list(
-    params = list(
-      id = NULL,
-      cancer_celltypes = NULL,
-      normalization = list(
-        type = NULL,
-        scale_factor = 1
-      )
-    ),
     initialize = function(count_matrix, cell_indices,
                           cancer_celltypes = NULL) {
       stopifnot(
@@ -32,7 +24,7 @@ Pseudobulk <- R6Class(
       super$initialize(count_matrix)
       private$.cell_indices <- cell_indices
 
-      self$params$cancer_celltypes <- cancer_celltypes
+      private$.params$cancer_celltypes <- cancer_celltypes
 
       cancer_indices <- which(
         count_matrix$celltypes %in% cancer_celltypes
@@ -45,6 +37,9 @@ Pseudobulk <- R6Class(
     }
   ),
   active = list(
+    params = function() {
+      private$.params
+    },
     # TODO Fix issues with different matrix versions:
     # * Core Pseudobulk is per celltype transcript props normalized
     #    (with or without cancer cells?).
@@ -149,6 +144,14 @@ Pseudobulk <- R6Class(
     .count_matrix = NULL,
     .cell_indices = NULL,
     .cancer_indices = NULL,
-    .clean_indices = NULL
+    .clean_indices = NULL,
+    .params = list(
+      id = NULL,
+      cancer_celltypes = NULL,
+      normalization = list(
+        type = NULL,
+        scale_factor = 1
+      )
+    )
   )
 )
