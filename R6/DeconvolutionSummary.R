@@ -16,6 +16,9 @@ DeconvolutionSummary <- R6Class(
   active = list(
     df = function() {
       stop("Not implemented.")
+    },
+    list = function() {
+      private$.deconvolution_list
     }
   ),
   private = list(
