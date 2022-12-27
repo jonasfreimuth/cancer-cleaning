@@ -29,22 +29,11 @@ Reference <- R6Class(
       private$.params
     },
     matrix_raw = function() {
-      private$.count_marix$matrix
+      # TODO Change to matrix_orig where matrix_raw is used.
+      self$matrix_orig
     },
     meta_raw = function() {
       private$.count_matrix$meta
-    },
-    transcripts = function() {
-      rownames(self$sigmat)
-    },
-    n_transcripts = function() {
-      nrow(self$sigmat)
-    },
-    celltypes = function() {
-      colnames(self$sigmat)
-    },
-    n_celltypes = function() {
-      ncol(self$sigmat)
     },
     markers = function() {
       private$.markers
