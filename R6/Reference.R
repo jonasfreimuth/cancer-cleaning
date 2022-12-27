@@ -53,8 +53,8 @@ Reference <- R6Class(
       # TODO Check if this works as intended wrt normalization
       private$.count_matrix$celltype_count_matrix %>%
         magrittr::extract(
-          i = private$.markers,
-          j = ,
+          i = rownames(.) %in% private$.markers,
+          j = !(colnames(.) %in% self$params$cancer_celltypes),
           drop = FALSE
         ) %>%
         normalize_count_mat(
