@@ -13,12 +13,6 @@ source(here("functions/norm_functions.R"))
 CountMatrix <- R6Class(
   "CountMatrix",
   public = list(
-    params = list(
-      normalization = list(
-        type = NULL,
-        scale_factor = 1
-      )
-    ),
     initialize = function(matrix, meta, downsample_frac = NULL) {
       meta <- meta %>%
         # Ordering ensured here.
@@ -40,6 +34,9 @@ CountMatrix <- R6Class(
     }
   ),
   active = list(
+    params = function() {
+      private$.params
+    },
     matrix = function() {
       private$.normalize_mat()
     },
@@ -88,6 +85,12 @@ CountMatrix <- R6Class(
     .matrix = NULL,
     # TODO Ensure meta is sorted by matrix order of cells
     .meta = NULL,
+    .params = list(
+      normalization = list(
+        type = NULL,
+        scale_factor = 1
+      )
+    ),
     .normalize_mat = function() {
       normalize_count_mat(
         count_mat = private$.matrix,
