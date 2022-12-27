@@ -45,8 +45,8 @@ Pseudobulk <- R6Class(
     # --> Celltype abundance matrix normalized (with or without cancer cells?).
     # *
     matrix_raw = function() {
-      # TODO Add normalization downstream
-      private$.count_matrix$matrix_orig
+      # TODO Change to matrix_orig where matrix_raw is used.
+      self$matrix_orig
     },
     bulk_matrix = function() {
       self$matrix_raw %>%

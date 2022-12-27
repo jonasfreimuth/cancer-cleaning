@@ -80,8 +80,8 @@ ScRnaExperiment <- R6Class(
       if (is.null(private$.marker_df)) {
         private$.marker_df <-
           private$.sigmat_utils$create_marker_df(
-            private$.count_matrix$matrix_orig,
-            private$.count_matrix$meta
+            self$matrix_orig,
+            self$meta
           )
       }
       private$.marker_df

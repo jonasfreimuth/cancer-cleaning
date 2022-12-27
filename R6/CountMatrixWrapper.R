@@ -17,11 +17,8 @@ CountMatrixWrapper <- R6Class(
     }
   ),
   active = list(
-    matrix = function() {
-      private$.count_matrix$matrix
-    },
     matrix_orig = function() {
-      private$.count_matrix$matrix_orig
+      private$.count_matrix$matrix
     },
     meta = function() {
       private$.count_matrix$meta
