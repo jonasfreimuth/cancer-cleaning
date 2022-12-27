@@ -7,6 +7,8 @@ suppressMessages(
 
 source(here("R6/CountMatrixWrapper.R"))
 
+source(here("functions/norm_functions.R"))
+
 Reference <- R6Class(
   "Reference",
   inherit = CountMatrixWrapper,
@@ -65,6 +67,10 @@ Reference <- R6Class(
           i = private$.markers,
           j = ,
           drop = FALSE
+        ) %>%
+        normalize_count_mat(
+          type = self$params$nomalization$type,
+          scale = self$params$nomalization$scale_factor
         )
     }
   ),

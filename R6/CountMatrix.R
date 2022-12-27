@@ -37,9 +37,6 @@ CountMatrix <- R6Class(
     params = function() {
       private$.params
     },
-    matrix = function() {
-      private$.normalize_mat()
-    },
     matrix_orig = function() {
       private$.matrix
     },
@@ -74,30 +71,13 @@ CountMatrix <- R6Class(
         t() %>%
         as.matrix() %>%
         rowsum(group = self$celltypes) %>%
-        t() %>%
-        normalize_count_mat(
-          type = self$params$normalization$type,
-          scale = self$params$normalization$scale_factor
-        )
+        t()
     }
   ),
   private = list(
     .matrix = NULL,
     # TODO Ensure meta is sorted by matrix order of cells
     .meta = NULL,
-    .params = list(
-      normalization = list(
-        type = NULL,
-        scale_factor = 1
-      )
-    ),
-    .normalize_mat = function() {
-      normalize_count_mat(
-        count_mat = private$.matrix,
-        type = self$params$normalization$type,
-        scale = self$params$normalization$scale_factor
-      )
-    },
     .downsample = function(cell_frac, transcript_frac) {
       rnd_cell_idx <- self$n_cells %>%
         {
