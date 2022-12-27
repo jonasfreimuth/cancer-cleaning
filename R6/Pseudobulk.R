@@ -6,11 +6,13 @@ suppressMessages(
 )
 
 source(here("R6/CountMatrix.R"))
+source(here("R6/CountMatrixWrapper.R"))
 
 source(here("functions/norm_functions.R"))
 
 Pseudobulk <- R6Class(
   "Pseudobulk",
+  inherit = CountMatrixWrapper,
   public = list(
     params = list(
       id = NULL,
@@ -27,7 +29,7 @@ Pseudobulk <- R6Class(
         length(cell_indices) <= count_matrix$n_cells,
         max(cell_indices) <= count_matrix$n_cells
       )
-      private$.count_matrix <- count_matrix
+      super$initialize(count_matrix)
       private$.cell_indices <- cell_indices
 
       self$params$cancer_celltypes <- cancer_celltypes
