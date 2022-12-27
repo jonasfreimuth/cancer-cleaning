@@ -19,6 +19,15 @@ DeconvolutionSummary <- R6Class(
     },
     list = function() {
       private$.deconvolution_list
+    },
+    rmse_vec = function() {
+      self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$rmse
+          }
+        ) %>%
+        unlist()
     }
   ),
   private = list(
