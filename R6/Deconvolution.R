@@ -89,9 +89,9 @@ Deconvolution <- R6Class(
       }
     },
     .compute_rmse = function() {
-      rmse(
-        private$.pseudobulk$celltype_abundances,
-        self$.celltype_props_predicted
+      private$.rmse <- rmse(
+        self$pseudobulk$celltype_abundances,
+        self$res
       )
     },
     .compute_residuals_marker = function() {
