@@ -6,7 +6,7 @@ suppressMessages(
   here::i_am("R6/Deconvolution.R")
 )
 
-soure(here("functions/rmse.R"))
+source(here("functions/rmse.R"))
 
 Deconvolution <- R6Class(
   "Deconvolution",
@@ -41,7 +41,7 @@ Deconvolution <- R6Class(
       if (is.null(private$.rmse)) {
         private$.compute_rmse()
       }
-      privat$.rmse
+      private$.rmse
     },
     residuals_marker = function() {
       if (is.null(private$.residuals_marker)) {
