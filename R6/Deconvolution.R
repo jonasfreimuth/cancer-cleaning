@@ -16,6 +16,7 @@ Deconvolution <- R6Class(
         all(c("Reference", "R6") %in% class(reference)),
         all(c("Pseudobulk", "R6") %in% class(pseudobulk))
       )
+      private$.check_ref_pbulk_fit(reference, pseudobulk)
       private$.reference <- reference
       private$.pseudobulk <- pseudobulk
       private$.method <- method
@@ -144,6 +145,14 @@ Deconvolution <- R6Class(
         self$residuals_all,
         private$.pseudobulk$transcript_abundances_cancer,
         method = method
+      )
+    },
+    .check_ref_pbulk_fit = function(reference, pseudobulk) {
+      ref_cancer_ctypes <- reference$params$cancer_celltypes
+      pbulk_cancer_ctypes <- pseudobulk$params$cancer_celltypes
+
+      stopifnot(
+        isTRUE(all.equal(sort(ref_cancer_ctypes), sort(pbulk_cancer_ctypes)))
       )
     }
   )
