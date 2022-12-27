@@ -1,7 +1,7 @@
 library("here")
 library("R6")
 
-supressMessages(
+suppressMessages(
   here::i_am("R6/Reference.R")
 )
 
@@ -82,7 +82,7 @@ Reference <- R6Class(
         is.character(markers)
       )
     },
-    .check_threshold = function(trheshold) {
+    .check_threshold = function(threshold) {
       stopifnot(
         is.numeric(threshold),
         length(threshold) == 1
@@ -92,6 +92,6 @@ Reference <- R6Class(
       stopifnot(
         c("R6", "CountMatrix") %in% class(count_matrix)
       )
-    },
+    }
   )
 )
