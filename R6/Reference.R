@@ -49,9 +49,20 @@ Reference <- R6Class(
         select(IDs, everything())
     },
     sigmat = function() {
-      # TODO Change this to lazy field.
+      if (is.null(private$.sigmat)) {
+        private$.compute_sigmat()
+      }
+      private$.sigmat
+    }
+  ),
+  private = list(
+    .count_matrix = NULL,
+    .markers = NULL,
+    .params = NULL,
+    .sigmat = NULL,
+    .compute_sigmat = function() {
       # TODO Check if this works as intended wrt normalization
-      private$.count_matrix$celltype_count_matrix %>%
+      private$.sigmat <- private$.count_matrix$celltype_count_matrix %>%
         magrittr::extract(
           i = rownames(.) %in% private$.markers,
           j = !(colnames(.) %in% self$params$cancer_celltypes),
@@ -61,12 +72,7 @@ Reference <- R6Class(
           type = self$params$nomalization$type,
           scale = self$params$nomalization$scale_factor
         )
-    }
-  ),
-  private = list(
-    .count_matrix = NULL,
-    .markers = NULL,
-    .params = NULL,
+    },
     .check_markers = function(markers) {
       stopifnot(
         is.character(markers)
