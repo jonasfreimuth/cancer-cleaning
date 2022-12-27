@@ -8,11 +8,13 @@ suppressMessages(
 
 source(here("R6/SigmatUtils.R"))
 source(here("R6/CountMatrix.R"))
+source(here("R6/CountMatrixWrapper.R"))
 source(here("R6/ReferenceDeseq2.R"))
 source(here("R6/Pseudobulk.R"))
 
 ScRnaExperiment <- R6Class(
   "ScRnaExperiment",
+  inherit = CountMatrixWrapper,
   public = list(
     initialize = function(count_mat_file, rowname_file, colname_file,
                           meta_file,
@@ -41,7 +43,7 @@ ScRnaExperiment <- R6Class(
         cells
       )
 
-      private$.count_matrix <- CountMatrix$new(matrix, meta, downsample_frac)
+      super$initialize(CountMatrix$new(matrix, meta, downsample_frac))
     },
     create_reference = function(metric = c("DESeq2", "raw_counts"),
                                 threshold) {
