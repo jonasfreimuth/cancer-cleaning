@@ -84,7 +84,7 @@ Reference <- R6Class(
     },
     .check_count_matrix = function(count_matrix) {
       stopifnot(
-        c("R6", "CountMatrix") %in% class(count_matrix)
+        all(c("R6", "CountMatrix") %in% class(count_matrix))
       )
     }
   )
