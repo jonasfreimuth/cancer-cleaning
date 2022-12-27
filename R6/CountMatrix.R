@@ -34,9 +34,6 @@ CountMatrix <- R6Class(
     }
   ),
   active = list(
-    params = function() {
-      private$.params
-    },
     matrix_orig = function() {
       private$.matrix
     },
