@@ -381,7 +381,12 @@ if (params$sigmat_type == "binary") {
     slice_max(metric, n = 10) %>%
     extract2("transcript")
 
-  qc_top_boxplot <- outlier_plot(deconv_ref_list[[1]], top_10_transcripts)
+  # TODO Move this to a point after deconv_ref_list has been cleaned or remove
+  # dependence on reference entirely.
+  qc_top_boxplot <- outlier_plot(
+    deconv_ref_list[[length(deconv_ref_list)]],
+    top_10_transcripts
+  )
 
   qc_plot_path <- here(run_path, "plots/qc_plots")
   dir.create(qc_plot_path, recursive = TRUE, showWarnings = FALSE)
