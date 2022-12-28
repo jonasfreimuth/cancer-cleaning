@@ -111,41 +111,47 @@ count_df_from_reference <- function(reference, feature_scale = FALSE) {
 }
 
 
-sigmat_qc_plot <- function(reference, title = NULL, feature_scale = FALSE) {
+sigmat_qc_plot <- function(reference, title = NULL,
+                           feature_scale = FALSE,
+                           transcripts_ordered = NULL,
+                           celltypes_ordered = NULL) {
   count_df <- count_df_from_reference(reference, feature_scale)
 
-  celltype_means <- count_df %>%
-    group_by(celltype) %>%
-    summarize(
-      mean = mean(abundance),
-      .groups = "drop_last"
+  if (is.null(celltypes_ordered)) {
+    celltypes_ordered <- count_df %>%
+      group_by(celltype) %>%
+      summarize(
+        mean = mean(abundance),
+        .groups = "drop_last"
+      ) %>%
+      arrange(desc(mean)) %>%
+      magrittr::extract2("celltype")
+  }
+
+
+  if (is.null(transcripts_ordered)) {
+    transcripts_ordered <- count_df %>%
+      group_by(transcript) %>%
+      summarize(
+        mean = mean(abundance),
+        .groups = "drop_last"
+      ) %>%
+      arrange(desc(mean)) %>%
+      magrittr::extract2("transcript")
+  }
+
+  qc_plot <- count_df %>%
+    mutate(
+      celltype = factor(celltype, levels = celltypes_ordered),
+      transcript = factor(transcript, levels = transcripts_ordered),
     ) %>%
-    # Align to count_df for reorder
-    {
-      left_join(select(count_df, celltype), ., by = "celltype")
-    } %>%
-    extract2("mean")
-
-  transcript_means <- count_df %>%
-    group_by(transcript) %>%
-    summarize(
-      mean = mean(abundance),
-      .groups = "drop_last"
-    ) %>%
-    # Align to count_df for reorder
-    {
-      left_join(select(count_df, transcript), ., by = "transcript")
-    } %>%
-    extract2("mean")
-
-
-  qc_plot <- ggplot(
-    count_df,
-    aes(
-      x = reorder(celltype, -celltype_means),
-      y = reorder(transcript, transcript_means), fill = abundance
-    )
-  ) +
+    ggplot(
+      aes(
+        x = celltype,
+        y = transcript,
+        fill = abundance
+      )
+    ) +
     geom_raster() +
     labs(
       x = "Celltype",
