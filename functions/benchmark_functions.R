@@ -189,6 +189,7 @@ outlier_plot <- function(reference, selection) {
 
   outlier_plot <- ggplot(count_df, aes(transcript, abundance)) +
     geom_boxplot() +
+    geom_point(aes(col = celltype)) +
     labs(
       x = "Transcript",
       y = "Per celltype abundance"
