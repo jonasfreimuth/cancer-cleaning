@@ -338,31 +338,58 @@ if (params$sigmat_type == "binary") {
     proto_sigmat = proto_sigmat
   )
 } else {
-  pval_thresh <- 0
-  lg2fch_thresh <- 0
+  if (params$sigmat_type == "fs_quantile") {
+    count_mat_fs <- count_mat %>%
+      magrittr::extract(
+        i = !apply(., 1, is_uniform),
+        j = , drop = FALSE
+      ) %>%
+      apply(
+        1,
+        feature_scale
+      ) %>%
+      t()
 
-  marker_transcripts <- count_mat %>%
-    # remove rows that are all the same
-    # Also includes rows that are all zero-counts
-    extract(i = !apply(., 1, is_uniform), j = , drop = FALSE) %>%
-    get_de_transcripts(
-      meta,
-      ~celltype_major
-    ) %>%
-    # This may be unncecessary if uniform rows have been previously removed.
-    drop_na(!lfcSE) %>%
-    arrange(padj) %>%
-    filter(
-      padj >= pval_thresh,
-      log2FoldChange >= lg2fch_thresh
-    ) %>%
-    # Transform to generic form of a df with a transcript col and a metric col,
-    # with the latter being some metric that can be thresholded to select
-    # most informative marker transcripts.
-    select(
-      transcript = row,
-      metric = padj
-    )
+    marker_transcripts <- count_mat_fs %>%
+      apply(
+        1,
+        mean_imbalance
+      ) %>%
+      {
+        data.frame(
+          transcript = names(.),
+          metric = .
+        )
+      }
+
+  } else if (params$sigmat_type == "deseq2") {
+    pval_thresh <- 0
+    lg2fch_thresh <- 0
+
+    marker_transcripts <- count_mat %>%
+      # remove rows that are all the same
+      # Also includes rows that are all zero-counts
+      extract(i = !apply(., 1, is_uniform), j = , drop = FALSE) %>%
+      get_de_transcripts(
+        meta,
+        ~celltype_major
+      ) %>%
+      # This may be unncecessary if uniform rows have been previously removed.
+      drop_na(!lfcSE) %>%
+      arrange(padj) %>%
+      filter(
+        padj >= pval_thresh,
+        log2FoldChange >= lg2fch_thresh
+      ) %>%
+      # Transform to generic form of a df with a transcript col and a metric
+      # col, with the latter being some metric that can be thresholded to select
+      # most informative marker transcripts.
+      select(
+        transcript = row,
+        metric = padj
+      )
+
+  }
 
   thresh_seq <- marker_transcripts %>%
     extract2("metric") %>%
