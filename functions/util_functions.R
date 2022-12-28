@@ -182,6 +182,22 @@ frequency_bins <- function(x, prob_seq = seq(0, 1, 0.2)) {
 }
 
 
+
+mean_imbalance <- function(x) {
+  mean_x <- mean(x)
+
+  low <- x < mean_x
+  high <- x > mean_x
+
+  if (sum(low) == 1) {
+    return(x[low] - mean_x)
+  } else if (sum(high) == 1) {
+    return(x[high] - mean_x)
+  } else {
+    return(0)
+  }
+}
+
 seq_power <- function(start, stop, step_frac, power = 10) {
   seq_span <- stop - start
 
