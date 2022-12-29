@@ -362,6 +362,10 @@ if (params$sigmat_type == "binary") {
         )
       }
 
+    transcripts_ordered <- marker_transcripts %>%
+      arrange(metric) %>%
+      magrittr::extract2("transcript") %>%
+      unique()
   } else if (params$sigmat_type == "deseq2") {
     pval_thresh <- 0
     lg2fch_thresh <- 0
@@ -389,6 +393,11 @@ if (params$sigmat_type == "binary") {
         metric = padj
       )
 
+    transcripts_ordered <- marker_transcripts %>%
+      arrange(desc(metric)) %>%
+      magrittr::extract2("transcript")
+  } else {
+    stop("Unknow sigmat type.")
   }
 
   thresh_seq <- marker_transcripts %>%
@@ -441,13 +450,26 @@ deconv_ref_list <- deconv_ref_list %>%
 heatmap_path <- here(run_path, "plots/heatmaps")
 dir.create(heatmap_path, recursive = TRUE, showWarnings = FALSE)
 
+if (!exists("transcripts_ordered")) {
+  transcripts_ordered <- NULL
+  transcripts_ordered_ref <- NULL
+}
+
 # FIXME Use lapply and figure out how to deal with the names.
 for (thresh in names(deconv_ref_list)) {
   ref <- deconv_ref_list[[thresh]]
   n_trans <- nrow(ref)
 
+  if (!is.null(transcripts_ordered)) {
+    transcripts_ordered_ref <- transcripts_ordered %>%
+      magrittr::extract(. %in% ref$IDs)
+  }
+
   tryCatch(
-    sigmat_qc_plot(ref, title = thresh, feature_scale = TRUE) %>%
+    sigmat_qc_plot(ref,
+      title = thresh, feature_scale = TRUE,
+      transcripts_ordered = transcripts_ordered_ref
+    ) %>%
       {
         ggsave(
           plot = .,
