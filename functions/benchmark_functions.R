@@ -130,14 +130,9 @@ sigmat_qc_plot <- function(reference, title = NULL,
 
 
   if (is.null(transcripts_ordered)) {
-    transcripts_ordered <- count_df %>%
-      group_by(transcript) %>%
-      summarize(
-        mean = mean(abundance),
-        .groups = "drop_last"
-      ) %>%
-      arrange(desc(mean)) %>%
-      magrittr::extract2("transcript")
+    transcripts_ordered <- reference %>%
+      arrange(across(all_of(celltypes_ordered))) %>%
+      magrittr::extract2("IDs")
   }
 
   qc_plot <- count_df %>%
