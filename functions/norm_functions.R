@@ -107,6 +107,11 @@ feature_scale <- function(count_vec, scale = 1) {
   min_count <- min(count_vec)
   max_count <- max(count_vec)
 
+  if (min_count == max_count) {
+    # Handle case of count vec being uniform.
+    return(rep(0, length(count_vec)))
+  }
+
   ((count_vec - min_count) / (max_count - min_count)) * scale
 }
 
