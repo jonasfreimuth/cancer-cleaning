@@ -8,6 +8,7 @@ suppressMessages(
 source(here("R6/CountMatrixWrapper.R"))
 
 source(here("functions/norm_functions.R"))
+source(here("R6/PlotUtils.R"))
 
 Reference <- R6Class(
   "Reference",
@@ -22,6 +23,23 @@ Reference <- R6Class(
       super$initialize(count_matrix)
       private$.params <- params
       private$.markers <- markers
+
+      private$.plot_utils <- PlotUtils$new()
+    },
+    print_heatmap = function(filename) {
+      heatmap <- private$.plot_utils$create_heatmap(
+        reference_matrix = self$sigmat,
+        title = paste("Threshold:", self$params$threshold)
+      ) %>%
+        {
+          ggsave(
+            plot = .,
+            filename = filename,
+            width = params$base_width + params$facet_width * 3,
+            height = params$base_height + 30,
+            limitsize = FALSE
+          )
+        }
     }
   ),
   active = list(
@@ -73,6 +91,7 @@ Reference <- R6Class(
           scale = self$params$nomalization$scale_factor
         )
     },
+    .plot_utils = NULL,
     .check_markers = function(markers) {
       stopifnot(
         is.character(markers)
