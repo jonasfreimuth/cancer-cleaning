@@ -309,31 +309,18 @@ is_empty_reference <- lapply(
 deconv_ref_list <- deconv_ref_list %>%
   magrittr::extract(!is_null_reference & !is_empty_reference)
 
-# # Generate heatmaps
-# heatmap_path <- here(run_path, "plots/heatmaps")
-# dir.create(heatmap_path, recursive = TRUE, showWarnings = FALSE)
-#
-# # FIXME Use lapply and figure out how to deal with the names.
-# for (thresh in names(deconv_ref_list)) {
-#   ref <- deconv_ref_list[[thresh]]
-#   n_trans <- nrow(ref)
-#
-#   tryCatch(
-#     sigmat_qc_plot(ref, title = thresh, feature_scale = TRUE) %>%
-#       {
-#         ggsave(
-#           plot = .,
-#           filename = here(heatmap_path, paste0("heatmaps", thresh, ".png")),
-#           width = params$base_width + params$facet_width * 3,
-#           height = params$base_height + 30,
-#           limitsize = FALSE
-#         )
-#       },
-#     error = function(e) {
-#       warning(paste0("Error during heatmap plot: ", e, "\nContinuing..."))
-#     }
-#   )
-# }
+# Generate heatmaps
+heatmap_path <- here(run_path, "plots/heatmaps")
+dir.create(heatmap_path, recursive = TRUE, showWarnings = FALSE)
+
+lapply(
+  deconv_ref_list,
+  function(reference) {
+    reference$print_heatmap(
+      here(heatmap_path, paste0("heatmaps", reference$params$threshold, ".png"))
+    )
+  }
+)
 
 ## ----pseudobulk_generation----------------------------------------------------
 n_bulk_cells <- params$pseudobulk_cell_frac * experiment$n_cells
