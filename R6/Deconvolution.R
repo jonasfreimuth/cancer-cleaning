@@ -23,6 +23,12 @@ Deconvolution <- R6Class(
     }
   ),
   active = list(
+    params = function() {
+      list(
+        reference = self$reference$params$.param_list,
+        pseudobulk = self$pseudobulk$params$.param_list
+      )
+    },
     reference = function() {
       private$.reference
     },
