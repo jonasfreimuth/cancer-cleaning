@@ -13,8 +13,6 @@ ReferenceParams <- R6Class(
   public = list(
     metric = NULL,
     threshold = NULL,
-    # TODO Change this from logical to char vec giving cols to split.
-    split_cancer = NULL,
     cancer_celltypes = NULL,
     normalization = list(
       type = NULL,
@@ -22,14 +20,12 @@ ReferenceParams <- R6Class(
     ),
     initialize = function(metric = "DESeq2",
                           threshold = 0.5,
-                          split_cancer = TRUE,
                           cancer_celltypes,
                           norm_type = "lognorm",
                           norm_scale_factor = 1) {
       param_list <- list(
         metric = metric,
         threshold = threshold,
-        split_cancer = split_cancer,
         cancer_celltypes = cancer_celltypes,
         normalization = list(
           type = norm_type,
@@ -55,8 +51,6 @@ ReferenceParams <- R6Class(
           is.numeric(threshold),
           length(threshold) == 1,
           threshold >= 0, threshold <= 1,
-          is.logical(split_cancer),
-          length(split_cancer) == 1,
           if (!is.null(cancer_celltypes)) is.character(cancer_celltypes),
           length(normalization) == 2,
           is.character(normalization$type),
