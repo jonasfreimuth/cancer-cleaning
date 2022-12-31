@@ -265,6 +265,11 @@ thresh_list <- seq_power(
   set_names(.) %>%
   as.list()
 
+cancer_cols_list <- list(
+  "Cancer split" = c("Cancer Celltypes"),
+  "Cancer not split" = NULL
+)
+
 
 ## ----data_loading-------------------------------------------------------------
 experiment <- ScRnaExperiment$new(
@@ -287,17 +292,24 @@ experiment <- ScRnaExperiment$new(
 deconv_ref_list <- lapply(
   thresh_list,
   function(thresh) {
-    experiment$create_reference(
-      params = ReferenceParams$new(
-        threshold = thresh,
-        metric = params$sigmat_type,
-        cancer_celltypes = "Cancer Epithelial",
-        norm_type = params$normalization_type,
-        norm_scale_factor = params$norm_scale
-      )
+    lapply(
+      cancer_cols_list,
+      function(cancer_cols) {
+        experiment$create_reference(
+          params = ReferenceParams$new(
+            threshold = thresh,
+            metric = params$sigmat_type,
+            cancer_celltypes = cancer_cols,
+            norm_type = params$normalization_type,
+            norm_scale_factor = params$norm_scale
+          )
+        )
+      }
     )
   }
-)
+) %>%
+  unlist() %>%
+  as.list()
 
 is_null_reference <- lapply(deconv_ref_list, is.null) %>%
   unlist()
@@ -340,17 +352,24 @@ pseudobulk_list <-
   lapply(
     function(idx_vec) {
       i <- i + 1
-      experiment$create_pseudobulk(
-        PseudobulkParams$new(
-          id = i,
-          cell_indices = idx_vec,
-          cancer_celltypes = "Cancer Epithelial",
-          norm_type = params$normalization_type,
-          norm_scale_factor = params$norm_scale
-        )
+      lapply(
+        cancer_cols_list,
+        function(cancer_cols) {
+          experiment$create_pseudobulk(
+            PseudobulkParams$new(
+              id = i,
+              cell_indices = idx_vec,
+              cancer_celltypes = cancer_cols,
+              norm_type = params$normalization_type,
+              norm_scale_factor = params$norm_scale
+            )
+          )
+        }
       )
     }
-  )
+  ) %>%
+  unlist() %>%
+  as.list()
 
 rm(i)
 
@@ -362,13 +381,24 @@ deconv_summary <- expand_grid(
   apply(
     1,
     function(deconv_pair) {
-      Deconvolution$new(
-        reference = deconv_pair$reference,
-        pseudobulk = deconv_pair$pseudobulk,
-        method = params$deconv_method
-      )
+      ref <- deconv_pair$reference
+      pbulk <- deconv_pair$pseudobulk
+      # FIXME Make pseudobulk and reference matching more elegant.
+      if (isTRUE(all.equal(
+        sort(ref$params$cancer_celltypes),
+        sort(pbulk$params$cancer_celltypes)
+      ))) {
+        return(
+          Deconvolution$new(
+            reference = deconv_pair$reference,
+            pseudobulk = deconv_pair$pseudobulk,
+            method = params$deconv_method
+          )
+        )
+      }
     }
   ) %>%
+  magrittr::extract(!unlist(lapply(., is.null))) %>%
   {
     DeconvolutionSummary$new(deconvolution_list = .)
   }
