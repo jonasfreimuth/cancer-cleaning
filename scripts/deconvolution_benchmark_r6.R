@@ -316,9 +316,7 @@ dir.create(heatmap_path, recursive = TRUE, showWarnings = FALSE)
 lapply(
   deconv_ref_list,
   function(reference) {
-    reference$print_heatmap(
-      here(heatmap_path, paste0("heatmaps", reference$params$threshold, ".png"))
-    )
+    reference$print_heatmap(heatmap_path)
   }
 )
 
