@@ -11,6 +11,7 @@ PseudobulkParams <- R6Class(
   "PseudobulkParams",
   inherit = Params,
   public = list(
+    .param_list = NULL,
     id = NULL,
     cell_indices = NULL,
     cancer_celltypes = NULL,
@@ -34,6 +35,8 @@ PseudobulkParams <- R6Class(
       )
 
       private$.check_param_list(param_list)
+
+      self$.param_list <- param_list
 
       for (param_name in names(param_list)) {
         self[[param_name]] <- param_list[[param_name]]
