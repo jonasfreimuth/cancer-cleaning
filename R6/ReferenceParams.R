@@ -11,6 +11,7 @@ ReferenceParams <- R6Class(
   "ReferenceParams",
   inherit = Params,
   public = list(
+    .param_list = NULL,
     metric = NULL,
     threshold = NULL,
     cancer_celltypes = NULL,
@@ -34,6 +35,8 @@ ReferenceParams <- R6Class(
       )
 
       private$.check_param_list(param_list)
+
+      self$.param_list <- param_list
 
       for (param_name in names(param_list)) {
         self[[param_name]] <- param_list[[param_name]]
