@@ -31,6 +31,15 @@ Reference <- R6Class(
         dir,
         paste0(
           "thresh_", self$params$threshold,
+          if (!is.null(self$params$cancer_celltypes)) {
+            paste0(
+              "-cancercols_",
+              paste0(
+                self$params$cancer_celltypes,
+                collapse = "_"
+              )
+            )
+          },
           ".png"
         )
       )
