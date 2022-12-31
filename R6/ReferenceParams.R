@@ -51,7 +51,6 @@ ReferenceParams <- R6Class(
           is.numeric(threshold),
           length(threshold) == 1,
           threshold >= 0, threshold <= 1,
-          if (!is.null(cancer_celltypes)) is.character(cancer_celltypes),
           length(normalization) == 2,
           is.character(normalization$type),
           length(normalization$type) == 1,
@@ -61,6 +60,10 @@ ReferenceParams <- R6Class(
           normalization$scale_factor > 0
         )
       )
+
+      if (!is.null(params$cancer_celltypes)) {
+        stopifnot(is.character(paramscancer_celltypes))
+      }
     }
   )
 )
