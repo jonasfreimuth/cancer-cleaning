@@ -255,6 +255,17 @@ lapply(
   invisible()
 
 
+## ----params_to_explore -------------------------------------------------------
+thresh_list <- seq_power(
+  start = params$thresh_start,
+  stop = params$thresh_stop,
+  step = params$thresh_step,
+  power = params$thresh_power
+) %>%
+  set_names(.) %>%
+  as.list()
+
+
 ## ----data_loading-------------------------------------------------------------
 experiment <- ScRnaExperiment$new(
   count_mat_file = here(
@@ -273,15 +284,8 @@ experiment <- ScRnaExperiment$new(
 
 
 ## ----signature_matrix_generation----------------------------------------------
-prob_vec <- seq_power(
-  start = params$thresh_start,
-  stop = params$thresh_stop,
-  step = params$thresh_step,
-  power = params$thresh_power
-)
-
 deconv_ref_list <- lapply(
-  prob_vec,
+  thresh_list,
   function(thresh) {
     experiment$create_reference(
       params = ReferenceParams$new(
