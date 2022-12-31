@@ -198,6 +198,35 @@ mean_imbalance <- function(x) {
   }
 }
 
+
+mean_dists <- function(x) {
+  mean_x <- mean(x)
+
+  x - mean_x
+}
+
+
+hampel_interval <- function(x, mad_mult = 3) {
+  x_median <- median(x)
+  x_mad_mult <- mad(x) * mad_mult
+
+  return(c(x_median - x_mad_mult, x_median + x_mad_mult))
+}
+
+
+outlier_dist <- function(x, mad_mult = 3) {
+  dists <- mean_dists(x)
+  dist_interval <- hampel_interval(dists, mad_mult)
+
+  outlier_idcs <- dists < dist_interval[1] | dists > dist_interval[2]
+
+  if (sum(outlier_idcs) == 1) {
+    return(dists[outlier_idcs])
+  } else {
+    return(0)
+  }
+}
+
 seq_power <- function(start, stop, step_frac, power = 10) {
   seq_span <- stop - start
 
