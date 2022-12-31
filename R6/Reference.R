@@ -26,10 +26,20 @@ Reference <- R6Class(
 
       private$.plot_utils <- PlotUtils$new()
     },
-    print_heatmap = function(filename) {
+    print_heatmap = function(dir) {
+      filename <- here(
+        dir,
+        paste0(
+          "thresh_", self$params$threshold,
+          ".png"
+        )
+      )
+
+      title <- paste("Threshold:", self$params$threshold)
+
       private$.plot_utils$create_heatmap(
         reference_matrix = self$sigmat,
-        title = paste("Threshold:", self$params$threshold)
+        title = title
       ) %>%
         {
           ggsave(
