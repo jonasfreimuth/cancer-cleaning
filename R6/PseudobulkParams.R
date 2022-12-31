@@ -51,7 +51,6 @@ PseudobulkParams <- R6Class(
           is.integer(cell_indices),
           length(cell_indices) > 0,
           !any(duplicated(cell_indices)),
-          if (!is.null(cancer_celltypes)) is.character(cancer_celltypes),
           length(normalization) == 2,
           is.character(normalization$type),
           length(normalization$type) == 1,
@@ -61,6 +60,10 @@ PseudobulkParams <- R6Class(
           normalization$scale_factor > 0
         )
       )
+
+      if (!is.null(params$cancer_celltypes)) {
+        stopifnot(is.character(paramscancer_celltypes))
+      }
     }
   )
 )
