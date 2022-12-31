@@ -27,7 +27,7 @@ Reference <- R6Class(
       private$.plot_utils <- PlotUtils$new()
     },
     print_heatmap = function(filename) {
-      heatmap <- private$.plot_utils$create_heatmap(
+      private$.plot_utils$create_heatmap(
         reference_matrix = self$sigmat,
         title = paste("Threshold:", self$params$threshold)
       ) %>%
