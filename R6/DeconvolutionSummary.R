@@ -38,6 +38,12 @@ DeconvolutionSummary <- R6Class(
     list = function() {
       private$.deconvolution_list
     },
+    rmse_summary = function() {
+      if (is.null(private$.rmse_summary)) {
+        private$.compute_rmse_summary()
+      }
+      private$.rmse_summary
+    },
     rmse_df = function() {
       if (is.null(private$.rmse_df)) {
         private$.compute_rmse_df()
@@ -59,6 +65,7 @@ DeconvolutionSummary <- R6Class(
     .deconvolution_list = NULL,
     .param_df = NULL,
     .rmse_df = NULL,
+    .rmse_summary = NULL,
     .compute_param_df = function() {
       private$.param_df <- self$list %>%
         lapply(
@@ -96,6 +103,11 @@ DeconvolutionSummary <- R6Class(
       rmse_df <- self$param_df
       rmse_df$rmse <- self$rmse_vec
       private$.rmse_df <- rmse_df
+    },
+    .compute_rmse_summary = function() {
+      private$.rmse_summary <- self$rmse_df %>%
+        group_by(across(self$params$summary_params)) %>%
+        summarize(mean_rmse = mean(rmse), .groups = "drop_last")
     },
     .check_params = function(params) {
       stopifnot(
