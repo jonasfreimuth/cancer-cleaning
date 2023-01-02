@@ -21,9 +21,13 @@ ReferenceParams <- R6Class(
     ),
     initialize = function(metric = "DESeq2",
                           threshold = 0.5,
-                          cancer_celltypes,
+                          cancer_celltypes = "",
                           norm_type = "lognorm",
                           norm_scale_factor = 1) {
+      if (is.null(cancer_celltypes)) {
+        cancer_celltypes <- ""
+      }
+
       param_list <- list(
         metric = metric,
         threshold = threshold,
@@ -54,6 +58,7 @@ ReferenceParams <- R6Class(
           is.numeric(threshold),
           length(threshold) == 1,
           threshold >= 0, threshold <= 1,
+          is.character(cancer_celltypes),
           length(normalization) == 2,
           is.character(normalization$type),
           length(normalization$type) == 1,
@@ -63,10 +68,6 @@ ReferenceParams <- R6Class(
           normalization$scale_factor > 0
         )
       )
-
-      if (!is.null(params$cancer_celltypes)) {
-        stopifnot(is.character(paramscancer_celltypes))
-      }
     }
   )
 )
