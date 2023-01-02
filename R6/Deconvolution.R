@@ -26,7 +26,10 @@ Deconvolution <- R6Class(
     params = function() {
       list(
         reference = self$reference$params$.param_list,
-        pseudobulk = self$pseudobulk$params$.param_list
+        pseudobulk = self$pseudobulk$params$.param_list,
+        deconvolution = list(
+          method = self$method
+        )
       )
     },
     reference = function() {
