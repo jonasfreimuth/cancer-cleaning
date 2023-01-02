@@ -19,6 +19,7 @@ Deconvolution <- R6Class(
       private$.check_ref_pbulk_fit(reference, pseudobulk)
       private$.reference <- reference
       private$.pseudobulk <- pseudobulk
+      # TODO Turn this into a proper param object.
       private$.method <- method
     }
   ),
