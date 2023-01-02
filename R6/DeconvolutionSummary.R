@@ -20,6 +20,9 @@ DeconvolutionSummary <- R6Class(
       }
       private$.param_df
     },
+    param_vec = function() {
+      names(self$param_df)
+    },
     df = function() {
       stop("Not implemented.")
     },
