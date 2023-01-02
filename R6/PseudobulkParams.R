@@ -21,9 +21,13 @@ PseudobulkParams <- R6Class(
     ),
     initialize = function(id,
                           cell_indices,
-                          cancer_celltypes = NULL,
+                          cancer_celltypes = "",
                           norm_type = NULL,
                           norm_scale_factor = 1) {
+      if (is.null(cancer_celltypes)) {
+        cancer_celltypes <- ""
+      }
+
       param_list <- list(
         id = as.integer(id),
         cell_indices = as.integer(cell_indices),
@@ -54,6 +58,7 @@ PseudobulkParams <- R6Class(
           is.integer(cell_indices),
           length(cell_indices) > 0,
           !any(duplicated(cell_indices)),
+          is.character(cancer_celltypes),
           length(normalization) == 2,
           is.character(normalization$type),
           length(normalization$type) == 1,
@@ -63,10 +68,6 @@ PseudobulkParams <- R6Class(
           normalization$scale_factor > 0
         )
       )
-
-      if (!is.null(params$cancer_celltypes)) {
-        stopifnot(is.character(paramscancer_celltypes))
-      }
     }
   )
 )
