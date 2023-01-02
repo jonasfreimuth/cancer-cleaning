@@ -70,13 +70,7 @@ DeconvolutionSummary <- R6Class(
       private$.param_df <- self$list %>%
         lapply(
           function(deconv) {
-            ref_params <- deconv$params$reference
-            pbulk_params <- deconv$params$pseudobulk
-
-            list(
-              reference = ref_params,
-              pseudobulk = pbulk_params
-            ) %>%
+            deconv$params %>%
               rapply(
                 paste,
                 classes = "ANY",
