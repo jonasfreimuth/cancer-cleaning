@@ -13,6 +13,7 @@ source(here("R6/Reference.R"))
 source(here("R6/PseudobulkParams.R"))
 source(here("R6/Pseudobulk.R"))
 source(here("R6/Deconvolution.R"))
+source(here("R6/DeconvSumParams.R"))
 source(here("R6/DeconvolutionSummary.R"))
 
 ## ----parameters --------------------------------------------------------------
@@ -400,7 +401,10 @@ deconv_summary <- expand_grid(
   ) %>%
   magrittr::extract(!unlist(lapply(., is.null))) %>%
   {
-    DeconvolutionSummary$new(deconvolution_list = .)
+    DeconvolutionSummary$new(
+      deconvolution_list = .,
+      params = DeconvSumParams$new()
+      )
   }
 
 # ## ----plot_deconv_err----------------------------------------------------------

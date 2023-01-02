@@ -8,12 +8,21 @@ suppressMessages(
 DeconvolutionSummary <- R6Class(
   "DeconvolutionSummary",
   public = list(
-    initialize = function(deconvolution_list) {
+    initialize = function(deconvolution_list,
+                          params) {
       private$.check_deconv_list(deconvolution_list)
+      private$.check_params(params)
+
       private$.deconvolution_list <- deconvolution_list
+      private$.params <- params
+
+      self$params$check_summary_params_fit(self$param_vec)
     }
   ),
   active = list(
+    params = function() {
+      private$.params
+    },
     param_df = function() {
       if (is.null(private$.param_df)) {
         private$.compute_param_df()
@@ -40,6 +49,7 @@ DeconvolutionSummary <- R6Class(
     }
   ),
   private = list(
+    .params = NULL,
     .deconvolution_list = NULL,
     .param_df = NULL,
     .compute_param_df = function() {
@@ -74,6 +84,11 @@ DeconvolutionSummary <- R6Class(
             )
           }
         )
+    },
+    .check_params = function(params) {
+      stopifnot(
+        all(c("R6", "Params", "DeconvSumParams") %in% class(params))
+      )
     },
     .check_deconv_list = function(deconv_list) {
       all_deconvolution <- lapply(
