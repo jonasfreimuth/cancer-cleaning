@@ -42,11 +42,19 @@ Deconvolution <- R6Class(
     method = function() {
       private$.method
     },
-    res = function() {
-      if (is.null(private$.celltype_props_predicted)) {
-        private$.deconvolute()
+    deconvolution_output = function() {
+      if (is.null(private$.deconvolution_output)) {
+        private$.compute_deconvolution_output()
       }
-      private$.celltype_props_predicted
+      private$.deconvolution_output
+    },
+    res = function() {
+      # TODO Remove res field, can be replaced with celltype_props_predicted.
+      self$celltype_props_predicted
+    },
+    celltype_props_predicted = function() {
+      self$deconvolution_output$proportions %>%
+        as.matrix()
     },
     rmse = function() {
       if (is.null(private$.rmse)) {
@@ -71,13 +79,13 @@ Deconvolution <- R6Class(
     .reference = NULL,
     .pseudobulk = NULL,
     .method = NULL,
-    .celltype_props_predicted = NULL,
+    .deconvolution_output = NULL,
     .rmse = NULL,
     .residuals_marker = NULL,
     .residuals_all = NULL,
     .cor_marker = NULL,
     .cor_all = NULL,
-    .deconvolute = function() {
+    .compute_deconvolution_output = function() {
       if (self$reference$n_celltypes <= 1) {
         # Some deconvolution methods will fail if only a single celltype is
         # present. This ensures the correct output.
@@ -86,13 +94,13 @@ Deconvolution <- R6Class(
       } else {
         capture.output(
           suppressMessages(
-            private$.celltype_props_predicted <- deconvR::deconvolute(
+            private$.deconvolution_output <- deconvR::deconvolute(
               # TODO Think about whether / how to ensure same transcripts in
               # ref & pbulk
               reference = self$reference$df,
               bulk = self$pseudobulk$df,
               model = self$method
-            )$proportions
+            )
           ),
           type = c("output")
         )
