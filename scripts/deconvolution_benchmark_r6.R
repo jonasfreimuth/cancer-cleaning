@@ -12,6 +12,7 @@ source(here("R6/ReferenceParams.R"))
 source(here("R6/Reference.R"))
 source(here("R6/PseudobulkParams.R"))
 source(here("R6/Pseudobulk.R"))
+source(here("R6/DeconvParams.R"))
 source(here("R6/Deconvolution.R"))
 source(here("R6/DeconvSumParams.R"))
 source(here("R6/DeconvolutionSummary.R"))
@@ -393,7 +394,9 @@ deconv_summary <- expand_grid(
           Deconvolution$new(
             reference = deconv_pair$reference,
             pseudobulk = deconv_pair$pseudobulk,
-            method = params$deconv_method
+            params = DeconvParams$new(
+              deconvolution_method = params$deconv_method
+            )
           )
         )
       }

@@ -6,12 +6,17 @@ suppressMessages(
   here::i_am("R6/Deconvolution.R")
 )
 
+source(here("R6/DeconvParams.R"))
+
 source(here("functions/rmse.R"))
 
 Deconvolution <- R6Class(
   "Deconvolution",
   public = list(
-    initialize = function(reference, pseudobulk, method) {
+    initialize = function(reference, pseudobulk, params) {
+      private$.check_params(params)
+      private$.params <- params
+
       stopifnot(
         all(c("Reference", "R6") %in% class(reference)),
         all(c("Pseudobulk", "R6") %in% class(pseudobulk))
@@ -19,18 +24,19 @@ Deconvolution <- R6Class(
       private$.check_ref_pbulk_fit(reference, pseudobulk)
       private$.reference <- reference
       private$.pseudobulk <- pseudobulk
-      # TODO Turn this into a proper param object.
-      private$.method <- method
     }
   ),
   active = list(
+    # TODO Handle params differently so that it fits the general template (i.e.
+    # params active returns just the params of the object.)
+    deconv_params = function() {
+      private$.params
+    },
     params = function() {
       list(
         reference = self$reference$params$.param_list,
         pseudobulk = self$pseudobulk$params$.param_list,
-        deconvolution = list(
-          method = self$method
-        )
+        deconvolution = self$deconv_params$.param_list
       )
     },
     reference = function() {
@@ -76,6 +82,7 @@ Deconvolution <- R6Class(
     }
   ),
   private = list(
+    .params = NULL,
     .reference = NULL,
     .pseudobulk = NULL,
     .method = NULL,
@@ -99,7 +106,7 @@ Deconvolution <- R6Class(
               # ref & pbulk
               reference = self$reference$df,
               bulk = self$pseudobulk$df,
-              model = self$method
+              model = self$deconv_params$deconvolution_method
             )
           ),
           type = c("output")
@@ -147,20 +154,23 @@ Deconvolution <- R6Class(
         transcript_predictions_all
     },
     .compute_cor_marker = function() {
-      method <- "pearson"
       # TODO Trim transcript_abundances_cancer to residuals
       private$.cor_marker <- cor(
         self$residuals_marker,
         private$.pseudobulk$transcript_abundances_cancer,
-        method = method
+        method = self$deconv_params$correlation_method
       )
     },
     .compute_cor_all = function() {
-      method <- "pearson"
       private$.cor_all <- cor(
         self$residuals_all,
         private$.pseudobulk$transcript_abundances_cancer,
-        method = method
+        method = self$deconv_params$correlation_method
+      )
+    },
+    .check_params = function(params) {
+      stopifnot(
+        all(c("R6", "Params", "DeconvParams") %in% class(params))
       )
     },
     .check_ref_pbulk_fit = function(reference, pseudobulk) {
