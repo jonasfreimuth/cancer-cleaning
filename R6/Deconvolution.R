@@ -116,7 +116,7 @@ Deconvolution <- R6Class(
     .compute_rmse = function() {
       private$.rmse <- rmse(
         self$pseudobulk$celltype_abundances,
-        self$res
+        self$celltype_props_predicted
       )
     },
     .compute_residuals_marker = function() {
@@ -130,7 +130,8 @@ Deconvolution <- R6Class(
           drop = FALSE
         )
 
-      transcript_predictions_marker <- matrix_marker %*% t(self$res)
+      transcript_predictions_marker <- matrix_marker %*%
+        t(self$celltype_props_predicted)
 
       transcript_abundances_marker <- pbulk$transcript_abundances %>%
         magrittr::extract(
@@ -146,7 +147,8 @@ Deconvolution <- R6Class(
 
       matrix_all <- pbulk$celltype_matrix_clean
 
-      transcript_predictions_all <- matrix_all %*% t(self$res)
+      transcript_predictions_all <- matrix_all %*%
+        t(self$celltype_props_predicted)
 
       transcript_abundances_all <- pbulk$transcript_abundances
 
