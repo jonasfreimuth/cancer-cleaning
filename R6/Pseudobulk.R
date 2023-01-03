@@ -142,8 +142,16 @@ Pseudobulk <- R6Class(
         )
     },
     celltype_matrix_clean = function() {
-      # TODO Implement.
-      stop("Not implemented")
+      self$bulk_matrix_unorm_clean %>%
+        as.matrix() %>%
+        t() %>%
+        rowsum(group = self$meta$celltype) %>%
+        t() %>%
+        # TODO Check if this is right.
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
+        )
     }
   ),
   private = list(
