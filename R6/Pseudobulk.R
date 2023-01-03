@@ -44,12 +44,8 @@ Pseudobulk <- R6Class(
     #    (with or without cancer cells?).
     # --> Celltype abundance matrix normalized (with or without cancer cells?).
     # *
-    matrix_raw = function() {
-      # TODO Change to matrix_orig where matrix_raw is used.
-      self$matrix_orig
-    },
     bulk_matrix = function() {
-      self$matrix_raw %>%
+      self$matrix_orig %>%
         magrittr::extract(
           i = ,
           j = private$.params$cell_indices,
@@ -62,7 +58,7 @@ Pseudobulk <- R6Class(
     },
     bulk_matrix_clean = function() {
       # TODO Change this to lazy field.
-      self$matrix_raw %>%
+      self$matrix_orig %>%
         magrittr::extract(
           i = ,
           j = private$.clean_indices,
@@ -75,7 +71,7 @@ Pseudobulk <- R6Class(
     },
     bulk_matrix_cancer = function() {
       # TODO Change this to lazy field.
-      self$matrix_raw %>%
+      self$matrix_orig %>%
         magrittr::extract(
           i = ,
           j = private$.cancer_indices,
@@ -102,8 +98,7 @@ Pseudobulk <- R6Class(
       rownames(self$bulk_matrix_clean)
     },
     bulk = function() {
-      self$transcript_abundances %>%
-        set_names(self$transcripts)
+      self$transcript_abundances
     },
     df = function() {
       self$bulk %>%
@@ -117,6 +112,7 @@ Pseudobulk <- R6Class(
     transcript_abundances = function() {
       self$bulk_matrix_clean %>%
         rowSums() %>%
+        # TODO Think about whether double normalization needs to be prevented.
         norm_vec(
           type = self$params$normalization$type,
           scale = self$params$normalization$scale_factor
