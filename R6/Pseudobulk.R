@@ -66,27 +66,22 @@ Pseudobulk <- R6Class(
         )
     },
     bulk_matrix = function() {
-      self$bulk_matrix_unorm %>%
-        normalize_count_mat(
-          type = self$params$nomalization$type,
-          scale = self$params$nomalization$scale_factor
-        )
+      if (is.null(private$.bulk_matrix)) {
+        private$.compute_bulk_matrix()
+      }
+      private$.bulk_matrix
     },
     bulk_matrix_clean = function() {
-      # TODO Change this to lazy field.
-      selfbulk_matrix_unorm_clean %>%
-        normalize_count_mat(
-          type = self$params$normalization$type,
-          scale = self$params$normalization$scale_factor
-        )
+      if (is.null(private$.bulk_matrix_clean)) {
+        private$.compute_bulk_matrix_clean()
+      }
+      private$.bulk_matrix_clean
     },
     bulk_matrix_cancer = function() {
-      # TODO Change this to lazy field.
-      self$bulk_matrix_unorm_cancer %>%
-        normalize_count_mat(
-          type = self$params$normalization$type,
-          scale = self$params$normalization$scale_factor
-        )
+      if (is.null(private$.bulk_matrix_cancer)) {
+        private$.compute_bulk_matrix_cancer()
+      }
+      private$.bulk_matrix_cancer
     },
     meta_raw = function() {
       private$.count_matrix$meta
@@ -156,6 +151,30 @@ Pseudobulk <- R6Class(
     .cancer_indices = NULL,
     .clean_indices = NULL,
     .params = NULL,
+    .bulk_matrix = NULL,
+    .bulk_matrix_clean = NULL,
+    .bulk_matrix_cancer = NULL,
+    .compute_bulk_matrix = function() {
+      private$.bulk_matrix <- self$bulk_matrix_unorm %>%
+        normalize_count_mat(
+          type = self$params$nomalization$type,
+          scale = self$params$nomalization$scale_factor
+        )
+    },
+    .compute_bulk_matrix_clean = function() {
+      private$.bulk_matrix_clean <- self$bulk_matrix_unorm_clean %>%
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
+        )
+    },
+    .compute_bulk_matrix_cancer = function() {
+      private$.bulk_matrix_cancer <- self$bulk_matrix_unorm_cancer %>%
+        normalize_count_mat(
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
+        )
+    },
     .check_params = function(params) {
       stopifnot(
         all(c("R6", "Params", "PseudobulkParams") %in% class(params))
