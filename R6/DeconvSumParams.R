@@ -14,8 +14,8 @@ DeconvSumParams <- R6Class(
     .param_list = NULL,
     summary_params = NULL,
     initialize = function(summary_params = c(
-      "reference.threshold", "reference.cancer_celltypes"
-    )) {
+                            "reference.threshold", "reference.cancer_celltypes"
+                          )) {
       param_list <- list(
         summary_params = summary_params
       )
