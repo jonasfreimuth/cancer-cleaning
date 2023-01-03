@@ -123,15 +123,14 @@ Deconvolution <- R6Class(
           drop = FALSE
         )
 
-      transcript_predictions_marker <- matrix_marker %*%
-        self$.celltype_props_predicted
+      transcript_predictions_marker <- matrix_marker %*% t(self$res)
 
       transcript_abundances_marker <- pbulk$transcript_abundances %>%
         magrittr::extract(
           names(.) %in% ref$markers
         )
 
-      private$.compute_residuals_marker <- transcript_abundances_marker -
+      private$.residuals_marker <- transcript_abundances_marker -
         transcript_predictions_marker
     },
     .compute_residuals_all = function() {
@@ -140,12 +139,11 @@ Deconvolution <- R6Class(
 
       matrix_all <- pbulk$celltype_matrix_clean
 
-      transcript_predictions_all <- matrix_all %*%
-        self$.celltype_props_predicted
+      transcript_predictions_all <- matrix_all %*% t(self$res)
 
       transcript_abundances_all <- pbulk$transcript_abundances
 
-      private$.compute_residuals_all <- transcript_abundances_allr -
+      private$.residuals_all <- transcript_abundances_all -
         transcript_predictions_all
     },
     .compute_cor_marker = function() {
