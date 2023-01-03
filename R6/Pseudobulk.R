@@ -39,18 +39,34 @@ Pseudobulk <- R6Class(
     params = function() {
       private$.params
     },
-    # TODO Fix issues with different matrix versions:
-    # * Core Pseudobulk is per celltype transcript props normalized
-    #    (with or without cancer cells?).
-    # --> Celltype abundance matrix normalized (with or without cancer cells?).
-    # *
-    bulk_matrix = function() {
+    # TODO Was the splitting of cancer celltypes after norming the matrix the
+    # only reason for the residual v. cancer expression pattern?
+    bulk_matrix_unorm = function() {
       self$matrix_orig %>%
         magrittr::extract(
           i = ,
           j = private$.params$cell_indices,
           drop = FALSE
-        ) %>%
+        )
+    },
+    bulk_matrix_unorm_clean = function() {
+      self$matrix_orig %>%
+        magrittr::extract(
+          i = ,
+          j = private$.clean_indices,
+          drop = FALSE
+        )
+    },
+    bulk_matrix_unorm_cancer = function() {
+      self$matrix_orig %>%
+        magrittr::extract(
+          i = ,
+          j = private$.cancer_indices,
+          drop = FALSE
+        )
+    },
+    bulk_matrix = function() {
+      self$bulk_matrix_unorm %>%
         normalize_count_mat(
           type = self$params$nomalization$type,
           scale = self$params$nomalization$scale_factor
@@ -58,12 +74,7 @@ Pseudobulk <- R6Class(
     },
     bulk_matrix_clean = function() {
       # TODO Change this to lazy field.
-      self$matrix_orig %>%
-        magrittr::extract(
-          i = ,
-          j = private$.clean_indices,
-          drop = FALSE
-        ) %>%
+      selfbulk_matrix_unorm_clean %>%
         normalize_count_mat(
           type = self$params$normalization$type,
           scale = self$params$normalization$scale_factor
@@ -71,12 +82,7 @@ Pseudobulk <- R6Class(
     },
     bulk_matrix_cancer = function() {
       # TODO Change this to lazy field.
-      self$matrix_orig %>%
-        magrittr::extract(
-          i = ,
-          j = private$.cancer_indices,
-          drop = FALSE
-        ) %>%
+      self$bulk_matrix_unorm_cancer %>%
         normalize_count_mat(
           type = self$params$normalization$type,
           scale = self$params$normalization$scale_factor
@@ -110,17 +116,15 @@ Pseudobulk <- R6Class(
         }
     },
     transcript_abundances = function() {
-      self$bulk_matrix_clean %>%
+      self$bulk_matrix_unorm_clean %>%
         rowSums() %>%
-        # TODO Think about whether double normalization needs to be prevented.
         norm_vec(
           type = self$params$normalization$type,
           scale = self$params$normalization$scale_factor
         )
     },
     transcript_abundances_cancer = function() {
-      # TODO Check if this makes sense wrt normalization.
-      self$bulk_matrix_cancer %>%
+      self$bulk_matrix_unorm_cancer %>%
         rowSums() %>%
         norm_vec(
           type = self$params$normalization$type,
