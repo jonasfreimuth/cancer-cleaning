@@ -268,7 +268,7 @@ thresh_list <- seq_power(
   as.list()
 
 cancer_cols_list <- list(
-  "Cancer split" = c("Cancer Celltypes"),
+  "Cancer split" = c("Cancer Epithelial"),
   "Cancer not split" = NULL
 )
 
