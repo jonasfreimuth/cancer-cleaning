@@ -54,10 +54,6 @@ Deconvolution <- R6Class(
       }
       private$.deconvolution_output
     },
-    res = function() {
-      # TODO Remove res field, can be replaced with celltype_props_predicted.
-      self$celltype_props_predicted
-    },
     celltype_props_predicted = function() {
       self$deconvolution_output$proportions %>%
         as.matrix()
