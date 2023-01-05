@@ -353,7 +353,7 @@ pseudobulk_list <-
   # actually draw pseudobulks
   lapply(
     function(idx_vec) {
-      i <- i + 1
+      i <<- i + 1
       lapply(
         cancer_cols_list,
         function(cancer_cols) {
