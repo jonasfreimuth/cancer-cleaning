@@ -8,7 +8,7 @@ suppressMessages(
 source(here("R6/CountMatrixWrapper.R"))
 
 source(here("functions/norm_functions.R"))
-source(here("R6/PlotUtils.R"))
+source(here("R6/HeatmapPlot.R"))
 
 Reference <- R6Class(
   "Reference",
@@ -23,13 +23,9 @@ Reference <- R6Class(
       super$initialize(count_matrix)
       private$.params <- params
       private$.markers <- markers
-
-      private$.plot_utils <- PlotUtils$new()
     },
     print_heatmap = function(dir) {
-      filename <- here(
-        dir,
-        paste0(
+      filename <- paste0(
           "thresh_", self$params$threshold,
           if (!is.null(self$params$cancer_celltypes)) {
             paste0(
@@ -42,23 +38,8 @@ Reference <- R6Class(
           },
           ".png"
         )
-      )
 
-      title <- paste("Threshold:", self$params$threshold)
-
-      private$.plot_utils$create_heatmap(
-        reference_matrix = self$sigmat,
-        title = title
-      ) %>%
-        {
-          ggsave(
-            plot = .,
-            filename = filename,
-            width = params$base_width + params$facet_width * 3,
-            height = params$base_height + 30,
-            limitsize = FALSE
-          )
-        }
+      self$heatmap_plot$save(dir, filename)
     }
   ),
   active = list(
@@ -90,6 +71,12 @@ Reference <- R6Class(
         private$.compute_sigmat()
       }
       private$.sigmat
+    },
+    heatmap_plot = function() {
+      if (is.null(private$.heatmap_plot)) {
+        private$.compute_heatmap_plot()
+      }
+      private$.heatmap_plot
     }
   ),
   private = list(
@@ -97,6 +84,7 @@ Reference <- R6Class(
     .markers = NULL,
     .params = NULL,
     .sigmat = NULL,
+    .heatmap_plot = NULL,
     .compute_sigmat = function() {
       # TODO Check if this works as intended wrt normalization
       private$.sigmat <- private$.count_matrix$celltype_count_matrix %>%
@@ -110,7 +98,14 @@ Reference <- R6Class(
           scale = self$params$nomalization$scale_factor
         )
     },
-    .plot_utils = NULL,
+    .compute_heatmap_plot = function() {
+      title <- paste("Threshold:", self$params$threshold)
+
+      private$.heatmap_plot <- HeatmapPlot$new(
+        reference_matrix = self$sigmat,
+        title = title
+      )
+    },
     .check_markers = function(markers) {
       stopifnot(
         is.character(markers)
