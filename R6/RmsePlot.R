@@ -27,18 +27,7 @@ RmsePlot <- R6Class(
       private$.summary_rmse_df <- summary_rmse_df
     },
     save = function(dir, filename = "rmse_plot.png") {
-      path <- here(dir, filename)
-
-      self$plot %>%
-        {
-          ggsave(
-            plot = .,
-            filename = path,
-            width = self$plot_width,
-            height = self$plot_height,
-            limitsize = FALSE
-          )
-        }
+      super$save(dir, filename)
     }
   ),
   active = list(
