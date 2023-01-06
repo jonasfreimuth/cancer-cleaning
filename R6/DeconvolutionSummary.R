@@ -5,6 +5,8 @@ suppressMessages(
   here::i_am("R6/DeconvolutionSummary.R")
 )
 
+source(here("R6/RmsePlot.R"))
+
 source(here("functions/rmse.R"))
 
 DeconvolutionSummary <- R6Class(
@@ -19,6 +21,9 @@ DeconvolutionSummary <- R6Class(
       private$.params <- params
 
       self$params$check_summary_params_fit(self$param_vec)
+    },
+    print_rmse_plot = function(dir) {
+      self$rmse_plot$save(dir)
     }
   ),
   active = list(
@@ -45,6 +50,12 @@ DeconvolutionSummary <- R6Class(
         private$.compute_rmse_summary()
       }
       private$.rmse_summary
+    },
+    rmse_plot = function() {
+      if (is.null(private$.rmse_plot)) {
+        private$.compute_rmse_plot()
+      }
+      private$.rmse_plot
     },
     rmse_df = function() {
       if (is.null(private$.rmse_df)) {
@@ -87,6 +98,7 @@ DeconvolutionSummary <- R6Class(
     .param_df = NULL,
     .rmse_df = NULL,
     .rmse_summary = NULL,
+    .rmse_plot = NULL,
     .celltype_props_predicted_df = NULL,
     .celltype_props_true_df = NULL,
     .celltype_rmse_df = NULL,
@@ -126,6 +138,12 @@ DeconvolutionSummary <- R6Class(
       private$.rmse_summary <- self$rmse_df %>%
         group_by(across(self$params$summary_params)) %>%
         summarize(mean_rmse = mean(rmse), .groups = "drop_last")
+    },
+    .compute_rmse_plot = function() {
+      private$.rmse_plot <- RmsePlot$new(
+        self$celltype_rmse_df,
+        self$rmse_summary
+      )
     },
     .compute_celltype_props_predicted_df = function() {
       celltype_props_predicted_df <- self$list %>%
