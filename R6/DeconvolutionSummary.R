@@ -1,3 +1,4 @@
+library("purrr")
 library("here")
 library("R6")
 
@@ -93,6 +94,18 @@ DeconvolutionSummary <- R6Class(
       }
       private$.cor_df
     },
+    residuals_marker_df = function() {
+      if (is.null(private$.residuals_marker_df)) {
+        private$.compute_residuals_marker_df()
+      }
+      private$.residuals_marker_df
+    },
+    residuals_all_df = function() {
+      if (is.null(private$.residuals_all_df)) {
+        private$.compute_residuals_all_df()
+      }
+      private$.residuals_all_df
+    },
     celltype_props_predicted_df = function() {
       if (is.null(private$.celltype_props_predicted_df)) {
         private$.compute_celltype_props_predicted_df()
@@ -124,6 +137,8 @@ DeconvolutionSummary <- R6Class(
     .cor_marker_vec = NULL,
     .cor_all_vec = NULL,
     .cor_df = NULL,
+    .residuals_marker_df = NULL,
+    .residuals_all_df = NULL,
     .celltype_props_predicted_df = NULL,
     .celltype_props_true_df = NULL,
     .celltype_rmse_df = NULL,
@@ -205,6 +220,52 @@ DeconvolutionSummary <- R6Class(
       cor_df$cor_marker <- self$cor_marker_vec
       cor_df$cor_all <- self$cor_all_vec
       private$.cor_df <- cor_df
+    },
+    .compute_residuals_marker_df = function() {
+      residuals_list <- self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$residuals_marker
+          }
+        )
+
+      private$.residuals_marker_df <- purrr::map2(
+        self$deconv_param_list,
+        residuals_list,
+        function(param_df, residuals) {
+          param_df[rep(1, length(residuals)), ] %>%
+            bind_cols(
+              data.frame(
+                transcript = names(residuals),
+                residuals = residuals
+              )
+            )
+        }
+      ) %>%
+        bind_rows()
+    },
+    .compute_residuals_all_df = function() {
+      residuals_list <- self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$residuals_all
+          }
+        )
+
+      private$.residuals_all_df <- purrr::map2(
+        self$deconv_param_list,
+        residuals_list,
+        function(param_df, residuals) {
+          param_df[rep(1, length(residuals)), ] %>%
+            bind_cols(
+              data.frame(
+                transcript = names(residuals),
+                residuals = residuals
+              )
+            )
+        }
+      ) %>%
+        bind_rows()
     },
     .compute_celltype_props_predicted_df = function() {
       celltype_props_predicted_df <- self$list %>%
