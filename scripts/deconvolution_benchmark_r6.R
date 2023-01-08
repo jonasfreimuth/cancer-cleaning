@@ -407,7 +407,7 @@ deconv_summary <- expand_grid(
     DeconvolutionSummary$new(
       deconvolution_list = .,
       params = DeconvSumParams$new()
-      )
+    )
   }
 
 # ## ----plot_deconv_err----------------------------------------------------------
