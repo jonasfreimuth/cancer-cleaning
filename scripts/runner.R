@@ -3,7 +3,7 @@
 library("magrittr")
 library("here")
 
-here::i_am("scripts/deconvolution_benchmark.R")
+here::i_am("scripts/runner.R")
 
 source(here("functions/util_functions.R"))
 
