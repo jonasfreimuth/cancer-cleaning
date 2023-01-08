@@ -69,6 +69,18 @@ DeconvolutionSummary <- R6Class(
       }
       private$.rmse_vec
     },
+    cor_marker_vec = function() {
+      if (is.null(private$.cor_marker_vec)) {
+        private$.compute_cor_marker_vec()
+      }
+      private$.cor_marker_vec
+    },
+    cor_all_vec = function() {
+      if (is.null(private$.cor_all_vec)) {
+        private$.compute_cor_all_vec()
+      }
+      private$.cor_all_vec
+    },
     celltype_props_predicted_df = function() {
       if (is.null(private$.celltype_props_predicted_df)) {
         private$.compute_celltype_props_predicted_df()
@@ -96,6 +108,8 @@ DeconvolutionSummary <- R6Class(
     .rmse_df = NULL,
     .rmse_summary = NULL,
     .rmse_plot = NULL,
+    .cor_marker_vec = NULL,
+    .cor_all_vec = NULL,
     .celltype_props_predicted_df = NULL,
     .celltype_props_true_df = NULL,
     .celltype_rmse_df = NULL,
@@ -150,6 +164,24 @@ DeconvolutionSummary <- R6Class(
         self$celltype_rmse_df,
         self$rmse_summary
       )
+    },
+    .compute_cor_marker_vec = function() {
+      private$.cor_marker_vec <- self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$cor_marker
+          }
+        ) %>%
+        unlist()
+    },
+    .compute_cor_all_vec = function() {
+      private$.cor_all_vec <- self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$cor_all
+          }
+        ) %>%
+        unlist()
     },
     .compute_celltype_props_predicted_df = function() {
       celltype_props_predicted_df <- self$list %>%
