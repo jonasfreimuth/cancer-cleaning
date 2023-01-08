@@ -294,7 +294,7 @@ reference_from_marker_df <- function(proto_sigmat, marker_df, thresh) {
     thresh <- 10^-16
   }
   marker_df_thresh <- marker_df %>%
-    slice_max(metric, prop = thresh)
+    filter(metric <= thresh)
 
   # TODO Think about whether further cleaning is needed, maybe look at
   # removed Hampel stuff for that.
