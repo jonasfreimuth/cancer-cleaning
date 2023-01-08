@@ -30,6 +30,12 @@ DeconvolutionSummary <- R6Class(
     params = function() {
       private$.params
     },
+    deconv_param_list = function() {
+      if (is.null(private$.deconv_param_list)) {
+        private$.compute_deconv_param_list()
+      }
+      private$.deconv_param_list
+    },
     param_df = function() {
       if (is.null(private$.param_df)) {
         private$.compute_param_df()
@@ -109,6 +115,7 @@ DeconvolutionSummary <- R6Class(
   private = list(
     .params = NULL,
     .deconvolution_list = NULL,
+    .deconv_param_list = NULL,
     .param_df = NULL,
     .rmse_vec = NULL,
     .rmse_df = NULL,
@@ -120,8 +127,8 @@ DeconvolutionSummary <- R6Class(
     .celltype_props_predicted_df = NULL,
     .celltype_props_true_df = NULL,
     .celltype_rmse_df = NULL,
-    .compute_param_df = function() {
-      private$.param_df <- self$list %>%
+    .compute_deconv_param_list = function() {
+      private$.deconv_param_list <- self$list %>%
         lapply(
           function(deconv) {
             deconv$params %>%
@@ -135,7 +142,10 @@ DeconvolutionSummary <- R6Class(
               t() %>%
               as.data.frame()
           }
-        ) %>%
+        )
+    },
+    .compute_param_df = function() {
+      private$.param_df <- self$deconv_param_list %>%
         Reduce(
           f = function(df1, df2) {
             merge(
