@@ -367,7 +367,7 @@ if (params$sigmat_type == "binary") {
       magrittr::extract2("transcript") %>%
       unique()
   } else if (params$sigmat_type == "deseq2") {
-    pval_thresh <- 0
+    pval_thresh <- 1
     lg2fch_thresh <- 0
 
     marker_transcripts <- count_mat %>%
@@ -382,7 +382,7 @@ if (params$sigmat_type == "binary") {
       drop_na(!lfcSE) %>%
       arrange(padj) %>%
       filter(
-        padj >= pval_thresh,
+        padj <= pval_thresh,
         log2FoldChange >= lg2fch_thresh
       ) %>%
       # Transform to generic form of a df with a transcript col and a metric
