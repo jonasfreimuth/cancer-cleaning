@@ -75,6 +75,18 @@ Deconvolution <- R6Class(
         private$.compute_residuals_all()
       }
       private$.residuals_all
+    },
+    cor_marker = function() {
+      if (is.null(private$.cor_marker)) {
+        private$.compute_cor_marker()
+      }
+      private$.cor_marker
+    },
+    cor_all = function() {
+      if (is.null(private$.cor_all)) {
+        private$.compute_cor_all()
+      }
+      private$.cor_all
     }
   ),
   private = list(
