@@ -127,7 +127,14 @@ Deconvolution <- R6Class(
         )
 
       transcript_predictions_marker <- matrix_marker %*%
-        t(self$celltype_props_predicted)
+        t(self$celltype_props_predicted) %>%
+        {
+          names <- rownames(.)
+          # Having the predictions be a matrix only complicates things,
+          # a named vector is more convenient.
+          as.vector(.) %>%
+            set_names(names)
+        }
 
       transcript_abundances_marker <- pbulk$transcript_abundances %>%
         magrittr::extract(
@@ -144,7 +151,14 @@ Deconvolution <- R6Class(
       matrix_all <- pbulk$celltype_matrix_clean
 
       transcript_predictions_all <- matrix_all %*%
-        t(self$celltype_props_predicted)
+        t(self$celltype_props_predicted) %>%
+        {
+          names <- rownames(.)
+          # Having the predictions be a matrix only complicates things,
+          # a named vector is more convenient.
+          as.vector(.) %>%
+            set_names(names)
+        }
 
       transcript_abundances_all <- pbulk$transcript_abundances
 
