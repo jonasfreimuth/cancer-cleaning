@@ -26,18 +26,18 @@ Reference <- R6Class(
     },
     print_heatmap = function(dir) {
       filename <- paste0(
-          "thresh_", self$params$threshold,
-          if (!is.null(self$params$cancer_celltypes)) {
+        "thresh_", self$params$threshold,
+        if (!is.null(self$params$cancer_celltypes)) {
+          paste0(
+            "-cancercols_",
             paste0(
-              "-cancercols_",
-              paste0(
-                self$params$cancer_celltypes,
-                collapse = "_"
-              )
+              self$params$cancer_celltypes,
+              collapse = "_"
             )
-          },
-          ".png"
-        )
+          )
+        },
+        ".png"
+      )
 
       self$heatmap_plot$save(dir, filename)
     }
