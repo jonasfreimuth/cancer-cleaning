@@ -396,6 +396,80 @@ if (params$sigmat_type == "binary") {
     transcripts_ordered <- marker_transcripts %>%
       arrange(desc(metric)) %>%
       magrittr::extract2("transcript")
+  } else if (params$sigmat_type == "deseq_ttest") {
+    # TODO Look at this more closely, it's even more of a hack than the other
+    # reference methods.
+    pval_thresh <- 0.05
+    lg2fch_thresh <- 0
+    celltype_col <- "celltype_major"
+
+    dummy_df <- meta %>%
+      select(celltype_major) %>%
+      dummy_cols(
+        select_columns = celltype_col,
+        remove_selected_columns = TRUE
+      ) %>%
+      rename_with(
+        .fn = function(name) {
+          str_replace_all(
+            name,
+            paste0(celltype_col, "_"),
+            ""
+          )
+        }
+      )
+
+    celltype_marker_df <- names(dummy_df) %>%
+      set_names(.) %>%
+      lapply(
+      function(celltype_col) {
+        dummy_meta <- meta %>%
+        select(cell) %>%
+        mutate(
+         celltype_dummy = dummy_df[[celltype_col]]
+        )
+
+      count_mat %>%
+        # remove rows that are all the same
+        # Also includes rows that are all zero-counts
+        extract(i = !apply(., 1, is_uniform), j = , drop = FALSE) %>%
+        get_de_transcripts(
+          dummy_meta,
+          ~celltype_dummy
+        ) %>%
+        # This may be unncecessary if uniform rows have been previously removed.
+        drop_na(!lfcSE) %>%
+        arrange(padj) %>%
+        filter(
+          padj <= pval_thresh,
+          log2FoldChange >= lg2fch_thresh
+        ) %>%
+        # Transform to generic form of a df with a transcript col and a metric
+        # col, with the latter being some metric that can be thresholded to select
+        # most informative marker transcripts.
+        select(
+          transcript = row,
+          metric = padj
+        )
+      }
+    )  %>%
+    bind_rows(.id = "celltype")
+
+    dupe_marker_df <- celltype_marker_df %>%
+      group_by(transcript) %>%
+      summarize(n = n())
+
+    dupe_markers <- dupe_marker_df %>%
+      filter(n >= 2) %>%
+      magrittr::extract2("transcript")
+
+    # TODO Remove celltype col when done validating/debugging.
+    marker_transcripts <- celltype_marker_df %>%
+      filter(!transcript %in% dupe_markers)
+
+    transcripts_ordered <- marker_transcripts %>%
+      arrange(metric) %>%
+      magrittr::extract2("transcript")
   } else {
     stop("Unknow sigmat type.")
   }
