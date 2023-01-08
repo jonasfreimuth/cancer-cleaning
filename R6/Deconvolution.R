@@ -166,10 +166,14 @@ Deconvolution <- R6Class(
         transcript_predictions_all
     },
     .compute_cor_marker = function() {
-      # TODO Trim transcript_abundances_cancer to residuals
+      cancer_abund_mark <- private$.pseudobulk$transcript_abundances_cancer %>%
+        magrittr::extract(
+          names(.) %in% names(self$residuals_marker)
+        )
+
       private$.cor_marker <- cor(
         self$residuals_marker,
-        private$.pseudobulk$transcript_abundances_cancer,
+        cancer_abund_mark,
         method = self$deconv_params$correlation_method
       )
     },
