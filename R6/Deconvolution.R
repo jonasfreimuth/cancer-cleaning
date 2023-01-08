@@ -178,6 +178,11 @@ Deconvolution <- R6Class(
         transcript_predictions_all
     },
     .compute_cor_marker = function() {
+      if (!self$pseudobulk$has_cancer_celltypes) {
+        # Correlation would be between two vectors of length 0.
+        private$.cor_marker <- NA
+        return(invisible(NULL))
+      }
       cancer_abund_mark <- private$.pseudobulk$transcript_abundances_cancer %>%
         magrittr::extract(
           names(.) %in% names(self$residuals_marker)
@@ -190,6 +195,11 @@ Deconvolution <- R6Class(
       )
     },
     .compute_cor_all = function() {
+      if (!self$pseudobulk$has_cancer_celltypes) {
+        # Correlation would be between two vectors of length 0.
+        private$.cor_all <- NA
+        return(invisible(NULL))
+      }
       private$.cor_all <- cor(
         self$residuals_all,
         private$.pseudobulk$transcript_abundances_cancer,
