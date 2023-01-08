@@ -410,6 +410,11 @@ deconv_summary <- expand_grid(
     )
   }
 
+plot_path <- here(run_path, "plots")
+dir.create(plot_path, recursive = TRUE, showWarnings = FALSE)
+
+deconv_summary$print_rmse_plot(dir = plot_path)
+
 # ## ----plot_deconv_err----------------------------------------------------------
 # sample_sum_df <- split_res_list %>%
 #   dfextract2("deconv_sum", "sigmat_thresh", "split")
