@@ -39,6 +39,9 @@ Pseudobulk <- R6Class(
     params = function() {
       private$.params
     },
+    has_cancer_celltypes = function() {
+      !isTRUE(all.equal(self$params$cancer_celltypes, ""))
+    },
     # TODO Was the splitting of cancer celltypes after norming the matrix the
     # only reason for the residual v. cancer expression pattern?
     bulk_matrix_unorm = function() {
