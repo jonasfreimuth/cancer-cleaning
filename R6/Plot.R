@@ -80,7 +80,8 @@ Plot <- R6Class(
         "exists for plot_width."
       ))
     },
-    .compute_plot_height = function() {stop(paste(
+    .compute_plot_height = function() {
+      stop(paste(
         "No class implementation found, and no superclass implementation",
         "exists for plot_height."
       ))
