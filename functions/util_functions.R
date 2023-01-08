@@ -181,6 +181,36 @@ frequency_bins <- function(x, prob_seq = seq(0, 1, 0.2)) {
     set_names(as.character(round(., 2)))
 }
 
+quantile_counts <- function(x, prob) {
+  if (length(prob) > 2) {
+    stop("prob needs to be either length 1 or 2.")
+  }
+  if (length(prob) == 1) {
+    prob <- c(prob, 1 - prob)
+  }
+
+  bins <- quantile(x, prob)
+
+  low_vec <- x <= bins[1]
+  high_vec <- x >= bins[2]
+
+  n_low <- sum(low_vec)
+  n_mid <- sum(!low_vec & !high_vec)
+  n_high <- sum(high_vec)
+
+  c("low" = n_low, "mid" = n_mid, "high" = n_high)
+}
+
+
+is_quantile_unique <- function(x, prob = 0.2) {
+  q_counts <- quantile_counts(x, prob)
+
+  if (q_counts["mid"] > 0) {
+    return(FALSE)
+  }
+
+  return(c(xor(q_counts["low"] == 1, q_counts["high"] == 1), use.names = FALSE))
+}
 
 
 mean_imbalance <- function(x) {
@@ -226,6 +256,42 @@ outlier_dist <- function(x, mad_mult = 3) {
     return(0)
   }
 }
+
+
+otsu_crit <- function(x, thresh) {
+  x_thresh <- x >= thresh
+
+  true_frac <- sum(x_thresh) / length(x_thresh)
+
+  if (true_frac == 0 || true_frac == 1) {
+    # Var won't be computable for low or high -> This threshold can't be
+    # considered
+    return(Inf)
+  }
+
+  x_high_var <- var(x[x_thresh])
+  x_low_var <- var(x[!x_thresh])
+
+  x_high_var * true_frac + x_low_var * (1 - true_frac)
+}
+
+
+otsu_thresh <- function(x) {
+  # This function probably won't help in finding uniquely identifying
+  # transcripts, due to the most extreme cases not working as
+  # true_frac %in% c(0,1) in those cases.
+  thresh_vec <- unique(x)
+
+  crit_vec <- lapply(
+    thresh_vec,
+    otsu_crit,
+    x = x
+  ) %>%
+    unlist()
+
+  thresh_vec[ctrit_vec == min(crit_vec)]
+}
+
 
 seq_power <- function(start, stop, step_frac, power = 10) {
   seq_span <- stop - start
