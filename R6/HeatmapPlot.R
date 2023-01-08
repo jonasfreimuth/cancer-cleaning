@@ -111,22 +111,22 @@ HeatmapPlot <- R6Class(
     },
     .compute_celltype_order = function() {
       private$.celltype_order <- self$count_df %>%
-          group_by(celltype) %>%
-          summarize(
-            mean = mean(abundance),
-            .groups = "drop_last"
-          ) %>%
-          arrange(desc(mean)) %>%
-          magrittr::extract2("celltype")
+        group_by(celltype) %>%
+        summarize(
+          mean = mean(abundance),
+          .groups = "drop_last"
+        ) %>%
+        arrange(desc(mean)) %>%
+        magrittr::extract2("celltype")
     },
     .compute_transcript_order = function() {
       # Transcripts will be ordered such that the first celltypes have the
       # transcripts with the highest abundances closest to the top of the plot.
       private$.transcript_order <- self$reference_matrix %>%
-          # FIXME Do the sorting in a more straightforward way.
-          as.data.frame() %>%
-          arrange(across(all_of(self$celltype_order))) %>%
-          rownames()
+        # FIXME Do the sorting in a more straightforward way.
+        as.data.frame() %>%
+        arrange(across(all_of(self$celltype_order))) %>%
+        rownames()
     },
     .compute_plot = function() {
       private$.plot <- self$count_df %>%
