@@ -64,14 +64,10 @@ DeconvolutionSummary <- R6Class(
       private$.rmse_df
     },
     rmse_vec = function() {
-      # TODO Change to lazy field.
-      self$list %>%
-        lapply(
-          function(deconv) {
-            deconv$rmse
-          }
-        ) %>%
-        unlist()
+      if (is.null(private$.rmse_vec)) {
+        private$.compute_rmse_vec()
+      }
+      private$.rmse_vec
     },
     celltype_props_predicted_df = function() {
       if (is.null(private$.celltype_props_predicted_df)) {
@@ -96,6 +92,7 @@ DeconvolutionSummary <- R6Class(
     .params = NULL,
     .deconvolution_list = NULL,
     .param_df = NULL,
+    .rmse_vec = NULL,
     .rmse_df = NULL,
     .rmse_summary = NULL,
     .rmse_plot = NULL,
@@ -128,6 +125,15 @@ DeconvolutionSummary <- R6Class(
             )
           }
         )
+    },
+    .compute_rmse_vec = function() {
+      private$.rmse_vec <- self$list %>%
+        lapply(
+          function(deconv) {
+            deconv$rmse
+          }
+        ) %>%
+        unlist()
     },
     .compute_rmse_df = function() {
       rmse_df <- self$param_df
