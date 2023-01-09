@@ -100,10 +100,6 @@ Deseq2Markers <- R6Class(
     .design = NULL,
     .ds2_data = NULL,
     .de_transcripts = NULL,
-    .is_uniform = function(x) {
-      # Test whether all elements of x are the same.
-      all(x == x[1])
-    },
     .compute_matrix_prefiltered = function() {
       private$.matrix_prefiltered <- self$scrna_experiment$matrix_orig %>%
         # remove rows that are all the same

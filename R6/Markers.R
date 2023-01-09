@@ -46,6 +46,10 @@ Markers <- R6Class(
   private = list(
     .scrna_experiment = NULL,
     .marker_df = NULL,
+    .is_uniform = function(x) {
+      # Test whether all elements of x are the same.
+      all(x == x[1])
+    },
     .compute_marker_df = function() {
       stop(paste(
         "Method for computing markers not implemented for Markers",
