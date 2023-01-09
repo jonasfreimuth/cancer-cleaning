@@ -43,6 +43,9 @@ Reference <- R6Class(
     }
   ),
   active = list(
+    count_matrix = function() {
+      private$.count_matrix
+    },
     params = function() {
       private$.params
     },
