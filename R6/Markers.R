@@ -36,6 +36,12 @@ Markers <- R6Class(
     scrna_experiment = function() {
       private$.scrna_experiment
     },
+    matrix = function() {
+      self$scrna_experiment$matrix_orig
+    },
+    meta = function() {
+      self$scrna_experiment$meta
+    },
     marker_df = function() {
       if (is.null(private$.marker_df)) {
         private$.compute_marker_df()
