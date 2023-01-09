@@ -45,6 +45,9 @@ Reference <- R6Class(
       private$.count_matrix
     },
     markers = function() {
+      private$.markers
+    },
+    marker_transcripts = function() {
       private$.markers$threshold_quality(self$params$threshold)
     },
     params = function() {
@@ -83,6 +86,7 @@ Reference <- R6Class(
   private = list(
     .count_matrix = NULL,
     .markers = NULL,
+    .marker_transcripts = NULL,
     .params = NULL,
     .sigmat = NULL,
     .heatmap_plot = NULL,
@@ -90,7 +94,7 @@ Reference <- R6Class(
       # TODO Check if this works as intended wrt normalization
       private$.sigmat <- self$count_matrix$celltype_count_matrix %>%
         magrittr::extract(
-          i = rownames(.) %in% self$markers,
+          i = rownames(.) %in% self$marker_transcripts,
           j = !(colnames(.) %in% self$params$cancer_celltypes),
           drop = FALSE
         ) %>%
