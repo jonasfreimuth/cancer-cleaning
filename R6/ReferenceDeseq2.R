@@ -9,8 +9,18 @@ ReferenceDeseq2 <- R6Class(
   "ReferenceDeseq2",
   inherit = Reference,
   public = list(
-    initialize = function(count_mat, markers, params) {
-      super$initialize(count_mat, markers, params)
+    initialize = function(markers, params) {
+      super$initialize(markers, params)
+    }
+  ),
+  private = list(
+    .check_markers = function(markers) {
+      stopifnot(
+        all(
+          c("R6", "Markers", "Deseq2Markers") %in%
+            class(markers)
+        )
+      )
     }
   )
 )
