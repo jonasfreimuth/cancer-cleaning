@@ -9,6 +9,7 @@ suppressMessages(
 source(here("R6/SigmatUtils.R"))
 source(here("R6/CountMatrix.R"))
 source(here("R6/CountMatrixWrapper.R"))
+source(here("R6/Deseq2Markers.R"))
 source(here("R6/ReferenceDeseq2.R"))
 source(here("R6/Pseudobulk.R"))
 
@@ -73,8 +74,6 @@ ScRnaExperiment <- R6Class(
   private = list(
     .count_matrix = NULL,
     .sigmat_utils = NULL,
-    # Marker dataframe is defined as a df with two cols:
-    # metric and transcript.
     .marker_df = NULL,
     .get_marker_df = function() {
       if (is.null(private$.marker_df)) {
@@ -90,12 +89,12 @@ ScRnaExperiment <- R6Class(
       stop("Raw counts reference not implemented.")
     },
     .reference_deseq2 = function(params) {
-      marker_thresh <- private$.get_marker_df() %>%
-        slice_max(metric, prop = params$threshold)
-
-      reference_transcripts <- marker_thresh$transcript
-
-      Reference$new(private$.count_matrix, reference_transcripts, params)
+      ReferenceDeseq2$new(
+        Deseq2Markers$new(
+          self
+        ),
+        params
+      )
     }
   )
 )
