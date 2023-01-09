@@ -100,7 +100,6 @@ Deseq2Markers <- R6Class(
     .design = NULL,
     .ds2_data = NULL,
     .de_transcripts = NULL,
-    .marker_df = NULL,
     .is_uniform = function(x) {
       # Test whether all elements of x are the same.
       all(x == x[1])
