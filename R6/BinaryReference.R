@@ -1,12 +1,12 @@
 library("here")
 library("R6")
 
-here::i_am("R6/ReferenceBinary.R")
+here::i_am("R6/BinaryReference.R")
 
 source(here("R6/Reference.R"))
 
-ReferenceBinary <- R6Class(
-  "ReferenceBinary",
+BinaryReference <- R6Class(
+  "BinaryReference",
   inherit = Reference,
   public = list(
     initialize = function(count_mat, threshold) {
