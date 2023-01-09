@@ -101,7 +101,7 @@ Deseq2Markers <- R6Class(
     .ds2_data = NULL,
     .de_transcripts = NULL,
     .compute_matrix_prefiltered = function() {
-      private$.matrix_prefiltered <- self$scrna_experiment$matrix_orig %>%
+      private$.matrix_prefiltered <- self$matrix %>%
         # remove rows that are all the same
         # Also includes rows that are all zero-counts
         magrittr::extract(
@@ -137,7 +137,7 @@ Deseq2Markers <- R6Class(
       }
     },
     .compute_meta_clean = function() {
-      private$.meta_clean <- self$scrna_experiment$meta %>%
+      private$.meta_clean <- self$meta %>%
         # Prevent DESeq fun from complaining
         mutate(across(where(is.character), as.factor)) %>%
         filter(cell %in% colnames(self$matrix_clean))
