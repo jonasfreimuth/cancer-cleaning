@@ -90,9 +90,9 @@ Reference <- R6Class(
     .heatmap_plot = NULL,
     .compute_sigmat = function() {
       # TODO Check if this works as intended wrt normalization
-      private$.sigmat <- private$.count_matrix$celltype_count_matrix %>%
+      private$.sigmat <- self$count_matrix$celltype_count_matrix %>%
         magrittr::extract(
-          i = rownames(.) %in% private$.markers,
+          i = rownames(.) %in% self$markers,
           j = !(colnames(.) %in% self$params$cancer_celltypes),
           drop = FALSE
         ) %>%
