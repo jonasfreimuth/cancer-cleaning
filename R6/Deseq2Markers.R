@@ -41,6 +41,12 @@ Deseq2Markers <- R6Class(
     size_factors = function() {
       private$.get_size_factors()
     },
+    matrix_prefiltered = function() {
+      if (is.null(private$.matrix_prefiltered)) {
+        private$.compute_matrix_prefiltered()
+      }
+      private$.matrix_prefiltered
+    },
     markers_raw = function() {
       if (is.null(private$.marker_raw)) {
         private$.compute_markers_raw()
@@ -52,24 +58,15 @@ Deseq2Markers <- R6Class(
         private$.compute_marker_df()
       }
       private$.marker_df
-    },
-    matrix_prefiltered = function() {
-      if (is.null(private$.matrix_prefiltered)) {
-        private$.compute_matrix_prefiltered()
-      }
-      private$.matrix_prefiltered
     }
   ),
   private = list(
+    .matrix_prefiltered = NULL,
     .markers_raw = NULL,
     .marker_df = NULL,
-    .matrix_prefiltered = NULL,
-    .compute_markers_raw = function() {
-      private$.markers_raw <- self$matrix_prefiltered %>%
-        private$.get_de_transcripts(
-          self$scrna_experiment$meta,
-          ~celltype
-        )
+    .is_uniform = function(x) {
+      # Test whether all elements of x are the same.
+      all(x == x[1])
     },
     .compute_matrix_prefiltered = function() {
       private$.matrix_prefiltered <- self$scrna_experiment$matrix_orig %>%
@@ -87,20 +84,6 @@ Deseq2Markers <- R6Class(
       # TODO Think about what to do with the negative size factors warning.
       self$matrix_prefiltered %>%
         scuttle::pooledSizeFactors()
-    },
-    .compute_marker_df = function() {
-      private$.marker_df <- self$markers_raw %>%
-        # This may be unncecessary if uniform rows have been previously
-        # removed.
-        drop_na(!lfcSE) %>%
-        arrange(padj) %>%
-        # Transform to generic form of a df with a transcript col and a metric
-        # col, with the latter being some metric that can be thresholded to
-        # select most informative marker transcripts.
-        select(
-          transcript = row,
-          metric = padj
-        )
     },
     .get_de_transcripts = function(count_mat, meta, design) {
       # TODO Get the functions in here to STFU.
@@ -164,9 +147,26 @@ Deseq2Markers <- R6Class(
         # zero cols were cleaned beforehand.
         return()
     },
-    .is_uniform = function(x) {
-      # Test whether all elements of x are the same.
-      all(x == x[1])
+    .compute_markers_raw = function() {
+      private$.markers_raw <- self$matrix_prefiltered %>%
+        private$.get_de_transcripts(
+          self$scrna_experiment$meta,
+          ~celltype
+        )
+    },
+    .compute_marker_df = function() {
+      private$.marker_df <- self$markers_raw %>%
+        # This may be unncecessary if uniform rows have been previously
+        # removed.
+        drop_na(!lfcSE) %>%
+        arrange(padj) %>%
+        # Transform to generic form of a df with a transcript col and a metric
+        # col, with the latter being some metric that can be thresholded to
+        # select most informative marker transcripts.
+        select(
+          transcript = row,
+          metric = padj
+        )
     }
   )
 )
