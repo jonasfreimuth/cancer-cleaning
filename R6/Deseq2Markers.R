@@ -37,23 +37,50 @@ Deseq2Markers <- R6Class(
         magrittr::extract(i = seq_len(quant_thresh))
     }
   ),
+  active = list(
+    markers_raw = function() {
+      if (is.null(private$.marker_raw)) {
+        private$.compute_markers_raw()
+      }
+      private$.markers_raw
+    },
+    marker_df = function() {
+      if (is.null(private$.marker_df)) {
+        private$.compute_marker_df()
+      }
+      private$.marker_df
+    },
+    matrix_prefiltered = function() {
+      if (is.null(private$.matrix_prefiltered)) {
+        private$.compute_matrix_prefiltered()
+      }
+      private$.matrix_prefiltered
+    }
+  ),
   private = list(
-    .compute_marker_df = function() {
-      matrix <- self$scrna_experiment$matrix_orig
-      meta <- self$scrna_experiment$meta
-
-      private$.marker_df <- matrix %>%
+    .markers_raw = NULL,
+    .marker_df = NULL,
+    .matrix_prefiltered = NULL,
+    .compute_markers_raw = function() {
+      private$.markers_raw <- self$matrix_prefiltered %>%
+        private$.get_de_transcripts(
+          self$scrna_experiment$meta,
+          ~celltype
+        )
+    },
+    .compute_matrix_prefiltered = function() {
+      private$.matrix_prefiltered <- self$scrna_experiment$matrix_orig %>%
         # remove rows that are all the same
         # Also includes rows that are all zero-counts
         magrittr::extract(
           i = !apply(
             ., 1, private$.is_uniform
-          ), j = , drop = FALSE
-        ) %>%
-        private$.get_de_transcripts(
-          meta,
-          ~celltype
-        ) %>%
+          ),
+          j = , drop = FALSE
+        )
+    },
+    .compute_marker_df = function() {
+      private$.marker_df <- self$markers_raw %>%
         # This may be unncecessary if uniform rows have been previously
         # removed.
         drop_na(!lfcSE) %>%
@@ -72,6 +99,7 @@ Deseq2Markers <- R6Class(
         arrange(cell) %>%
         # Prevent DESeq fun from complaining
         mutate(across(where(is.character), as.factor))
+
       count_mat <- count_mat[, order(colnames(count_mat))]
 
       zero_sum_cells <- colSums(count_mat) == 0
