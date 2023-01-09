@@ -1,3 +1,5 @@
+library("DESeq2")
+library("scuttle")
 library("dplyr")
 library("here")
 library("R6")
