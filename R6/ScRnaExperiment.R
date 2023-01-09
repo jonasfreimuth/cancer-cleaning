@@ -11,6 +11,8 @@ source(here("R6/CountMatrix.R"))
 source(here("R6/CountMatrixWrapper.R"))
 source(here("R6/Deseq2Markers.R"))
 source(here("R6/Deseq2Reference.R"))
+source(here("R6/OutlierDistMarkers.R"))
+source(here("R6/OutlierDistReference.R"))
 source(here("R6/Pseudobulk.R"))
 
 ScRnaExperiment <- R6Class(
@@ -56,7 +58,8 @@ ScRnaExperiment <- R6Class(
       #       differential expression, as determined by DESeq2.
       switch(params$metric,
         raw_counts = private$.reference_raw_counts(params),
-        deseq2 = private$.reference_deseq2(params)
+        deseq2 = private$.reference_deseq2(params),
+        outlier_dist = private$.reference_outlier_dist(params)
       )
     },
     create_pseudobulk = function(params) {
@@ -91,6 +94,14 @@ ScRnaExperiment <- R6Class(
     .reference_deseq2 = function(params) {
       Deseq2Reference$new(
         Deseq2Markers$new(
+          self
+        ),
+        params
+      )
+    },
+    .reference_outlier_dist = function(params) {
+      OutlierDistReference$new(
+        OutlierDistMarkers$new(
           self
         ),
         params
