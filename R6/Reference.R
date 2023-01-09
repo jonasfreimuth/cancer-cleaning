@@ -14,13 +14,11 @@ Reference <- R6Class(
   "Reference",
   inherit = CountMatrixWrapper,
   public = list(
-    initialize = function(count_matrix, markers, params) {
-      # TODO Check more args.
+    initialize = function(markers, params) {
       private$.check_markers(markers)
-      private$.check_count_matrix(count_matrix)
       private$.check_params(params)
 
-      super$initialize(count_matrix)
+      super$initialize(markers$scrna_experiment$count_matrix)
       private$.params <- params
       private$.markers <- markers
     },
@@ -46,6 +44,9 @@ Reference <- R6Class(
     count_matrix = function() {
       private$.count_matrix
     },
+    markers = function() {
+      private$.markers$threshold_quality(self$params$threshold)
+    },
     params = function() {
       private$.params
     },
@@ -55,9 +56,6 @@ Reference <- R6Class(
     },
     meta_raw = function() {
       private$.count_matrix$meta
-    },
-    markers = function() {
-      private$.markers
     },
     df = function() {
       self$sigmat %>%
@@ -109,19 +107,17 @@ Reference <- R6Class(
         title = title
       )
     },
-    .check_markers = function(markers) {
-      stopifnot(
-        is.character(markers)
-      )
-    },
     .check_params = function(params) {
       stopifnot(
         all(c("R6", "Params", "ReferenceParams") %in% class(params))
       )
     },
-    .check_count_matrix = function(count_matrix) {
+    .check_markers = function(markers) {
       stopifnot(
-        all(c("R6", "CountMatrix") %in% class(count_matrix))
+        all(
+          c("R6", "Markers") %in%
+            class(markers)
+        )
       )
     }
   )
