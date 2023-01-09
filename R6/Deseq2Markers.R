@@ -38,6 +38,9 @@ Deseq2Markers <- R6Class(
     }
   ),
   active = list(
+    size_factors = function() {
+      private$.get_size_factors()
+    },
     markers_raw = function() {
       if (is.null(private$.marker_raw)) {
         private$.compute_markers_raw()
@@ -79,6 +82,12 @@ Deseq2Markers <- R6Class(
           j = , drop = FALSE
         )
     },
+    .get_size_factors = function() {
+      # TODO Is prescaling useful here?
+      # TODO Think about what to do with the negative size factors warning.
+      self$matrix_prefiltered %>%
+        scuttle::pooledSizeFactors()
+    },
     .compute_marker_df = function() {
       private$.marker_df <- self$markers_raw %>%
         # This may be unncecessary if uniform rows have been previously
@@ -116,10 +125,6 @@ Deseq2Markers <- R6Class(
         meta <- meta[!zero_sum_cells, ]
       }
 
-      # TODO Is prescaling useful here?
-      size_factors <- count_mat %>%
-        scuttle::pooledSizeFactors()
-
       ds2_data <- DESeqDataSetFromMatrix(
         countData = count_mat,
         colData = meta,
@@ -136,7 +141,7 @@ Deseq2Markers <- R6Class(
       }
 
       ds2_data %>%
-        `sizeFactors<-`(value = size_factors) %>%
+        `sizeFactors<-`(value = self$size_factors) %>%
         DESeq(
           # Args are set according to
           # https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis.
