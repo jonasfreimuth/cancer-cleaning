@@ -95,8 +95,8 @@ Reference <- R6Class(
           drop = FALSE
         ) %>%
         normalize_count_mat(
-          type = self$params$nomalization$type,
-          scale = self$params$nomalization$scale_factor
+          type = self$params$normalization$type,
+          scale = self$params$normalization$scale_factor
         )
     },
     .compute_heatmap_plot = function() {
