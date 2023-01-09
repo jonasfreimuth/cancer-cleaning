@@ -158,11 +158,11 @@ Deseq2Markers <- R6Class(
         countData = self$matrix_clean,
         colData = self$meta_clean,
         design = self$design
-      )
+      ) %>%
+        `sizeFactors<-`(value = self$size_factors)
     },
     .compute_de_transcripts = function() {
       private$.de_transcripts <- self$ds2_data %>%
-        `sizeFactors<-`(value = self$size_factors) %>%
         DESeq(
           # Args are set according to
           # https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis.
