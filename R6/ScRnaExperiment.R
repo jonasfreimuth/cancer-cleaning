@@ -10,7 +10,7 @@ source(here("R6/SigmatUtils.R"))
 source(here("R6/CountMatrix.R"))
 source(here("R6/CountMatrixWrapper.R"))
 source(here("R6/Deseq2Markers.R"))
-source(here("R6/ReferenceDeseq2.R"))
+source(here("R6/Deseq2Reference.R"))
 source(here("R6/Pseudobulk.R"))
 
 ScRnaExperiment <- R6Class(
@@ -89,7 +89,7 @@ ScRnaExperiment <- R6Class(
       stop("Raw counts reference not implemented.")
     },
     .reference_deseq2 = function(params) {
-      ReferenceDeseq2$new(
+      Deseq2Reference$new(
         Deseq2Markers$new(
           self
         ),

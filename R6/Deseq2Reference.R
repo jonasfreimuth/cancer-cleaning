@@ -1,12 +1,12 @@
 library("here")
 library("R6")
 
-here::i_am("R6/ReferenceDeseq2.R")
+here::i_am("R6/Deseq2Reference.R")
 
 source(here("R6/Reference.R"))
 
-ReferenceDeseq2 <- R6Class(
-  "ReferenceDeseq2",
+Deseq2Reference <- R6Class(
+  "Deseq2Reference",
   inherit = Reference,
   public = list(
     initialize = function(markers, params) {
