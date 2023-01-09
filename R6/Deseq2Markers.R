@@ -16,6 +16,8 @@ Deseq2Markers <- R6Class(
   public = list(
     initialize = function(scrna_experiment) {
       super$initialize(scrna_experiment)
+
+      private$.design <- ~celltype
     },
     threshold_quality = function(qual_thresh) {
       # Thresholding based on pvalue of DE analysis for log fold change.
@@ -38,6 +40,19 @@ Deseq2Markers <- R6Class(
     }
   ),
   active = list(
+    reduced_design = function() {
+      if (length(self$design) >= 3) {
+        # This assumes the last term of the design formula is the only one of
+        # interest.
+        # TODO Enforce this assumption.
+        return(self$design[-length(self$design)])
+      } else {
+        return(~1)
+      }
+    },
+    design = function() {
+      private$.design
+    },
     size_factors = function() {
       private$.get_size_factors()
     },
@@ -47,11 +62,29 @@ Deseq2Markers <- R6Class(
       }
       private$.matrix_prefiltered
     },
-    markers_raw = function() {
-      if (is.null(private$.marker_raw)) {
-        private$.compute_markers_raw()
+    matrix_clean = function() {
+      if (is.null(private$.matrix_clean)) {
+        private$.compute_matrix_clean()
       }
-      private$.markers_raw
+      private$.matrix_clean
+    },
+    meta_clean = function() {
+      if (is.null(private$.meta_clean)) {
+        private$.compute_meta_clean()
+      }
+      private$.meta_clean
+    },
+    ds2_data = function() {
+      if (is.null(private$.ds2_data)) {
+        private$.compute_ds2_data()
+      }
+      private$.ds2_data
+    },
+    de_transcripts = function() {
+      if (is.null(private$.de_transcripts)) {
+        private$.compute_de_transcripts()
+      }
+      private$.de_transcripts
     },
     marker_df = function() {
       if (is.null(private$.marker_df)) {
@@ -61,8 +94,12 @@ Deseq2Markers <- R6Class(
     }
   ),
   private = list(
+    .matrix_clean = NULL,
+    .meta_clean = NULL,
     .matrix_prefiltered = NULL,
-    .markers_raw = NULL,
+    .design = NULL,
+    .ds2_data = NULL,
+    .de_transcripts = NULL,
     .marker_df = NULL,
     .is_uniform = function(x) {
       # Test whether all elements of x are the same.
@@ -77,7 +114,38 @@ Deseq2Markers <- R6Class(
             ., 1, private$.is_uniform
           ),
           j = , drop = FALSE
+        ) %>%
+        magrittr::extract(
+          i = ,
+          j = order(colnames(.)),
+          drop = FALSE
         )
+    },
+    # TODO Check if this can be merged with matrix_prefiltered
+    .compute_matrix_clean = function() {
+      private$.matrix_clean <- self$matrix_prefiltered %>%
+        magrittr::extract(
+          i = ,
+          j = !colSums(.) == 0,
+          drop = FALSE
+        )
+
+      zero_cols <- setdiff(self$matrix_clean, self$matrix_prefiltered)
+      if (length(zero_cols) >= 1) {
+        warning(paste(
+          "During calculation of size factors, cells",
+          paste(zero_cols, collapse = ", "),
+          "had no transcript",
+          "expression after removal of uniform rows and were therefore not",
+          "considered."
+        ))
+      }
+    },
+    .compute_meta_clean = function() {
+      private$.meta_clean <- self$scrna_experiment$meta %>%
+        # Prevent DESeq fun from complaining
+        mutate(across(where(is.character), as.factor)) %>%
+        filter(cell %in% colnames(self$matrix_clean))
     },
     .get_size_factors = function() {
       # TODO Is prescaling useful here?
@@ -85,45 +153,15 @@ Deseq2Markers <- R6Class(
       self$matrix_prefiltered %>%
         scuttle::pooledSizeFactors()
     },
-    .get_de_transcripts = function(count_mat, meta, design) {
-      # TODO Get the functions in here to STFU.
-      meta <- meta %>%
-        arrange(cell) %>%
-        # Prevent DESeq fun from complaining
-        mutate(across(where(is.character), as.factor))
-
-      count_mat <- count_mat[, order(colnames(count_mat))]
-
-      zero_sum_cells <- colSums(count_mat) == 0
-
-      if (any(zero_sum_cells)) {
-        # TODO Make this a more helpfull message.
-        warning(paste(
-          "During calculation of size factors, cells",
-          paste(colnames(count_mat)[zero_sum_cells], collapse = ", "),
-          "had no transcript",
-          "expression after removal of uniform rows and were not considered."
-        ))
-        count_mat <- count_mat[, !zero_sum_cells]
-        meta <- meta[!zero_sum_cells, ]
-      }
-
-      ds2_data <- DESeqDataSetFromMatrix(
-        countData = count_mat,
-        colData = meta,
-        design = design
+    .compute_ds2_data = function() {
+      private$.ds2_data <- DESeqDataSetFromMatrix(
+        countData = self$matrix_clean,
+        colData = self$meta_clean,
+        design = self$design
       )
-
-      if (length(design) >= 3) {
-        # This assumes the last term of the design formula is the only one of
-        # interest.
-        # TODO Enforce this assumption.
-        reduced_design <- design[-length(design)]
-      } else {
-        reduced_design <- ~1
-      }
-
-      ds2_data %>%
+    },
+    .compute_de_transcripts = function() {
+      private$.de_transcripts <- self$ds2_data %>%
         `sizeFactors<-`(value = self$size_factors) %>%
         DESeq(
           # Args are set according to
@@ -137,25 +175,17 @@ Deseq2Markers <- R6Class(
 
           # This should also be already set when using fitType = "glmGamPoi".
           minmu = 10^-6,
-          reduced = reduced_design,
+          reduced = self$reduced_design,
           quiet = TRUE
-        ) %>%
-        results(
-          tidy = TRUE
         ) %>%
         # Caution, results may contain NAs, seems to mainly depend on whether
         # zero cols were cleaned beforehand.
-        return()
-    },
-    .compute_markers_raw = function() {
-      private$.markers_raw <- self$matrix_prefiltered %>%
-        private$.get_de_transcripts(
-          self$scrna_experiment$meta,
-          ~celltype
+        results(
+          tidy = TRUE
         )
     },
     .compute_marker_df = function() {
-      private$.marker_df <- self$markers_raw %>%
+      private$.marker_df <- self$de_transcripts %>%
         # This may be unncecessary if uniform rows have been previously
         # removed.
         drop_na(!lfcSE) %>%
