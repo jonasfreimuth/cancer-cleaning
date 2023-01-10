@@ -19,7 +19,7 @@ ReferenceParams <- R6Class(
       type = NULL,
       scale_factor = NULL
     ),
-    initialize = function(metric = "DESeq2",
+    initialize = function(metric = "deseq2",
                           threshold = 0.5,
                           cancer_celltypes = "",
                           norm_type = "lognorm",
