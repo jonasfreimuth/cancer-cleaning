@@ -72,28 +72,48 @@ ScRnaExperiment <- R6Class(
   active = list(
     count_matrix = function() {
       private$.count_matrix
+    },
+    deseq2_markers = function() {
+      if (is.null(private$.deseq2_markers)) {
+        private$.compute_deseq2_markers()
+      }
+      private$.deseq2_markers
+    },
+    outlier_dist_markers = function() {
+      if (is.null(private$.outlier_dist_markers)) {
+        private$.compute_outlier_dist_markers()
+      }
+      private$.outlier_dist_markers
     }
   ),
   private = list(
     .count_matrix = NULL,
     .sigmat_utils = NULL,
     .marker_df = NULL,
+    .deseq2_markers = NULL,
+    .outlier_dist_markers = NULL,
     .reference_raw_counts = function(params) {
       stop("Raw counts reference not implemented.")
     },
+    .compute_deseq2_markers = function() {
+      private$.deseq2_markers <- Deseq2Markers$new(
+        self
+      )
+    },
+    .compute_outlier_dist_markers = function() {
+      private$.outlier_dist_markers <- OutlierDistMarkers$new(
+        self
+      )
+    },
     .reference_deseq2 = function(params) {
       Deseq2Reference$new(
-        Deseq2Markers$new(
-          self
-        ),
+        self$deseq2_markers,
         params
       )
     },
     .reference_outlier_dist = function(params) {
       OutlierDistReference$new(
-        OutlierDistMarkers$new(
-          self
-        ),
+        self$outlier_dist_markers,
         params
       )
     }
