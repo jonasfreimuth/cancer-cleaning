@@ -162,8 +162,16 @@ Deseq2Markers <- R6Class(
       )
     },
     .compute_ds2_data = function() {
+      # This is to just shut DESeqDataSetFromMatrix up. matrix_clean is still
+      # sparse and if we can avoid it we shouldn't save non-sparse matrices
+      # because they may be very big. However I couldn't find an easier way to
+      # coerce it to integer as the DESeq... fun wants its input to be.
+      matrix_int <- self$matrix_clean %>%
+        as.matrix() %>%
+        `mode<-`("integer")
+
       private$.ds2_data <- DESeqDataSetFromMatrix(
-        countData = self$matrix_clean,
+        countData = matrix_int,
         colData = self$meta_clean,
         design = self$design
       ) %>%
