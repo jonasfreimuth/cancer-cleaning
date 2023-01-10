@@ -358,7 +358,8 @@ DeconvolutionSummary <- R6Class(
         drop_na() %>%
         group_by(across(all_of(c(self$params$summary_params, "celltype")))) %>%
         summarize(
-          rmse = rmse(true, predicted)
+          rmse = rmse(true, predicted),
+          .groups = "drop_last"
         )
     },
     .check_params = function(params) {
