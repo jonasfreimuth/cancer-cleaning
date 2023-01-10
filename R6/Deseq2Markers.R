@@ -144,9 +144,22 @@ Deseq2Markers <- R6Class(
     },
     .get_size_factors = function() {
       # TODO Is prescaling useful here?
-      # TODO Think about what to do with the negative size factors warning.
-      self$matrix_prefiltered %>%
-        scuttle::pooledSizeFactors()
+      withCallingHandlers(
+        self$matrix_prefiltered %>%
+          scuttle::pooledSizeFactors(
+            # TODO Think about whether there are general improvements possible
+            # that would eliminate the necessity for positive = TRUE
+            positive = TRUE
+          ),
+        warning = function(w) {
+          is_size_factor_warning <- {
+            w$message == "encountered non-positive size factor estimates"
+          }
+          if (is_size_factor_warning) {
+            tryInvokeRestart("muffleWarning")
+          }
+        }
+      )
     },
     .compute_ds2_data = function() {
       private$.ds2_data <- DESeqDataSetFromMatrix(
