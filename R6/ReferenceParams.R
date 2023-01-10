@@ -54,7 +54,7 @@ ReferenceParams <- R6Class(
         stopifnot(
           is.character(metric),
           length(metric) == 1,
-          metric %in% c("deseq2", "outlier_dist"),
+          metric %in% c("deseq2", "deseq2_ttest", "outlier_dist"),
           is.numeric(threshold),
           length(threshold) == 1,
           threshold >= 0, threshold <= 1,
