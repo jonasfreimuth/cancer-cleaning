@@ -178,27 +178,44 @@ Deseq2Markers <- R6Class(
         `sizeFactors<-`(value = self$size_factors)
     },
     .compute_de_transcripts = function() {
-      private$.de_transcripts <- self$ds2_data %>%
-        DESeq(
-          # Args are set according to
-          # https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis.
-          test = "LRT",
-          fitType = "glmGamPoi",
+      withCallingHandlers(
+        private$.de_transcripts <- self$ds2_data %>%
+          DESeq(
+            # Args are set according to
+            # https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis.
+            test = "LRT",
+            fitType = "glmGamPoi",
 
-          # This is recommended, but according to the source above shouldn't
-          # do anything with test = "LRT".
-          useT = TRUE,
+            # This is recommended, but according to the source above shouldn't
+            # do anything with test = "LRT".
+            useT = TRUE,
 
-          # This should also be already set when using fitType = "glmGamPoi".
-          minmu = 10^-6,
-          reduced = self$reduced_design,
-          quiet = TRUE
-        ) %>%
-        # Caution, results may contain NAs, seems to mainly depend on whether
-        # zero cols were cleaned beforehand.
-        results(
-          tidy = TRUE
-        )
+            # This should also be already set when using fitType = "glmGamPoi".
+            minmu = 10^-6,
+            reduced = self$reduced_design,
+            quiet = TRUE
+          ) %>%
+          # Caution, results may contain NAs, seems to mainly depend on whether
+          # zero cols were cleaned beforehand.
+          results(
+            tidy = TRUE
+          ),
+        message = function(m) {
+          is_factor_level_warning <- {
+            m$message == paste0(
+              "  Note: levels of factors in the design contain characters ",
+              "other than\n  letters, numbers, '_' and '.'. It is recommended",
+              " (but not required) to use\n  only letters, numbers, and ",
+              "delimiters '_' or '.', as these are safe characters\n  for ",
+              "column names in R. [This is a message, not a warning or an",
+              " error]\n"
+            )
+          }
+          if (is_factor_level_warning) {
+            tryInvokeRestart("muffleMessage")
+          }
+        }
+      )
     },
     .compute_marker_df = function() {
       private$.marker_df <- self$de_transcripts %>%
