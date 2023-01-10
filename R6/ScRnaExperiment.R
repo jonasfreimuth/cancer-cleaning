@@ -11,6 +11,8 @@ source(here("R6/CountMatrix.R"))
 source(here("R6/CountMatrixWrapper.R"))
 source(here("R6/Deseq2Markers.R"))
 source(here("R6/Deseq2Reference.R"))
+source(here("R6/Deseq2TtestMarkers.R"))
+source(here("R6/Deseq2TtestReference.R"))
 source(here("R6/OutlierDistMarkers.R"))
 source(here("R6/OutlierDistReference.R"))
 source(here("R6/Pseudobulk.R"))
@@ -59,6 +61,7 @@ ScRnaExperiment <- R6Class(
       switch(params$metric,
         raw_counts = private$.reference_raw_counts(params),
         deseq2 = private$.reference_deseq2(params),
+        deseq2_ttest = private$.reference_deseq2_ttest(params),
         outlier_dist = private$.reference_outlier_dist(params)
       )
     },
@@ -79,6 +82,12 @@ ScRnaExperiment <- R6Class(
       }
       private$.deseq2_markers
     },
+    deseq2_ttest_markers = function() {
+      if (is.null(private$.deseq2_ttest_markers)) {
+        private$.compute_deseq2_ttest_markers()
+      }
+      private$.deseq2_ttest_markers
+    },
     outlier_dist_markers = function() {
       if (is.null(private$.outlier_dist_markers)) {
         private$.compute_outlier_dist_markers()
@@ -87,16 +96,23 @@ ScRnaExperiment <- R6Class(
     }
   ),
   private = list(
+    # TODO Clean up fields.
     .count_matrix = NULL,
     .sigmat_utils = NULL,
     .marker_df = NULL,
     .deseq2_markers = NULL,
+    .deseq2_ttest_markers = NULL,
     .outlier_dist_markers = NULL,
     .reference_raw_counts = function(params) {
       stop("Raw counts reference not implemented.")
     },
     .compute_deseq2_markers = function() {
       private$.deseq2_markers <- Deseq2Markers$new(
+        self
+      )
+    },
+    .compute_deseq2_ttest_markers = function() {
+      private$.deseq2_ttest_markers <- Deseq2TtestMarkers$new(
         self
       )
     },
@@ -108,6 +124,12 @@ ScRnaExperiment <- R6Class(
     .reference_deseq2 = function(params) {
       Deseq2Reference$new(
         self$deseq2_markers,
+        params
+      )
+    },
+    .reference_deseq2_ttest = function(params) {
+      Deseq2TtestReference$new(
+        self$deseq2_ttest_markers,
         params
       )
     },
