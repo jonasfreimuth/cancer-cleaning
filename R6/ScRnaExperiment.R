@@ -78,16 +78,6 @@ ScRnaExperiment <- R6Class(
     .count_matrix = NULL,
     .sigmat_utils = NULL,
     .marker_df = NULL,
-    .get_marker_df = function() {
-      if (is.null(private$.marker_df)) {
-        private$.marker_df <-
-          private$.sigmat_utils$create_marker_df(
-            self$matrix_orig,
-            self$meta
-          )
-      }
-      private$.marker_df
-    },
     .reference_raw_counts = function(params) {
       stop("Raw counts reference not implemented.")
     },
