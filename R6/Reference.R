@@ -24,7 +24,8 @@ Reference <- R6Class(
     },
     print_heatmap = function(dir) {
       filename <- paste0(
-        "thresh_", self$params$threshold,
+        "reftype_", self$params$metric,
+        "-thresh_", self$params$threshold,
         if (!is.null(self$params$cancer_celltypes)) {
           paste0(
             "-cancercols_",
